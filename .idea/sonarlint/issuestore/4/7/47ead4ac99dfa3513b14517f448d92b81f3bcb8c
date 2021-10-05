@@ -1,0 +1,8 @@
+
+n
+java:S3776€"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(°¹µýùÿÿÿÿ
+]	java:S899¸"BDo something with the "boolean" value returned by "createNewFile".(«ÐŸËøÿÿÿÿ
+D
+java:S1121E".Extract the assignment out of this expression.(Ãæšæ
+d
+java:S3824B"NReplace this "Map.get()" and condition with a call to "Map.computeIfAbsent()".(¨“úÕ

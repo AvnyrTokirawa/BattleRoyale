@@ -1,0 +1,21 @@
+
+M
+java:S1135/"2Complete the task associated to this TODO comment.(¡ºÎúÿÿÿÿ
+G
+java:S1874j"1Remove this use of "setHelmet"; it is deprecated.(ÛÎ
+G
+java:S1874|"1Remove this use of "setHelmet"; it is deprecated.(ÒØ›
+i
+java:S3776Ö"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(“–ış
+G
+java:S1874ü"1Remove this use of "setHelmet"; it is deprecated.(†ÖÙ8
+M
+java:S1874 "1Remove this use of "getHelmet"; it is deprecated.(‹İŠäÿÿÿÿÿ
+H
+java:S1874¡"1Remove this use of "setHelmet"; it is deprecated.(ˆâ‹
+n
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 22 to the 15 allowed.(­…¡üûÿÿÿÿ
+p
+java:S2293Ÿ"YReplace the type specification in this constructor call with the diamond operator ("<>").(ı 
+E
+java:S1121·".Extract the assignment out of this expression.(ÿæÑ’

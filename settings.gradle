@@ -1,0 +1,26 @@
+// == Define locations for build logic ==
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+
+    plugins {
+        id 'net.minecrell.plugin-yml.bukkit' version '0.4.0'
+       // id 'com.github.johnrengelman.shadow' version '7.0.0'
+    }
+
+    includeBuild('../AdrianSRCore/build-logic')
+}
+
+// == Define locations for components ==
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
+// including AdrianSRCore
+include ':AdrianSRCore'
+project(':AdrianSRCore').projectDir = new File('D:/Documentos/GradleProjects/AdrianSRCore')
+
+rootProject.name = 'BattleRoyale'

@@ -1,0 +1,17 @@
+
+h
+java:S3776S"RRefactor this method to reduce its Cognitive Complexity from 37 to the 15 allowed.(—µ©φ
+@
+java:S1181c"%Catch Exception instead of Throwable.(ΐ§όÿÿÿÿ
+M
+java:S1874b"2Remove this use of "getNewData"; it is deprecated.(½΄Òÿÿÿÿÿ
+P
+java:S1874h"5Remove this use of "setDurability"; it is deprecated.(…—ΙΉύÿÿÿÿ
+E
+java:S1481")Remove this unused "save" local variable.(¨όβΆώÿÿÿÿ
+j
+java:S2975§"SRemove this "clone" implementation; use a copy constructor or copy factory instead.(ΐΈ
+Y
+java:S2583Y"CChange this condition so that it does not always evaluate to "true"(ΩΆλ»
+Y
+java:S2583\"CChange this condition so that it does not always evaluate to "true"(Ωϋ

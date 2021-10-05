@@ -1,0 +1,17 @@
+
+m
+java:S3776U"RRefactor this method to reduce its Cognitive Complexity from 44 to the 15 allowed.(´ğòàúÿÿÿÿ
+I
+java:S1874e"3Remove this use of "TRANSPARENT"; it is deprecated.(æêïÍ
+M
+java:S1874g"2Remove this use of "matchColor"; it is deprecated.(èïœÌûÿÿÿÿ
+J
+java:S1874"3Remove this use of "TRANSPARENT"; it is deprecated.(æêïÍ
+N
+java:S1874"2Remove this use of "matchColor"; it is deprecated.(èïœÌûÿÿÿÿ
+J
+java:S1874’"3Remove this use of "TRANSPARENT"; it is deprecated.(æêïÍ
+C
+java:S1125Ù"'Remove the unnecessary boolean literal.(´àÖìøÿÿÿÿ
+i
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(ÃÑÄ

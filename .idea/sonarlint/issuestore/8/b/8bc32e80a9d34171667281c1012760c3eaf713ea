@@ -1,0 +1,5 @@
+
+n
+java:S1602"SRemove useless curly braces around statement and then remove useless return keyword(Ã‚¾­øÿÿÿÿ
+c
+java:S1612"HReplace this lambda with method reference 'WorldUtil::worldFolderCheck'.(Ã‚¾­øÿÿÿÿ

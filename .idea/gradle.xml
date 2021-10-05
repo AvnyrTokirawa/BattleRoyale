@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/../AdrianSRCore/build-logic" name="build-logic">
+                <projects>
+                  <project path="$PROJECT_DIR$/../AdrianSRCore/build-logic" />
+                  <project path="$PROJECT_DIR$/../AdrianSRCore/build-logic/custom-plugin" />
+                  <project path="$PROJECT_DIR$/../AdrianSRCore/build-logic/java-library" />
+                  <project path="$PROJECT_DIR$/../AdrianSRCore/build-logic/minecraft-plugin" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="C:/Gradle/gradle-7.1.1" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/../AdrianSRCore" />
+            <option value="$PROJECT_DIR$/../AdrianSRCore/build-logic" />
+            <option value="$PROJECT_DIR$/../AdrianSRCore/build-logic/custom-plugin" />
+            <option value="$PROJECT_DIR$/../AdrianSRCore/build-logic/java-library" />
+            <option value="$PROJECT_DIR$/../AdrianSRCore/build-logic/minecraft-plugin" />
+            <option value="$PROJECT_DIR$" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

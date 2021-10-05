@@ -1,0 +1,17 @@
+
+(
+java:S2176"Rename this class.(«ôªç
+t
+java:S3776K"RRefactor this method to reduce its Cognitive Complexity from 29 to the 15 allowed.(®¼ãÐýÿÿÿÿ8Ì„Ê¾Â/
+T
+java:S1135Y"2Complete the task associated to this TODO comment.(×€ìÙøÿÿÿÿ8Ñ„Ê¾Â/
+u
+java:S3776“"RRefactor this method to reduce its Cognitive Complexity from 37 to the 15 allowed.(üÍžˆýÿÿÿÿ8ß„Ê¾Â/
+M
+java:S2093í"*Change this "try" to a try-with-resources.(¡»¢üùÿÿÿÿ8ï„Ê¾Â/
+K
+java:S1121n".Extract the assignment out of this expression.(ÙÑ¦Ö8ï„Ê¾Â/
+K
+java:S1121u".Extract the assignment out of this expression.(£¤ê°8ð„Ê¾Â/
+L
+java:S1121‚".Extract the assignment out of this expression.(¬Éç¬8ð„Ê¾Â/

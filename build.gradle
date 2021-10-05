@@ -1,0 +1,105 @@
+plugins {
+    id('es.outlook.adriansrj.custom-plugin')
+    id 'net.minecrell.plugin-yml.bukkit'
+
+    //id 'com.github.johnrengelman.shadow' version '7.0.0'
+    // id "io.github.patrick.remapper" version "1.1.0"
+}
+
+group 'es.outlook.adriansrj'
+version '2.0.0'
+description 'A battle royale minigame plugin'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    // maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.enginehub.org/repo/' }
+}
+
+dependencies {
+    implementation project(':AdrianSRCore')
+    //implementation project(path: ':AdrianSRCore', configuration: 'shadow')
+
+    // adventure nbt
+    implementation 'net.kyori:adventure-nbt:4.8.1'
+
+    // spigot api
+    implementation fileTree(dir: 'D:/Documentos/Librerias', include:
+            [
+                    'Spigot 1_17_R1/spigot-api-1.17.1-R0.1-SNAPSHOT-shaded.jar',
+            ])
+
+    // nms
+    implementation fileTree(dir: 'D:/Documentos/Librerias', include:
+            [
+                    'nms.jar',
+            ])
+
+    implementation group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.7.0";
+
+    // google guava
+    implementation("com.google.guava:guava:30.1.1-jre")
+    // apache commons
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    // apache commons io
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    // netty
+    implementation 'io.netty:netty-all:4.1.44.Final'
+
+    // local jars
+    implementation fileTree(dir: 'D:/Documentos/Librerias', include:
+            [
+                    'worldedit-bukkit-7.2.6.jar',
+                    'QualityArmoryVehicles.jar' ,
+                    'QualityArmory.jar' ,
+                    'CrackShot.jar',
+                    'CrackShotPlus.jar',
+            ])
+
+    // ParticleLib
+    implementation 'xyz.xenondevs:particle:1.6.4'
+
+    // HikariCP
+    implementation 'com.zaxxer:HikariCP:4.0.3'
+    // MongoDB
+    implementation 'org.mongodb:mongodb-driver-sync:4.2.1'
+
+    // nbt
+    // implementation 'se.llbit:jo-nbt:1.3.0'
+    // implementation 'net.kyori:adventure-nbt:4.8.1'
+
+    /* world edit */
+    //implementation 'com.sk89q.worldedit:worldedit-core:7.2.6'
+    //implementation 'com.sk89q.worldedit:worldedit-bukkit:7.2.6'
+    // 1.12-
+    //implementation 'com.sk89q.worldedit:worldedit-core:6.0'
+    //implementation 'com.sk89q.worldedit:worldedit-bukkit:6.0'
+}
+
+bukkit {
+    main = 'es.outlook.adriansrj.battleroyale.main.BattleRoyale'
+    author = 'AdrianSR'
+    apiVersion = '1.13'
+
+    softDepend = ['AdrianSRCore', 'WorldEdit', 'ProtocolSupport', 'ViaVersion',
+                  'Vault', 'QualityArmory', 'QualityArmoryVehicles',
+                  'CrackShot', 'CrackShotPlus', 'PlaceholderAPI', 'ProtocolLib']
+
+    commands {
+        battleroyale {
+            description = 'Plugin base command'
+            aliases = ['br', 'brl', 'btr', 'btrl']
+            permission = 'br.br-op'
+            usage = '/battleroyale [arguments]'
+            permissionMessage = 'You do not have permission to use this command.'
+        }
+    }
+
+    permissions {
+        'br.op' {
+            description = 'Battle royale operators permission'
+            setDefault('OP')
+        }
+    }
+}

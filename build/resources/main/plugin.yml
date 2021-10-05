@@ -1,0 +1,33 @@
+name: BattleRoyale
+version: 2.0.0
+main: es.outlook.adriansrj.battleroyale.main.BattleRoyale
+description: A battle royale minigame plugin
+author: AdrianSR
+commands:
+  battleroyale:
+    description: Plugin base command
+    aliases:
+     - br
+     - brl
+     - btr
+     - btrl
+    permission: br.br-op
+    usage: "/battleroyale [arguments]"
+    permission-message: You do not have permission to use this command.
+permissions:
+  br.op:
+    description: Battle royale operators permission
+    default: op
+api-version: 1.13
+softdepend:
+ - AdrianSRCore
+ - WorldEdit
+ - ProtocolSupport
+ - ViaVersion
+ - Vault
+ - QualityArmory
+ - QualityArmoryVehicles
+ - CrackShot
+ - CrackShotPlus
+ - PlaceholderAPI
+ - ProtocolLib

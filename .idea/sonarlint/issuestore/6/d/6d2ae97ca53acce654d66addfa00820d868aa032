@@ -1,0 +1,13 @@
+
+=
+java:S1905Ò"&Remove this unnecessary cast to "int".(€°ãã
+=
+java:S1905Ó"&Remove this unnecessary cast to "int".(Ê¼Ùã
+B
+java:S1905Ô"&Remove this unnecessary cast to "int".(ñê’¡ÿÿÿÿÿ
+B
+java:S1905Õ"&Remove this unnecessary cast to "int".(øÞöãúÿÿÿÿ
+o
+java:S2975•"SRemove this "clone" implementation; use a copy constructor or copy factory instead.(á±¯Èþÿÿÿÿ
+D
+java:S1121$".Extract the assignment out of this expression.(Õõ”µ

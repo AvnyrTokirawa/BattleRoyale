@@ -1,0 +1,101 @@
+package es.outlook.adriansrj.battleroyale.world.border;
+
+import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.core.util.reflection.bukkit.BukkitReflection;
+import net.minecraft.server.v1_13_R1.PacketPlayOutWorldBorder;
+import net.minecraft.server.v1_13_R1.WorldBorder;
+import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
+
+/**
+ * @author AdrianSR / 05/09/2021 / 11:53 p. m.
+ */
+class WorldBorderHandle_v1_13_R1 extends WorldBorderHandleBase {
+	
+	protected final WorldBorder handle;
+	
+	public WorldBorderHandle_v1_13_R1 ( World world ) {
+		super ( world );
+		
+		this.handle       = new WorldBorder ( );
+		this.handle.world = ( ( CraftWorld ) world ).getHandle ( );
+	}
+	
+	@Override
+	public double getCenterX ( ) {
+		return handle.getCenterX ( );
+	}
+	
+	@Override
+	public double getCenterZ ( ) {
+		return handle.getCenterZ ( );
+	}
+	
+	@Override
+	public double getSize ( ) {
+		return handle.getSize ( );
+	}
+	
+	@Override
+	public WorldBorderState getState ( ) {
+		switch ( handle.getState ( ) ) {
+			case GROWING:
+			case SHRINKING:
+				return WorldBorderState.RESIZING;
+			
+			default:
+			case STATIONARY:
+				return WorldBorderState.STATIONARY;
+		}
+	}
+	
+	@Override
+	public void setCenter ( double x , double z ) {
+		this.handle.setCenter ( x , z );
+		this.broadcastUpdatePacket ( PacketPlayOutWorldBorder.EnumWorldBorderAction.SET_CENTER );
+	}
+	
+	@Override
+	public void setSize ( double size ) {
+		this.handle.setSize ( size );
+		this.broadcastUpdatePacket ( PacketPlayOutWorldBorder.EnumWorldBorderAction.SET_SIZE );
+	}
+	
+	@Override
+	public void setSizeTransition ( double size , long milliseconds ) {
+		if ( handle.getSize ( ) != size ) {
+			this.handle.transitionSizeBetween ( handle.getSize ( ) , size , milliseconds );
+			this.broadcastUpdatePacket ( PacketPlayOutWorldBorder.EnumWorldBorderAction.LERP_SIZE );
+		}
+	}
+	
+	@Override
+	protected void resetBorder ( Player br_player ) {
+		br_player.getBukkitPlayerOptional ( ).ifPresent ( player -> {
+			WorldBorder fake = new WorldBorder ( );
+			fake.world = handle.world;
+			
+			BukkitReflection.sendPacket ( player , new PacketPlayOutWorldBorder (
+					fake , PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE ) );
+		} );
+	}
+	
+	@Override
+	protected void refresh ( Player player ) {
+		updatePacket ( player , PacketPlayOutWorldBorder.EnumWorldBorderAction.SET_CENTER );
+		updatePacket ( player , PacketPlayOutWorldBorder.EnumWorldBorderAction.SET_SIZE );
+		
+		if ( getState ( ) == WorldBorderState.RESIZING ) {
+			updatePacket ( player , PacketPlayOutWorldBorder.EnumWorldBorderAction.LERP_SIZE );
+		}
+	}
+	
+	protected void broadcastUpdatePacket ( PacketPlayOutWorldBorder.EnumWorldBorderAction action ) {
+		safeGetPlayers ( ).forEach ( player -> updatePacket ( player , action ) );
+	}
+	
+	protected void updatePacket ( Player br_player , PacketPlayOutWorldBorder.EnumWorldBorderAction action ) {
+		br_player.getBukkitPlayerOptional ( ).ifPresent ( player -> BukkitReflection.sendPacket (
+				player , new PacketPlayOutWorldBorder ( handle , action ) ) );
+	}
+}
