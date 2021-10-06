@@ -11,6 +11,7 @@ import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
 import es.outlook.adriansrj.battleroyale.world.region.Region;
 import es.outlook.adriansrj.core.util.world.WorldUtil;
+import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,6 +22,7 @@ import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -92,6 +94,7 @@ public class BattleRoyaleArenaRegion {
 						}
 					}
 					
+					// reserving
 					reserved.add ( location );
 					return location;
 				}
@@ -107,6 +110,28 @@ public class BattleRoyaleArenaRegion {
 		
 		protected static synchronized File getRegionFile ( File world_folder , Location2I location ) {
 			return getRegionFile ( world_folder , location.getX ( ) , location.getZ ( ) );
+		}
+		
+		protected static synchronized void clear ( File world_Folder ) {
+			Set < Location2I > reserved = RESERVED_MAP.get ( world_Folder );
+			
+			if ( reserved != null ) {
+				for ( Location2I location : reserved ) {
+					File file = getRegionFile ( world_Folder , location );
+					
+					if ( file.exists ( ) ) {
+						try {
+							FileDeleteStrategy.FORCE.delete ( file );
+						} catch ( IOException e ) {
+							e.printStackTrace ( );
+						}
+					}
+				}
+				
+				reserved.clear ( );
+			}
+			
+			RESERVED_MAP.remove ( world_Folder );
 		}
 	}
 	

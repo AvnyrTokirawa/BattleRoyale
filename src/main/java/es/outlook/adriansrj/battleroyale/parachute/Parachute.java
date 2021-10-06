@@ -12,6 +12,8 @@ import es.outlook.adriansrj.core.util.itemstack.banner.BannerColor;
 import es.outlook.adriansrj.core.util.itemstack.wool.WoolColor;
 import es.outlook.adriansrj.core.util.permission.Permissions;
 import es.outlook.adriansrj.core.util.yaml.YamlUtil;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -176,6 +178,24 @@ public abstract class Parachute implements Configurable, Cloneable {
 		}
 		
 		return save;
+	}
+	
+	@Override
+	public boolean equals ( Object o ) {
+		if ( this == o ) { return true; }
+		
+		if ( o == null || getClass ( ) != o.getClass ( ) ) { return false; }
+		
+		Parachute parachute = ( Parachute ) o;
+		
+		return new EqualsBuilder ( ).append ( price , parachute.price )
+				.append ( permission , parachute.permission ).isEquals ( );
+	}
+	
+	@Override
+	public int hashCode ( ) {
+		return new HashCodeBuilder ( 17 , 37 )
+				.append ( price ).append ( permission ).toHashCode ( );
 	}
 	
 	@Override

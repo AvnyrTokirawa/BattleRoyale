@@ -5,6 +5,8 @@ import es.outlook.adriansrj.battleroyale.player.Player;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
 import es.outlook.adriansrj.core.util.itemstack.banner.BannerColor;
 import es.outlook.adriansrj.core.util.itemstack.wool.WoolColor;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.permissions.Permission;
 
@@ -65,6 +67,24 @@ public class ParachuteCustom extends Parachute {
 	@Override
 	public boolean isValid ( ) {
 		return model != null && model.isValid ( );
+	}
+	
+	@Override
+	public boolean equals ( Object o ) {
+		if ( this == o ) { return true; }
+		
+		if ( o == null || getClass ( ) != o.getClass ( ) ) { return false; }
+		
+		ParachuteCustom that = ( ParachuteCustom ) o;
+		
+		return new EqualsBuilder ( ).appendSuper ( super.equals ( o ) ).append ( model , that.model )
+				.isEquals ( );
+	}
+	
+	@Override
+	public int hashCode ( ) {
+		return new HashCodeBuilder ( 17 , 37 )
+				.appendSuper ( super.hashCode ( ) ).append ( model ).toHashCode ( );
 	}
 	
 	@Override

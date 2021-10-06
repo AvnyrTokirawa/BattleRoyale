@@ -6,6 +6,8 @@ import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
 import me.zombie_striker.qav.api.QualityArmoryVehicles;
 import me.zombie_striker.qav.vehicles.AbstractVehicle;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.permissions.Permission;
 
@@ -66,5 +68,23 @@ public class ParachuteQAV extends Parachute {
 	@Override
 	public boolean isValid ( ) {
 		return StringUtil.isNotBlank ( model_name ) && QualityArmoryVehicles.getVehicle ( model_name ) != null;
+	}
+	
+	@Override
+	public boolean equals ( Object o ) {
+		if ( this == o ) { return true; }
+		
+		if ( o == null || getClass ( ) != o.getClass ( ) ) { return false; }
+		
+		ParachuteQAV that = ( ParachuteQAV ) o;
+		
+		return new EqualsBuilder ( ).appendSuper ( super.equals ( o ) )
+				.append ( model_name , that.model_name ).isEquals ( );
+	}
+	
+	@Override
+	public int hashCode ( ) {
+		return new HashCodeBuilder ( 17 , 37 )
+				.appendSuper ( super.hashCode ( ) ).append ( model_name ).toHashCode ( );
 	}
 }

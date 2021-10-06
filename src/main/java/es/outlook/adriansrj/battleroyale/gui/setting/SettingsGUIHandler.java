@@ -3,7 +3,7 @@ package es.outlook.adriansrj.battleroyale.gui.setting;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.enums.EnumSettingsGUIsConfiguration;
 import es.outlook.adriansrj.battleroyale.gui.setting.bus.BusSettingsGUIHandler;
-import es.outlook.adriansrj.battleroyale.gui.setting.parachute.ParachuteSettingsGUIHandler;
+import es.outlook.adriansrj.battleroyale.gui.setting.parachute.ParachuteSettingsMainGUIHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.player.Player;
 import es.outlook.adriansrj.core.handler.PluginHandler;
@@ -73,7 +73,7 @@ public final class SettingsGUIHandler extends PluginHandler {
 								 new ItemStack ( Objects.requireNonNull (
 										 EnumSettingsGUIsConfiguration.MAIN_GUI_PARACHUTE_SETTINGS_BUTTON_MATERIAL.getAsItemStack ( ) ) )
 				).addAction (
-						action -> ParachuteSettingsGUIHandler.getInstance ( ).open ( action.getPlayer ( ) ) ) );
+						action -> ParachuteSettingsMainGUIHandler.getInstance ( ).open ( action.getPlayer ( ) ) ) );
 		
 		// close button
 		this.handle.setItem (

@@ -22,7 +22,10 @@ import es.outlook.adriansrj.core.menu.size.ItemMenuSize;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import org.bukkit.ChatColor;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author AdrianSR / 25/09/2021 / 10:14 a. m.
@@ -124,6 +127,10 @@ public final class BusSettingsGUIHandler extends PluginHandler {
 				if ( unlocked ) {
 					Player.getPlayer ( action.getPlayer ( ) ).getDataStorage ( )
 							.setSetting ( EnumPlayerSetting.BUS , key , true );
+					
+					// message
+					action.getPlayer ( ).sendMessage (
+							EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_SELECTED_MESSAGE.getAsString ( ) );
 				} else {
 					action.getPlayer ( ).sendMessage (
 							EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_LOCKED_MESSAGE.getAsString ( ) );

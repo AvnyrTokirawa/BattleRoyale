@@ -99,6 +99,7 @@ public class BattleRoyaleLobby implements Listener {
 	}
 	
 	protected void introduce0 ( Player player ) {
+		// leaving arena
 		player.leaveArena ( );
 		
 		// hiding compass

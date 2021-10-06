@@ -1,5 +1,6 @@
 package es.outlook.adriansrj.battleroyale.gui.setting.parachute.color;
 
+import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.enums.EnumSettingsGUIsConfiguration;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
@@ -11,10 +12,13 @@ import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.menu.Item;
 import es.outlook.adriansrj.core.menu.ItemMenu;
 import es.outlook.adriansrj.core.menu.custom.book.BookItemMenu;
+import es.outlook.adriansrj.core.menu.custom.book.item.AlternateBookPageActionItem;
 import es.outlook.adriansrj.core.menu.item.action.ActionItem;
+import es.outlook.adriansrj.core.menu.item.action.close.CloseMenuActionItem;
 import es.outlook.adriansrj.core.menu.size.ItemMenuSize;
 import es.outlook.adriansrj.core.util.itemstack.wool.WoolItemStack;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -88,6 +92,25 @@ public final class ParachuteColorSettingsGUIHandler extends PluginHandler {
 			}
 		}
 		
+		// back button
+		handle.setBarButton ( 3 , new AlternateBookPageActionItem (
+				ChatColor.GREEN + EnumLanguage.BACK_WORD.getAsStringStripColors ( ) ,
+				EnumSettingsGUIsConfiguration.COMMON_BUTTON_BACK_MATERIAL.getAsItemStack ( ) )
+				// go next disabled to go to the previous
+				.setGoNext ( false ) );
+		
+		// next button
+		handle.setBarButton ( 5 , new AlternateBookPageActionItem (
+				ChatColor.GREEN + EnumLanguage.NEXT_WORD.getAsStringStripColors ( ) ,
+				EnumSettingsGUIsConfiguration.COMMON_BUTTON_NEXT_MATERIAL.getAsItemStack ( ) )
+				// go next disabled to go to the next
+				.setGoNext ( true ) );
+		
+		// close button
+		handle.setBarButton ( 8 , new CloseMenuActionItem (
+				ChatColor.DARK_RED + EnumLanguage.CLOSE_WORD.getAsStringStripColors ( ) ,
+				EnumSettingsGUIsConfiguration.COMMON_BUTTON_CLOSE_MATERIAL.getAsItemStack ( ) ) );
+		
 		return handle;
 	}
 	
@@ -119,19 +142,21 @@ public final class ParachuteColorSettingsGUIHandler extends PluginHandler {
 							EnumSettingsGUIsConfiguration.PARACHUTE_COLOR_GUI_ITEM_UNLOCKED_DESCRIPTION_FORMAT :
 							EnumSettingsGUIsConfiguration.PARACHUTE_COLOR_GUI_ITEM_LOCKED_DESCRIPTION_FORMAT )
 							.getAsStringList ( )
-			).addAction (
-					action -> {
-						action.setClose ( true );
-						
-						// setting and immediately uploading
-						if ( unlocked ) {
-							Player.getPlayer ( action.getPlayer ( ) ).getDataStorage ( )
-									.setSetting ( EnumPlayerSetting.PARACHUTE_COLOR , key , true );
-						} else {
-							action.getPlayer ( ).sendMessage (
-									EnumSettingsGUIsConfiguration.PARACHUTE_COLOR_GUI_ITEM_LOCKED_MESSAGE.getAsString ( ) );
-						}
-					} );
+			).addAction ( action -> {
+				action.setClose ( true );
+				
+				// setting and immediately uploading
+				if ( unlocked ) {
+					Player.getPlayer ( action.getPlayer ( ) ).getDataStorage ( )
+							.setSetting ( EnumPlayerSetting.PARACHUTE_COLOR , key , true );
+					// message
+					action.getPlayer ( ).sendMessage (
+							EnumSettingsGUIsConfiguration.PARACHUTE_COLOR_GUI_ITEM_SELECTED_MESSAGE.getAsString ( ) );
+				} else {
+					action.getPlayer ( ).sendMessage (
+							EnumSettingsGUIsConfiguration.PARACHUTE_COLOR_GUI_ITEM_LOCKED_MESSAGE.getAsString ( ) );
+				}
+			} );
 		} else {
 			return null;
 		}

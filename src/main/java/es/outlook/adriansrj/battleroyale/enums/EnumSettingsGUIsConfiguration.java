@@ -114,29 +114,94 @@ public enum EnumSettingsGUIsConfiguration implements ConfigurationEntry {
 			ChatColor.DARK_GRAY + "You can buy this bus" ,
 			ChatColor.DARK_GRAY + "in the cosmetics shop" ),
 	
+	BUS_GUI_ITEM_SELECTED_MESSAGE (
+			"bus-settings.bus-item.selected-message" ,
+			"bus settings gui: message players will receive when" +
+					"\nselecting to use a bus" ,
+			ChatColor.GREEN + "Bus settings saved!" ),
+	
 	BUS_GUI_ITEM_LOCKED_MESSAGE (
 			"bus-settings.bus-item.locked-message" ,
 			"bus settings gui: message players will receive when" +
 					"\ntrying to use a locked bus" ,
 			ChatColor.DARK_RED + "You don't have permissions to use this bus!" ),
 	
+	// -------- parachute settings main gui
+	PARACHUTE_MAIN_GUI_TITLE ( "parachute-settings-main.title" ,
+							   "parachute settings gui title" ,
+							   ChatColor.BLACK + "Parachute Settings" ),
+	
+	PARACHUTE_MAIN_GUI_SIZE ( "parachute-settings-main.size" ,
+							  "parachute settings gui size" , ItemMenuSize.THREE_LINE ),
+	
+	PARACHUTE_MAIN_GUI_PARACHUTE_BUTTON_TEXT (
+			"parachute-settings-main.button.display-text" ,
+			"button to open parachute settings: display text" ,
+			ChatColor.GOLD + "All Parachutes" ),
+	
+	PARACHUTE_MAIN_GUI_PARACHUTE_BUTTON_POSITION (
+			"parachute-settings-main.button.position" ,
+			"button to open parachute settings: position" ,
+			12 ),
+	
+	PARACHUTE_MAIN_GUI_PARACHUTE_COLOR_BUTTON_TEXT (
+			"parachute-settings-main.button.color.display-text" ,
+			"button to open parachute color settings: display text" ,
+			ChatColor.GOLD + "Parachute Colors" ),
+	
+	PARACHUTE_MAIN_GUI_PARACHUTE_COLOR_BUTTON_POSITION (
+			"parachute-settings-main.button.color.position" ,
+			"button to open parachute color settings: position" ,
+			14 ),
+	
 	// -------- parachute settings gui
 	PARACHUTE_GUI_TITLE ( "parachute-settings.title" ,
 						  "parachute settings gui title" ,
-						  ChatColor.BLACK + "Parachute Settings" ),
+						  ChatColor.BLACK + "Available Parachutes" ),
 	
 	PARACHUTE_GUI_SIZE ( "parachute-settings.size" ,
 						 "parachute settings gui size" , ItemMenuSize.THREE_LINE ),
 	
-	PARACHUTE_GUI_PARACHUTE_COLOR_BUTTON_TEXT (
-			"parachute-settings.button.color.display-text" ,
-			"button to open parachute color settings: display text" ,
-			ChatColor.GOLD + "Parachute Colors" ),
+	PARACHUTE_GUI_ITEM_UNLOCKED_TEXT_FORMAT (
+			"parachute-settings.parachute-item.unlocked-text-format" ,
+			"parachute settings gui: parachute items display text format when unlocked" +
+					"\nthe '%s' will be replaced by the name of the parachute" ,
+			ChatColor.GOLD + "%s" ),
 	
-	PARACHUTE_GUI_PARACHUTE_COLOR_BUTTON_POSITION (
-			"parachute-settings.button.color.position" ,
-			"button to open parachute color settings: position" ,
-			12 ),
+	PARACHUTE_GUI_ITEM_UNLOCKED_DESCRIPTION_FORMAT (
+			"parachute-settings.parachute-item.unlocked-description-format" ,
+			"parachute settings gui: parachute items description format when unlocked" ,
+			"" ,
+			ChatColor.GREEN + "Unlocked" ,
+			"" ,
+			ChatColor.GREEN + "Click to use" ),
+	
+	PARACHUTE_GUI_ITEM_LOCKED_TEXT_FORMAT (
+			"parachute-settings.parachute-item.locked-display-text-format" ,
+			"parachute settings gui: parachute items display text format when locked" +
+					"\nthe '%s' will be replaced by the name of the parachute" ,
+			ChatColor.DARK_GRAY + "%s" ),
+	
+	PARACHUTE_GUI_ITEM_LOCKED_DESCRIPTION_FORMAT (
+			"parachute-settings.parachute-item.locked-description-format" ,
+			"parachute settings gui: parachute items description format when locked" ,
+			"" ,
+			ChatColor.DARK_RED + "Locked" ,
+			"" ,
+			ChatColor.DARK_GRAY + "You can buy this parachute" ,
+			ChatColor.DARK_GRAY + "in the cosmetics shop" ),
+	
+	PARACHUTE_GUI_ITEM_SELECTED_MESSAGE (
+			"parachute-settings.parachute-item.selected-message" ,
+			"parachute settings gui: message players will receive when" +
+					"\nselecting a parachute" ,
+			ChatColor.GREEN + "Parachute settings saved!" ),
+	
+	PARACHUTE_GUI_ITEM_LOCKED_MESSAGE (
+			"parachute-settings.parachute-item.locked-message" ,
+			"parachute settings gui: message players will receive when" +
+					"\ntrying to use a locked parachute" ,
+			ChatColor.DARK_RED + "You don't have permissions to use this parachute!" ),
 	
 	// -------- parachute color settings gui
 	PARACHUTE_COLOR_GUI_TITLE ( "parachute-color-settings.title" ,
@@ -162,7 +227,7 @@ public enum EnumSettingsGUIsConfiguration implements ConfigurationEntry {
 			ChatColor.GREEN + "Click to use" ),
 	
 	PARACHUTE_COLOR_GUI_ITEM_LOCKED_TEXT_FORMAT (
-			"parachute-color-settings.color-item.unlocked-display-text-format" ,
+			"parachute-color-settings.color-item.locked-display-text-format" ,
 			"parachute color settings gui: parachute color items display text format when locked" +
 					"\nthe first '%s' will be replaced by the parachute color" +
 					"\nthe second '%s' will be replaced by the name of the parachute color" ,
@@ -170,17 +235,23 @@ public enum EnumSettingsGUIsConfiguration implements ConfigurationEntry {
 	
 	PARACHUTE_COLOR_GUI_ITEM_LOCKED_DESCRIPTION_FORMAT (
 			"parachute-color-settings.color-item.locked-description-format" ,
-			"parachute color settings gui: parachute color items description format when unlocked" ,
+			"parachute color settings gui: parachute color items description format when locked" ,
 			"" ,
 			ChatColor.DARK_RED + "Locked" ,
 			"" ,
 			ChatColor.DARK_GRAY + "You can buy this parachute" ,
 			ChatColor.DARK_GRAY + "color in the cosmetics shop" ),
 	
+	PARACHUTE_COLOR_GUI_ITEM_SELECTED_MESSAGE (
+			"parachute-color-settings.color-item.selected-message" ,
+			"parachute color settings gui: message players will receive when" +
+					"\nselecting a parachute color" ,
+			ChatColor.GREEN + "Parachute settings saved!" ),
+	
 	PARACHUTE_COLOR_GUI_ITEM_LOCKED_MESSAGE (
 			"parachute-color-settings.color-item.locked-message" ,
 			"parachute color settings gui: message players will receive when" +
-					"\ntrying to use a locked color" ,
+					"\ntrying to use a locked parachute color" ,
 			ChatColor.DARK_RED + "You don't have permissions to use this color!" ),
 	;
 	

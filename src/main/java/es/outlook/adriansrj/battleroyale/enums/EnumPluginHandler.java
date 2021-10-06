@@ -32,6 +32,7 @@ import es.outlook.adriansrj.battleroyale.gui.arena.ArenaSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setting.SettingsGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setting.bus.BusSettingsGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setting.parachute.ParachuteSettingsGUIHandler;
+import es.outlook.adriansrj.battleroyale.gui.setting.parachute.ParachuteSettingsMainGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setting.parachute.color.ParachuteColorSettingsGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setup.SetupGUI;
 import es.outlook.adriansrj.battleroyale.gui.setup.battlefield.BattlefieldSetupGUI;
@@ -80,11 +81,12 @@ public enum EnumPluginHandler {
 	KNOCK_HANDLER ( PlayerKnockHandler.class ),
 	REANIMATION_HANDLER ( PlayerReviveHandler.class ),
 	
-	SETTINGS_GUIS_CONFIGURATION_HANDLER ( SettingsGUIsConfigHandler.class ) ,
+	SETTINGS_GUIS_CONFIGURATION_HANDLER ( SettingsGUIsConfigHandler.class ),
 	SETTINGS_GUI ( SettingsGUIHandler.class ),
 	BUS_SETTINGS_GUI ( BusSettingsGUIHandler.class ),
+	PARACHUTE_SETTINGS_MAIN_GUI ( ParachuteSettingsMainGUIHandler.class ),
 	PARACHUTE_SETTINGS_GUI ( ParachuteSettingsGUIHandler.class ),
-	PARACHUTE_COLOR_SETTINGS_GUI ( ParachuteColorSettingsGUIHandler.class ) ,
+	PARACHUTE_COLOR_SETTINGS_GUI ( ParachuteColorSettingsGUIHandler.class ),
 	
 	SETUP_HANDLER ( BattlefieldSetupHandler.class ),
 	SETUP_GUI_HANDLER ( SetupGUI.class ),
@@ -106,7 +108,7 @@ public enum EnumPluginHandler {
 	ARENA_HANDLER ( BattleRoyaleArenaHandler.class ),
 	ARENA_CONFIGURATION_HANDLER ( BattleRoyaleArenasConfigHandler.class ),
 	ARENA_GUI_HANDLER ( ArenaSelectorGUIHandler.class ),
-	ARENA_GUI_CONFIGURATION_HANDLER ( ArenaSelectorGUIConfigHandler.class ) ,
+	ARENA_GUI_CONFIGURATION_HANDLER ( ArenaSelectorGUIConfigHandler.class ),
 	ARENA_SIGN_HANDLER ( BattleRoyaleArenaSignHandler.class ),
 	ARENA_SIGN_CONFIGURATION_HANDLER ( BattleRoyaleArenaSignConfigHandler.class ),
 	ARENA_SIGN_CONTAINER_HANDLER ( BattleRoyaleArenaSignContainerHandler.class ),

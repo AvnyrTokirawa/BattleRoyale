@@ -55,6 +55,9 @@ class StartArgument extends BaseArgument {
 							sender.sendMessage (
 									ChatColor.RED + "The server must be restarted in order to start this arena!" );
 							break;
+							
+						default:
+							break;
 					}
 					
 				}

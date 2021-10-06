@@ -53,7 +53,7 @@ public class BattleRoyaleArena {
 	
 	protected final UUID                    id;
 	protected final String                  name;
-	protected final World                   world;
+	protected       World                   world;
 	protected final Battlefield             battlefield;
 	protected final BattleRoyaleMode        mode;
 	protected final BattleRoyaleArenaRegion region;
@@ -355,6 +355,8 @@ public class BattleRoyaleArena {
 			// moving players
 			BattleRoyaleLobby lobby = BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( );
 			
+			// this ensures all the players in the arena
+			// will actually be moved.
 			Player.getPlayers ( ).stream ( )
 					.filter ( player -> Objects.equals ( player.getArena ( ) , this ) )
 					.forEach ( lobby :: introduce );
@@ -367,7 +369,7 @@ public class BattleRoyaleArena {
 			// then restarting
 			try {
 				// must reassign the region before anything
-				// else, as the other members will probably
+				// else, as the other modules will probably
 				// access the bounds or a location within this arena.
 				this.region.reassignRegion ( );
 			} catch ( WorldRegionLimitReached ex ) {
@@ -375,17 +377,9 @@ public class BattleRoyaleArena {
 				return;
 			}
 			
-			this.border.restart ( );
-			this.team_registry.clear ( );
-			
-			if ( bus_registry != null ) {
-				this.bus_registry.restart ( );
-			}
-			
+			this.restartModules ( );
 			this.setState ( EnumArenaState.RESTARTING );
-			this.prepare0 ( ( ) -> {
-				this.setState ( EnumArenaState.WAITING /* ready to start */ );
-			} );
+			this.prepare0 ( ( ) -> this.setState ( EnumArenaState.WAITING /* ready to start */ ) );
 		} else {
 			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , this :: restart );
 		}
@@ -396,31 +390,21 @@ public class BattleRoyaleArena {
 			throw new IllegalStateException ( "arena already stopped" );
 		}
 		
+		this.restartModules ( );
 		this.setState ( EnumArenaState.STOPPED );
+		
+		// this ensures all the players in the arena
+		// will actually be moved.
+		BattleRoyaleLobby lobby = BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( );
+		
+		Player.getPlayers ( ).stream ( )
+				.filter ( player -> Objects.equals ( player.getArena ( ) , this ) )
+				.forEach ( lobby :: introduce );
+		
 		this.region.disposeCurrentRegion ( player -> {
-			BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( ).introduce ( player );
+			lobby.introduce ( player );
 			return true;
 		} );
-		
-		if ( bus_registry != null ) {
-			this.bus_registry.finish ( );
-		}
-	}
-	
-	protected void prepare0 ( Runnable callback ) {
-		if ( Bukkit.isPrimaryThread ( ) ) {
-			this.region.shape ( ( ) -> {
-				this.preparation ( );
-				this.prepared = true;
-				
-				// callback
-				if ( callback != null ) {
-					callback.run ( );
-				}
-			} );
-		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> prepare0 ( callback ) );
-		}
 	}
 	
 	public void prepare ( Runnable callback ) {
@@ -476,6 +460,31 @@ public class BattleRoyaleArena {
 		this.state_time = System.currentTimeMillis ( );
 		
 		new ArenaStateChangeEvent ( this , old_state , state ).callSafe ( );
+	}
+	
+	protected void prepare0 ( Runnable callback ) {
+		if ( Bukkit.isPrimaryThread ( ) ) {
+			this.region.shape ( ( ) -> {
+				this.preparation ( );
+				this.prepared = true;
+				
+				// callback
+				if ( callback != null ) {
+					callback.run ( );
+				}
+			} );
+		} else {
+			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> prepare0 ( callback ) );
+		}
+	}
+	
+	protected synchronized void restartModules ( ) {
+		this.border.restart ( );
+		this.team_registry.clear ( );
+		
+		if ( bus_registry != null ) {
+			this.bus_registry.restart ( );
+		}
 	}
 	
 	@Override

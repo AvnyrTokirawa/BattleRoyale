@@ -5,6 +5,8 @@ import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.configurable.Configurable;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Collections;
@@ -123,6 +125,23 @@ public class ParachuteCustomModel implements Configurable, Cloneable {
 		}
 		
 		return save;
+	}
+	
+	@Override
+	public boolean equals ( Object o ) {
+		if ( this == o ) { return true; }
+		
+		if ( o == null || getClass ( ) != o.getClass ( ) ) { return false; }
+		
+		ParachuteCustomModel that = ( ParachuteCustomModel ) o;
+		
+		return new EqualsBuilder ( ).append ( map , that.map ).isEquals ( );
+	}
+	
+	@Override
+	public int hashCode ( ) {
+		return new HashCodeBuilder ( 17 , 37 )
+				.append ( map ).toHashCode ( );
 	}
 	
 	@Override

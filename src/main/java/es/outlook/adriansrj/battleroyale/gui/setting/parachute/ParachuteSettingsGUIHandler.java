@@ -1,35 +1,42 @@
 package es.outlook.adriansrj.battleroyale.gui.setting.parachute;
 
+import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
+import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.enums.EnumSettingsGUIsConfiguration;
-import es.outlook.adriansrj.battleroyale.gui.setting.parachute.color.ParachuteColorSettingsGUIHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.parachute.Parachute;
+import es.outlook.adriansrj.battleroyale.parachute.ParachuteRegistry;
+import es.outlook.adriansrj.battleroyale.parachute.plugin.ParachuteQAV;
 import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.util.NamespacedKey;
+import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.core.handler.PluginHandler;
+import es.outlook.adriansrj.core.menu.Item;
 import es.outlook.adriansrj.core.menu.ItemMenu;
+import es.outlook.adriansrj.core.menu.custom.book.BookItemMenu;
+import es.outlook.adriansrj.core.menu.custom.book.item.AlternateBookPageActionItem;
 import es.outlook.adriansrj.core.menu.item.action.ActionItem;
+import es.outlook.adriansrj.core.menu.item.action.close.CloseMenuActionItem;
 import es.outlook.adriansrj.core.menu.size.ItemMenuSize;
-import es.outlook.adriansrj.core.util.itemstack.wool.WoolColor;
-import es.outlook.adriansrj.core.util.itemstack.wool.WoolItemStack;
-import es.outlook.adriansrj.core.util.math.RandomUtil;
+import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * @author AdrianSR / 17/09/2021 / 08:40 p. m.
+ * @author AdrianSR / 04/10/2021 / 05:54 p. m.
  */
 public final class ParachuteSettingsGUIHandler extends PluginHandler {
-
-	// TODO: make configurable
-
+	
 	public static ParachuteSettingsGUIHandler getInstance ( ) {
 		return getPluginHandler ( ParachuteSettingsGUIHandler.class );
 	}
-
-	private final Map < UUID, ItemMenu > main_handle_map = new HashMap <> ( );
-
+	
+	private final Map < UUID, BookItemMenu > handle_map = new HashMap <> ( );
+	
 	/**
 	 * Constructs the plugin handler.
 	 *
@@ -37,17 +44,17 @@ public final class ParachuteSettingsGUIHandler extends PluginHandler {
 	 */
 	public ParachuteSettingsGUIHandler ( BattleRoyale plugin ) {
 		super ( plugin );
-
+		
 		// this task is responsible for updating
 		// the guis so players can actually
 		// see changes in real-time.
 		Bukkit.getScheduler ( ).runTaskTimerAsynchronously ( plugin , ( ) -> {
-			for ( Map.Entry < UUID, ItemMenu > next : main_handle_map.entrySet ( ) ) {
+			for ( Map.Entry < UUID, BookItemMenu > next : handle_map.entrySet ( ) ) {
 				org.bukkit.entity.Player player = Bukkit.getPlayer ( next.getKey ( ) );
-
+				
 				if ( player != null && player.isOnline ( ) ) {
-					ItemMenu handle = next.getValue ( );
-
+					BookItemMenu handle = next.getValue ( );
+					
 					if ( handle.isMenuOpen ( player ) ) {
 						update ( player );
 					}
@@ -55,45 +62,109 @@ public final class ParachuteSettingsGUIHandler extends PluginHandler {
 			}
 		} , 20L , 20L );
 	}
-
+	
 	public synchronized void open ( org.bukkit.entity.Player player ) {
 		this.build ( player ).open ( player );
 	}
-
+	
 	public synchronized void open ( Player player ) {
 		player.getBukkitPlayerOptional ( ).ifPresent ( this :: open );
 	}
-
+	
 	public synchronized void update ( org.bukkit.entity.Player player ) {
 		this.build ( player ).update ( player );
 	}
-
+	
 	private synchronized ItemMenu build ( org.bukkit.entity.Player player ) {
-		ItemMenu handle = this.main_handle_map.computeIfAbsent ( player.getUniqueId ( ) , k -> {
-			ItemMenu result = new ItemMenu (
+		BookItemMenu handle = this.handle_map.computeIfAbsent ( player.getUniqueId ( ) , k -> {
+			BookItemMenu result = new BookItemMenu (
 					EnumSettingsGUIsConfiguration.PARACHUTE_GUI_TITLE.getAsString ( ) ,
 					EnumSettingsGUIsConfiguration.PARACHUTE_GUI_SIZE.getAsEnum ( ItemMenuSize.class ) );
-
+			
 			result.registerListener ( BattleRoyale.getInstance ( ) );
 			return result;
 		} );
-
+		
 		handle.clear ( );
-
-		// color settings button
-		handle.setItem (
-				EnumSettingsGUIsConfiguration.PARACHUTE_GUI_PARACHUTE_COLOR_BUTTON_POSITION.getAsInteger ( ) ,
-				new ActionItem ( EnumSettingsGUIsConfiguration.PARACHUTE_GUI_PARACHUTE_COLOR_BUTTON_TEXT.getAsString ( ) ,
-								 // this will build a random-color wool item stack,
-								 // so every time it updates the icon will change its
-								 // material, enabling an interesting effect.
-								 new WoolItemStack ( RandomUtil.getRandomElement ( WoolColor.values ( ) ) )
-				).addAction (
-						action -> ParachuteColorSettingsGUIHandler.getInstance ( ).open ( action.getPlayer ( ) ) ) );
-
+		
+		// inserting default parachute item
+		ParachuteRegistry registry = ParachuteRegistry.getInstance ( );
+		
+		handle.addItem ( buildParachuteItem ( player , registry.getDefaultParachute ( ) ) );
+		
+		// inserting items
+		for ( Parachute parachute : registry.getRegisteredParachutes ( ) ) {
+			handle.addItem ( buildParachuteItem ( player , parachute ) );
+		}
+		
+		// back button
+		handle.setBarButton ( 3 , new AlternateBookPageActionItem (
+				ChatColor.GREEN + EnumLanguage.BACK_WORD.getAsStringStripColors ( ) ,
+				EnumSettingsGUIsConfiguration.COMMON_BUTTON_BACK_MATERIAL.getAsItemStack ( ) )
+				// go next disabled to go to the previous
+				.setGoNext ( false ) );
+		
+		// next button
+		handle.setBarButton ( 5 , new AlternateBookPageActionItem (
+				ChatColor.GREEN + EnumLanguage.NEXT_WORD.getAsStringStripColors ( ) ,
+				EnumSettingsGUIsConfiguration.COMMON_BUTTON_NEXT_MATERIAL.getAsItemStack ( ) )
+				// go next disabled to go to the next
+				.setGoNext ( true ) );
+		
+		// close button
+		handle.setBarButton ( 8 , new CloseMenuActionItem (
+				ChatColor.DARK_RED + EnumLanguage.CLOSE_WORD.getAsStringStripColors ( ) ,
+				EnumSettingsGUIsConfiguration.COMMON_BUTTON_CLOSE_MATERIAL.getAsItemStack ( ) ) );
 		return handle;
 	}
-
+	
+	private synchronized Item buildParachuteItem ( org.bukkit.entity.Player player , Parachute parachute ) {
+		NamespacedKey     key      = ParachuteRegistry.getInstance ( ).getRegistrationKey ( parachute );
+		UniversalMaterial material = UniversalMaterial.SADDLE;
+		final boolean     unlocked = parachute.getPermission ( ) == null || player.hasPermission ( parachute.getPermission ( ) );
+		
+		if ( parachute instanceof ParachuteQAV ) {
+			material = UniversalMaterial.LEATHER;
+		}
+		
+		// the parachute must be in the registry
+		if ( key != null ) {
+			return new ActionItem (
+					// display text
+					String.format (
+							( unlocked
+									? EnumSettingsGUIsConfiguration.PARACHUTE_GUI_ITEM_UNLOCKED_TEXT_FORMAT
+									: EnumSettingsGUIsConfiguration.PARACHUTE_GUI_ITEM_LOCKED_TEXT_FORMAT ).getAsString ( ) ,
+							// parachute name from key
+							StringUtil.capitalize ( key.getKey ( )
+															.replace ( "_" , " " )
+															.replace ( "-" , " " ) ) ) ,
+					// icon
+					material.getItemStack ( ) ,
+					// description
+					( unlocked
+							? EnumSettingsGUIsConfiguration.PARACHUTE_GUI_ITEM_UNLOCKED_DESCRIPTION_FORMAT
+							: EnumSettingsGUIsConfiguration.PARACHUTE_GUI_ITEM_LOCKED_DESCRIPTION_FORMAT ).getAsStringList ( )
+			).addAction ( action -> {
+				action.setClose ( true );
+				
+				// setting and immediately uploading
+				if ( unlocked ) {
+					Player.getPlayer ( action.getPlayer ( ) ).getDataStorage ( )
+							.setSetting ( EnumPlayerSetting.PARACHUTE , key , true );
+					// message
+					action.getPlayer ( ).sendMessage (
+							EnumSettingsGUIsConfiguration.PARACHUTE_GUI_ITEM_SELECTED_MESSAGE.getAsString ( ) );
+				} else {
+					action.getPlayer ( ).sendMessage (
+							EnumSettingsGUIsConfiguration.PARACHUTE_GUI_ITEM_LOCKED_MESSAGE.getAsString ( ) );
+				}
+			} );
+		} else {
+			return null;
+		}
+	}
+	
 	@Override
 	protected boolean isAllowMultipleInstances ( ) {
 		return false;

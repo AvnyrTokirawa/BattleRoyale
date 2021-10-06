@@ -13,6 +13,8 @@ import es.outlook.adriansrj.battleroyale.util.packet.interceptor.entity.PacketEn
 import es.outlook.adriansrj.battleroyale.util.packet.interceptor.entity.PacketEntityTeleportInterceptorSimple;
 import es.outlook.adriansrj.battleroyale.util.packet.reader.PacketReader;
 import es.outlook.adriansrj.battleroyale.util.reflection.bukkit.EntityReflection;
+import es.outlook.adriansrj.core.util.Duration;
+import es.outlook.adriansrj.core.util.entity.EntityUtil;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
@@ -24,6 +26,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Collections;
@@ -213,6 +216,12 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 			// legacy versions
 			seat.setPassenger ( player );
 		}
+		
+		// blindness effect
+		EntityUtil.addPotionEffectForcing (
+				player , PotionEffectType.SLOW , Duration.ofSeconds ( 3 ) , 10 );
+		EntityUtil.addPotionEffectForcing (
+				player , PotionEffectType.BLINDNESS , Duration.ofSeconds ( 3 ) , 0 );
 		
 		// showing shape
 		SchedulerUtil.scheduleSyncDelayedTask ( ( ) -> {

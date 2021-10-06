@@ -9,6 +9,8 @@ import es.outlook.adriansrj.battleroyale.util.PluginUtil;
 import es.outlook.adriansrj.battleroyale.util.VehicleUtil;
 import es.outlook.adriansrj.battleroyale.util.packet.interceptor.entity.PacketEntityTeleportInterceptorProtocolLib;
 import es.outlook.adriansrj.battleroyale.util.reflection.bukkit.EntityReflection;
+import es.outlook.adriansrj.core.util.Duration;
+import es.outlook.adriansrj.core.util.entity.EntityUtil;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -21,6 +23,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -159,6 +162,12 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 			// legacy versions
 			seat.setPassenger ( player );
 		}
+		
+		// blindness effect
+		EntityUtil.addPotionEffectForcing (
+				player , PotionEffectType.SLOW , Duration.ofSeconds ( 3 ) , 10 );
+		EntityUtil.addPotionEffectForcing (
+				player , PotionEffectType.BLINDNESS , Duration.ofSeconds ( 3 ) , 0 );
 		
 		seat_map.put ( player.getUniqueId ( ) , seat );
 		

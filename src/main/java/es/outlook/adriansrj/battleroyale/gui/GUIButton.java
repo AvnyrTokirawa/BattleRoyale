@@ -5,6 +5,7 @@ import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
 import es.outlook.adriansrj.core.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
+import es.outlook.adriansrj.core.util.server.Version;
 import es.outlook.adriansrj.core.util.yaml.YamlUtil;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -80,17 +81,23 @@ public abstract class GUIButton extends GUIIcon {
 	@Override
 	protected GUIIconInstance createInstance ( GUIInstance gui , Player player , String display_name ,
 			List < String > description ) {
+		ItemStack icon = new ItemStack ( material , Math.max ( amount , 0 ) );
+		
+		// legacy versions data
+		if ( Version.getServerVersion ( ).isOlder ( Version.v1_13_R1 ) ) {
+			ItemStackUtil.setData ( icon , data );
+		}
+		
 		return createInstance (
 				gui , player ,
 				// display name
 				StringUtil.translateAlternateColorCodes (
 						StringUtil.defaultIfBlank ( display_name_format , StringUtil.EMPTY ) ) ,
 				// icon
-				ItemStackUtil.setData ( new ItemStack ( material , Math.max ( amount , 0 ) ) , data ) ,
+				icon ,
 				// description
 				StringUtil.translateAlternateColorCodes (
-						description_format != null ? new ArrayList <> ( description_format ) : new ArrayList <> ( )
-				) );
+						description_format != null ? new ArrayList <> ( description_format ) : new ArrayList <> ( ) ) );
 	}
 	
 	protected abstract GUIIconInstance createInstance ( GUIInstance gui , Player player ,

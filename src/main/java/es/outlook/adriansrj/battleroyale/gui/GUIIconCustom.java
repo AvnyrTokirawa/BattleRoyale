@@ -6,6 +6,7 @@ import es.outlook.adriansrj.core.menu.action.ItemClickAction;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
 import es.outlook.adriansrj.core.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
+import es.outlook.adriansrj.core.util.server.Version;
 import es.outlook.adriansrj.core.util.yaml.YamlUtil;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -60,12 +61,14 @@ public class GUIIconCustom extends GUIIcon {
 	@Override
 	protected GUIIconInstance createInstance ( GUIInstance gui , Player player , String display_name ,
 			List < String > description ) {
-		return new GUIIconInstance (
-				gui ,
-				display_name ,
-				// icon
-				ItemStackUtil.setData ( new ItemStack ( material , Math.max ( amount , 0 ) ) , data ) ,
-				description ) {
+		ItemStack icon = new ItemStack ( material , Math.max ( amount , 0 ) );
+		
+		// legacy versions data
+		if ( Version.getServerVersion ( ).isOlder ( Version.v1_13_R1 ) ) {
+			ItemStackUtil.setData ( icon , data );
+		}
+		
+		return new GUIIconInstance ( gui , display_name , icon , description ) {
 			@Override
 			public void onClick ( ItemClickAction action ) {
 				// nothing to do

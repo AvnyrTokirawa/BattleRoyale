@@ -5,6 +5,7 @@ import es.outlook.adriansrj.battleroyale.battlefield.Battlefield;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
 import es.outlook.adriansrj.battleroyale.enums.EnumWorldGenerator;
+import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaLeaveEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaSetEvent;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
@@ -20,6 +21,7 @@ import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.file.FilenameUtil;
 import es.outlook.adriansrj.core.util.player.PlayerUtil;
+import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
 import es.outlook.adriansrj.core.util.server.Version;
 import es.outlook.adriansrj.core.util.sound.UniversalSound;
 import es.outlook.adriansrj.core.util.world.GameRuleDisableDaylightCycle;
@@ -228,7 +230,74 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 		return false;
 	}
 	
-	// this event handlers are responsible for hiding/showing the players
+	// ---------------------------------------------------------------
+	
+	// this event handler is responsible for restarting a certain
+	// world when all the arenas that take places in it are stopped.
+	@EventHandler ( priority = EventPriority.MONITOR )
+	public void onStop ( ArenaStateChangeEvent event ) {
+		System.out.println ( ">>>>>> onStop: 0" );
+		if ( event.getState ( ) == EnumArenaState.STOPPED ) {
+			System.out.println ( ">>>>>> onStop: 1" );
+			World             world = event.getArena ( ).getWorld ( );
+			BattleRoyaleLobby lobby = BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( );
+			
+			if ( arena_map.values ( ).stream ( )
+					.filter ( arena -> !Objects.equals ( arena , event.getArena ( ) ) )
+					.filter ( arena -> arena.getState ( ) != EnumArenaState.STOPPED )
+					.anyMatch ( arena -> Objects.equals ( arena.getWorld ( ) , world ) ) ) {
+				System.out.println ( ">>>>>> onStop: 2" );
+				return;
+			}
+			
+			System.out.println ( ">>>>>> RESTARTING WORLD '" + world.getWorldFolder ( ).getName ( ) + "'" );
+			
+			// sending players back to lobby, so bukkit will
+			// actually be able to unload the world.
+			world.getPlayers ( ).forEach ( lobby :: introduce );
+			
+			System.out.println ( ">>>>>> onStop: 4" );
+			
+			// then restarting
+			if ( Bukkit.isPrimaryThread ( ) ) {
+				System.out.println ( ">>>>>> onStop: 5" );
+				restartWorld ( world );
+			} else {
+				System.out.println ( ">>>>>> onStop: 6" );
+				SchedulerUtil.runTask ( ( ) -> restartWorld ( world ) );
+			}
+		}
+	}
+	
+	private void restartWorld ( World world ) {
+		Validate.isTrue ( Bukkit.isPrimaryThread ( ) , "must run on server thread" );
+		
+		File folder = world.getWorldFolder ( );
+		
+		// we will not save changes
+		Bukkit.unloadWorld ( world , false );
+		// clearing regions used by the matches
+		BattleRoyaleArenaRegion.RegionFileAssigner.clear ( folder );
+		
+		// then we can load the world again and reassign
+		// it (update reference to it from arenas).
+		world = loadWorld ( folder );
+		
+		// reassigning and preparing arenas.
+		for ( BattleRoyaleArena arena : arena_map.values ( ) ) {
+			if ( Objects.equals ( arena.getWorld ( ).getWorldFolder ( ) , folder ) ) {
+				arena.world = world; // reassign
+				
+				// preparing
+				arena.region.reassignRegion ( );
+				arena.prepare0 ( ( ) -> arena.setState ( EnumArenaState.WAITING ) /* ready to start */ );
+			}
+		}
+	}
+	
+	// ---------------------------------------------------------------
+	
+	// these event handlers are responsible for hiding/showing the players
 	// in a certain arena to the player that joins/leaves.
 	@EventHandler ( priority = EventPriority.LOWEST )
 	public void onJoinArena ( PlayerArenaSetEvent event ) {
