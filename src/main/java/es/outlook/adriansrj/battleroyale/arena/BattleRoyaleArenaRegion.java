@@ -273,6 +273,8 @@ public class BattleRoyaleArenaRegion {
 								( loc.getZ ( ) >> 4 ) >> 5 ) );
 						
 						if ( saved.add ( region ) ) {
+							System.out.println ( ">>>>>>> shape: saving region: " + region.getLocation ( ) );
+							
 							region.save ( getRegionsFolder ( ) );
 						}
 					}

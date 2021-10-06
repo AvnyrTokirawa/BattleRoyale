@@ -25,6 +25,7 @@ import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
 import es.outlook.adriansrj.core.util.server.Version;
 import es.outlook.adriansrj.core.util.sound.UniversalSound;
 import es.outlook.adriansrj.core.util.world.GameRuleDisableDaylightCycle;
+import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -36,6 +37,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -119,31 +121,10 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 			throw new IllegalArgumentException ( "another arena with the same name already exists" );
 		}
 		
+		// in case the world doesn't exist we will
+		// generate an empty world.
 		if ( !world_folder.exists ( ) || !WorldUtil.worldFolderCheck ( world_folder ) ) {
-			ArenaWorldGenerator generator      = ArenaWorldGenerator.createGenerator ( world_folder );
-			WorldData           generator_data = generator.getWorldData ( );
-			
-			if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_13_R1 ) ) {
-				generator_data.setGeneratorOptions ( "minecraft:air;minecraft:air" );
-			} else {
-				generator_data.setGeneratorOptions ( "2;0;1" );
-			}
-			
-			generator_data.setGeneratorType ( EnumWorldGenerator.FLAT );
-			generator_data.setGenerateStructures ( false );
-			generator_data.setInitialized ( true );
-			generator_data.setName ( world_folder.getName ( ) );
-			generator_data.setSpawnX ( 0 );
-			generator_data.setSpawnY ( 0 );
-			generator_data.setSpawnZ ( 0 );
-			
-			// bukkit world loader must have something to load!
-			// if the region folder of the world is empty, bukkit
-			// will not load the world, so we have to give bukkit
-			// something to load.
-			generator.setBlockAtFromLegacyId ( 0 , 0 , 0 , 1 );
-			// then saving
-			generator.save ( );
+			generateEmptyWorld ( world_folder ).save ( );
 		}
 		
 		if ( Bukkit.isPrimaryThread ( ) ) {
@@ -153,18 +134,6 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> callback.accept ( register (
 					new BattleRoyaleArena ( name , loadWorld ( world_folder ) , battlefield , mode ) ) ) );
 		}
-	}
-	
-	private World loadWorld ( File world_folder ) {
-		World world = Bukkit.getWorld ( world_folder.getName ( ) );
-		
-		if ( world == null && ( world = Bukkit.getWorld ( world_folder.getAbsolutePath ( ) ) ) == null ) {
-			world = WorldUtil.loadWorldEmpty ( world_folder );
-		}
-		
-		new GameRuleDisableDaylightCycle ( ).apply ( world );
-		
-		return world;
 	}
 	
 	public void createArena ( String name , String world_name , Battlefield battlefield , BattleRoyaleMode mode ,
@@ -236,9 +205,7 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 	// world when all the arenas that take places in it are stopped.
 	@EventHandler ( priority = EventPriority.MONITOR )
 	public void onStop ( ArenaStateChangeEvent event ) {
-		System.out.println ( ">>>>>> onStop: 0" );
 		if ( event.getState ( ) == EnumArenaState.STOPPED ) {
-			System.out.println ( ">>>>>> onStop: 1" );
 			World             world = event.getArena ( ).getWorld ( );
 			BattleRoyaleLobby lobby = BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( );
 			
@@ -246,24 +213,17 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 					.filter ( arena -> !Objects.equals ( arena , event.getArena ( ) ) )
 					.filter ( arena -> arena.getState ( ) != EnumArenaState.STOPPED )
 					.anyMatch ( arena -> Objects.equals ( arena.getWorld ( ) , world ) ) ) {
-				System.out.println ( ">>>>>> onStop: 2" );
 				return;
 			}
-			
-			System.out.println ( ">>>>>> RESTARTING WORLD '" + world.getWorldFolder ( ).getName ( ) + "'" );
 			
 			// sending players back to lobby, so bukkit will
 			// actually be able to unload the world.
 			world.getPlayers ( ).forEach ( lobby :: introduce );
 			
-			System.out.println ( ">>>>>> onStop: 4" );
-			
 			// then restarting
 			if ( Bukkit.isPrimaryThread ( ) ) {
-				System.out.println ( ">>>>>> onStop: 5" );
 				restartWorld ( world );
 			} else {
-				System.out.println ( ">>>>>> onStop: 6" );
 				SchedulerUtil.runTask ( ( ) -> restartWorld ( world ) );
 			}
 		}
@@ -278,9 +238,17 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 		Bukkit.unloadWorld ( world , false );
 		// clearing regions used by the matches
 		BattleRoyaleArenaRegion.RegionFileAssigner.clear ( folder );
+		// we're now clear to delete it
+		try {
+			FileDeleteStrategy.FORCE.delete ( folder );
+		} catch ( IOException e ) {
+			e.printStackTrace ( );
+		}
 		
-		// then we can load the world again and reassign
-		// it (update reference to it from arenas).
+		// then we can generate and load the world again; and then
+		// reassign it (update reference to it from arenas).
+		generateEmptyWorld ( folder ).save ( );
+		
 		world = loadWorld ( folder );
 		
 		// reassigning and preparing arenas.
@@ -368,5 +336,45 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 		Player                   br_player = Player.getPlayer ( player );
 		
 		br_player.leaveArena ( );
+	}
+	
+	// ---------------------------------------------------------------
+	
+	private ArenaWorldGenerator generateEmptyWorld ( File world_folder ) {
+		ArenaWorldGenerator generator      = ArenaWorldGenerator.createGenerator ( world_folder );
+		WorldData           generator_data = generator.getWorldData ( );
+		
+		if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_13_R1 ) ) {
+			generator_data.setGeneratorOptions ( "minecraft:air;minecraft:air" );
+		} else {
+			generator_data.setGeneratorOptions ( "2;0;1" );
+		}
+		
+		generator_data.setGeneratorType ( EnumWorldGenerator.FLAT );
+		generator_data.setGenerateStructures ( false );
+		generator_data.setInitialized ( true );
+		generator_data.setName ( world_folder.getName ( ) );
+		generator_data.setSpawnX ( 0 );
+		generator_data.setSpawnY ( 0 );
+		generator_data.setSpawnZ ( 0 );
+		
+		// bukkit world loader must have something to load!
+		// if the region folder of the world is empty, bukkit
+		// will not load the world, so we have to give bukkit
+		// something to load.
+		generator.setBlockAtFromLegacyId ( 0 , 0 , 0 , 1 );
+		return generator;
+	}
+	
+	private World loadWorld ( File world_folder ) {
+		World world = Bukkit.getWorld ( world_folder.getName ( ) );
+		
+		if ( world == null && ( world = Bukkit.getWorld ( world_folder.getAbsolutePath ( ) ) ) == null ) {
+			world = WorldUtil.loadWorldEmpty ( world_folder );
+		}
+		
+		new GameRuleDisableDaylightCycle ( ).apply ( world );
+		
+		return world;
 	}
 }
