@@ -31,14 +31,10 @@ public final class CompassBarHandler extends PluginHandler {
 		register ( );
 		
 		// task responsible for updating the compasses
-		Bukkit.getScheduler ( ).runTaskTimerAsynchronously ( plugin , new Runnable ( ) {
-			@Override
-			public void run ( ) {
-				Player.getPlayers ( ).stream ( ).map ( Player :: getCompass )
-						.filter ( Objects :: nonNull ).filter ( CompassBar :: isVisible )
-						.forEach ( CompassBar :: update );
-			}
-		} , 0 , 0 );
+		Bukkit.getScheduler ( ).runTaskTimerAsynchronously ( plugin , ( )
+				-> Player.getPlayers ( ).stream ( ).map ( Player :: getCompass )
+				.filter ( Objects :: nonNull ).filter ( CompassBar :: isVisible )
+				.forEach ( CompassBar :: update ) , 0 , 0 );
 	}
 	
 	@EventHandler ( priority = EventPriority.LOWEST )

@@ -1,0 +1,8 @@
+
+@
+java:S1481("*Remove this unused "lobby" local variable.(ëñ¸ð
+Q	java:S125*"<This block of commented-out lines of code should be removed.(¬ÿú”
+S	java:S1062"9Replace this use of System.out or System.err by a logger.(‰Ê§öþÿÿÿÿ
+S	java:S1068"9Replace this use of System.out or System.err by a logger.(’—™Öùÿÿÿÿ
+N	java:S106W"9Replace this use of System.out or System.err by a logger.(ï—ÛŸ
+S	java:S106^"9Replace this use of System.out or System.err by a logger.(ü…û¬üÿÿÿÿ

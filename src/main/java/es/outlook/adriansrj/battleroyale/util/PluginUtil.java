@@ -13,6 +13,18 @@ public class PluginUtil {
 		return isPluginEnabled ( Constants.PROTOCOL_LIB_PLUGIN_NAME );
 	}
 	
+	public static boolean isPlaceholderAPIEnabled ( ) {
+		return isPluginEnabled ( Constants.PLACEHOLDER_API_PLUGIN_NAME );
+	}
+	
+	public static boolean isMVdWPlaceholderAPIEnabled ( ) {
+		return isPluginEnabled ( Constants.MVDW_PLACEHOLDER_API_PLUGIN_NAME );
+	}
+	
+	public static boolean isQualityArmoryEnabled ( ) {
+		return isPluginEnabled ( Constants.QUALITY_ARMORY_PLUGIN_NAME );
+	}
+	
 	public static boolean isQualityArmoryVehiclesEnabled ( ) {
 		return isPluginEnabled ( Constants.QUALITY_ARMORY_VEHICLES_PLUGIN_NAME );
 	}

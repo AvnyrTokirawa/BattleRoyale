@@ -1,0 +1,9 @@
+
+q
+java:S2975Ê"SRemove this "clone" implementation; use a copy constructor or copy factory instead.(˜µñĞ8Ğğ³šÅ/
+P
+java:S1121#".Extract the assignment out of this expression.(­›„ıÿÿÿÿ8Óğ³šÅ/
+K
+java:S1121(".Extract the assignment out of this expression.(ÙÆŸ‘8Ôğ³šÅ/
+L
+java:S1066("/Merge this if statement with the enclosing one.(ÙÆŸ‘8Õğ³šÅ/

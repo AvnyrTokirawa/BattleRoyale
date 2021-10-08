@@ -11,7 +11,7 @@ public abstract class CompassBar {
 	
 	protected final Player player;
 	
-	public CompassBar ( Player player ) {
+	protected CompassBar ( Player player ) {
 		this.player = player;
 	}
 	
@@ -21,11 +21,11 @@ public abstract class CompassBar {
 	
 	public abstract boolean isVisible ( );
 	
+	public abstract void setVisible ( boolean visible );
+	
 	public abstract void update ( );
 	
 	public abstract void destroy ( );
-	
-	public abstract void setVisible ( boolean visible );
 	
 	/**
 	 * Called whenever the player reconnects.

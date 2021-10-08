@@ -186,6 +186,10 @@ public class BattleRoyaleArena {
 		return getPlayers ( true );
 	}
 	
+	public int getCount ( ) {
+		return getPlayers ( ).size ( );
+	}
+	
 	/**
 	 * Gets whether this arena is full.
 	 * <br>

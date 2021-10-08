@@ -29,6 +29,18 @@ public enum EnumLanguage implements ConfigurationEntry {
 										"time format that includes hours, minutes and seconds" ,
 										"hh'h' mm'm' ss's'" ),
 	
+	ARENA_STATE_WAITING_WORD ( "arena.state.waiting-word" ,
+							   "waiting state word. colors will be ignored" , "Waiting" ),
+	
+	ARENA_STATE_RUNNING_WORD ( "arena.state.running-word" ,
+							   "running state word. colors will be ignored" , "Running" ),
+	
+	ARENA_STATE_RESTARTING_WORD ( "arena.state.restarting-word" ,
+								  "restarting state word. colors will be ignored" , "Restarting" ),
+	
+	ARENA_STATE_STOPPED_WORD ( "arena.state.stopped-word" ,
+							   "stopped state word. colors will be ignored" , "Stopped" ),
+	
 	ARENA_SIGN_WAITING_TEXT ( "arena.sign.waiting-text" , "arena signs waiting text format. '\\n' supported" ,
 							  ChatColor.DARK_RED + "Battle Royale\n%s\n\n" + ChatColor.DARK_GREEN + "Waiting" ),
 	
@@ -41,19 +53,19 @@ public enum EnumLanguage implements ConfigurationEntry {
 	
 	ARENA_MESSAGE_RUNNING ( "arena.message.running" ,
 							"message players will receive when trying to\njoin an arena that is running/in-game" ,
-							ChatColor.DARK_RED + "You cannot join an arena that has already started!" ) ,
+							ChatColor.DARK_RED + "You cannot join an arena that has already started!" ),
 	
 	ARENA_MESSAGE_FULL ( "arena.message.full" ,
-							"message players will receive when trying to\njoin an arena that is full" ,
-							ChatColor.DARK_RED + "This arena is full!" ) ,
+						 "message players will receive when trying to\njoin an arena that is full" ,
+						 ChatColor.DARK_RED + "This arena is full!" ),
 	
 	ARENA_MESSAGE_RESTARTING ( "arena.message.restarting" ,
-						 "message players will receive when trying to\njoin an arena that is being restarted" ,
-						 ChatColor.DARK_RED + "This arena is restarting!" ) ,
+							   "message players will receive when trying to\njoin an arena that is being restarted" ,
+							   ChatColor.DARK_RED + "This arena is restarting!" ),
 	
 	ARENA_MESSAGE_STOPPED ( "arena.message.stopped" ,
-							   "message players will receive when trying to\njoin an arena that is stopped" ,
-							   ChatColor.DARK_RED + "This arena is unavailable right now." ) ,
+							"message players will receive when trying to\njoin an arena that is stopped" ,
+							ChatColor.DARK_RED + "This arena is unavailable right now." ),
 	
 	KNOCKED_BLEEDING_OUT ( "knocked.bleeding-out" , "bleeding out action bar message" ,
 						   StringUtil.concatenate ( ChatColor.DARK_RED , ChatColor.BOLD ) + "You are bleeding out" ),

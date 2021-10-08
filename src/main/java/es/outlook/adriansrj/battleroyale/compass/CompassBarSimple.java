@@ -38,9 +38,7 @@ public class CompassBarSimple extends CompassBarBase {
 			}
 			
 			// then creating
-			for ( int i = 0 ; i < points.length ; i++ ) {
-				CompassCardinalPoint point = points[ i ];
-				
+			for ( CompassCardinalPoint point : points ) {
 				builder.append ( StringUtil.stripColors ( StringUtil.defaultIfBlank (
 						point.getAbbreviation ( ).getAsString ( ) , point.getDefaultAbbreviation ( ) ) ) );
 				

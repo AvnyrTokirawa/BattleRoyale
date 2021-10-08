@@ -1,0 +1,13 @@
+
+f
+java:S1149)"PReplace the synchronized class "Stack" by an unsynchronized one such as "Deque".(μη«Ά
+I
+java:S1874›"2Remove this use of "hidePlayer"; it is deprecated.(¥›ύ
+P
+java:S1874£"4Remove this use of "setPassenger"; it is deprecated.(€ϋς»ώÿÿÿÿ
+H
+java:S1602Φ",Remove useless curly braces around statement(™κΖιÿÿÿÿÿ
+N
+java:S1874¬"2Remove this use of "showPlayer"; it is deprecated.(ηΊ±³ψÿÿÿÿ
+E
+java:S1121χ".Extract the assignment out of this expression.(¤Ξ¦

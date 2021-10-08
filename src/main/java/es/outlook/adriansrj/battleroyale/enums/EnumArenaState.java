@@ -10,20 +10,30 @@ public enum EnumArenaState {
 	/**
 	 * The arena is waiting for players to start.
 	 */
-	WAITING,
+	WAITING ( EnumLanguage.ARENA_STATE_WAITING_WORD ),
 	
 	/**
 	 * The arena is running.
 	 */
-	RUNNING,
+	RUNNING ( EnumLanguage.ARENA_STATE_RUNNING_WORD ),
 	
 	/**
 	 * The arena is restarting.
 	 */
-	RESTARTING,
+	RESTARTING ( EnumLanguage.ARENA_STATE_RESTARTING_WORD ),
 	
 	/**
 	 * The arena cannot be restarted until the world is reset.
 	 */
-	STOPPED;
+	STOPPED ( EnumLanguage.ARENA_STATE_STOPPED_WORD );
+	
+	private final EnumLanguage language;
+	
+	EnumArenaState ( EnumLanguage language ) {
+		this.language = language;
+	}
+	
+	public EnumLanguage getLanguage ( ) {
+		return language;
+	}
 }

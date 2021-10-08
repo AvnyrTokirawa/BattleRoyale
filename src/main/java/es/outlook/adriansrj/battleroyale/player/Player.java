@@ -13,6 +13,8 @@ import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaSetEvent;
 import es.outlook.adriansrj.battleroyale.parachute.Parachute;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteRegistry;
+import es.outlook.adriansrj.battleroyale.scoreboard.Scoreboard;
+import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardSimple;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.core.player.PlayerWrapper;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
@@ -77,6 +79,8 @@ public final class Player extends PlayerWrapper {
 	
 	/** the compass of the player */
 	private          CompassBar        compass;
+	/** the scoreboard of the player */
+	private          Scoreboard        scoreboard;
 	/** the bus of the player */
 	private          BusInstance < ? > bus;
 	/** the parachute of the player */
@@ -97,6 +101,8 @@ public final class Player extends PlayerWrapper {
 		
 		// default compass
 		this.compass = new CompassBarSimple ( this );
+		// default scoreboard
+		this.scoreboard = new ScoreboardSimple ( this );
 		// we would like to set it visible when the arena starts
 		this.compass.setVisible ( false );
 	}
@@ -130,12 +136,16 @@ public final class Player extends PlayerWrapper {
 	}
 	
 	//	@Override
-	public synchronized Player getSpectatorBRTarget ( ) {
+	public synchronized Player getBRSpectatorTarget ( ) {
 		return spectator_target;
 	}
 	
 	public synchronized CompassBar getCompass ( ) {
 		return compass;
+	}
+	
+	public Scoreboard getBRScoreboard ( ) {
+		return scoreboard;
 	}
 	
 	public synchronized BusInstance < ? > getBus ( ) {
@@ -321,7 +331,8 @@ public final class Player extends PlayerWrapper {
 	 * @param dispose_previous whether to dispose/destroy the previous compass.
 	 */
 	public synchronized void setCompass ( CompassBar compass , boolean dispose_previous ) {
-		if ( compass != null && !Objects.equals ( compass.getPlayer ( ) , this ) ) {
+		if ( !Objects.equals ( Objects.requireNonNull (
+				compass , "compass cannot be null" ).getPlayer ( ) , this ) ) {
 			throw new IllegalArgumentException ( "this player and the owner of the compass must match" );
 		}
 		
@@ -337,6 +348,17 @@ public final class Player extends PlayerWrapper {
 	
 	public synchronized void setCompass ( CompassBar compass ) {
 		setCompass ( compass , true );
+	}
+	
+	public void setScoreboard ( Scoreboard scoreboard ) {
+		if ( !Objects.equals ( Objects.requireNonNull (
+				scoreboard , "scoreboard cannot be null" ).getPlayer ( ) , this ) ) {
+			throw new IllegalArgumentException ( "this player and the owner of the scoreboard must match" );
+		}
+		
+		if ( !Objects.equals ( this.scoreboard , scoreboard ) ) {
+			this.scoreboard = scoreboard;
+		}
 	}
 	
 	/**

@@ -22,7 +22,7 @@ public abstract class CompassBarBase extends CompassBar {
 	/** 3 times the model (model-model-model) */
 	protected final String model_x3;
 	
-	public CompassBarBase ( Player player ) {
+	protected CompassBarBase ( Player player ) {
 		super ( player );
 		
 		// initializing handle
@@ -65,7 +65,7 @@ public abstract class CompassBarBase extends CompassBar {
 				int    begin_index = base.length ( );
 				int    angle       = ( int ) DirectionUtil.normalize ( bukkit.getLocation ( ).getYaw ( ) );
 				int    base_length = base.length ( );
-				float  factor      = ( ( float ) angle ) / 360.0F;
+				float  factor      = angle / 360.0F;
 				int    bar_length  = getLength ( );
 				int    index       = ( begin_index - ( bar_length / 2 ) ) + ( int ) ( base_length * factor );
 				

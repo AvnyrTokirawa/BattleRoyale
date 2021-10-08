@@ -30,4 +30,5 @@ softdepend:
  - CrackShot
  - CrackShotPlus
  - PlaceholderAPI
+ - MVdWPlaceholderAPI
  - ProtocolLib

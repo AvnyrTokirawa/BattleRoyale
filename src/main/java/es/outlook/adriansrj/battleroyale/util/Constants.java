@@ -54,18 +54,25 @@ public class Constants {
 	public static final String SCHEMATIC_LENGTH_KEY = "Length";
 	
 	/** Update period of the displacement executor of the buses */
-	public static final long BUS_DISPLACEMENT_EXECUTOR_PERIOD = 60L;
+	public static final long BUS_DISPLACEMENT_EXECUTOR_PERIOD    = 60L;
 	/** Parachute life-loop executor period */
 	public static final long PARACHUTE_LIFE_LOOP_EXECUTOR_PERIOD = 30L;
 	
 	// ---------- plugin
 	
 	public static final String PROTOCOL_LIB_PLUGIN_NAME            = "ProtocolLib";
+	public static final String PLACEHOLDER_API_PLUGIN_NAME         = "PlaceholderAPI";
+	public static final String MVDW_PLACEHOLDER_API_PLUGIN_NAME    = "MVdWPlaceholderAPI";
+	public static final String QUALITY_ARMORY_PLUGIN_NAME          = "QualityArmory";
 	public static final String QUALITY_ARMORY_VEHICLES_PLUGIN_NAME = "QualityArmoryVehicles2";
 	
 	// ---------- metadata
 	
 	public static final String LOOT_CHEST_METADATA_KEY = UUID.randomUUID ( ).toString ( );
+	
+	// ---------- placeholder
+	
+	public static final String BATTLE_ROYALE_PLACEHOLDER_IDENTIFIER = "br";
 	
 	// ---------- namespace
 	

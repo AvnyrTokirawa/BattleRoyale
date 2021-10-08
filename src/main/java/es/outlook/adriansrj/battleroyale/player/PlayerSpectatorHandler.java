@@ -70,7 +70,7 @@ public final class PlayerSpectatorHandler extends PluginHandler implements Packe
 	public void onReceiving ( PacketEvent event ) {
 		org.bukkit.entity.Player player    = event.getPlayer ( );
 		Player                   br_player = Player.getPlayer ( player );
-		Player                   br_target = br_player.getSpectatorBRTarget ( );
+		Player                   br_target = br_player.getBRSpectatorTarget ( );
 		
 		if ( br_player.isSpectator ( ) && player.getGameMode ( ) == GameMode.SPECTATOR ) {
 			// spectator opening the spectator mode gui

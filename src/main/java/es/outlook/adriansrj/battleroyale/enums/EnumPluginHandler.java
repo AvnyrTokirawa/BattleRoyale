@@ -48,10 +48,13 @@ import es.outlook.adriansrj.battleroyale.packet.reader.PacketReaderService;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteHandler;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteRegistry;
+import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
+import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderNodeRegistry;
 import es.outlook.adriansrj.battleroyale.player.*;
+import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardHandler;
+import es.outlook.adriansrj.battleroyale.util.PluginUtil;
 import es.outlook.adriansrj.battleroyale.vehicle.VehiclesConfigurationRegistry;
 import es.outlook.adriansrj.core.handler.PluginHandler;
-import org.bukkit.Bukkit;
 
 import java.util.concurrent.Callable;
 
@@ -69,6 +72,8 @@ public enum EnumPluginHandler {
 	LANGUAGE_CONFIGURATION_HANDLER ( BattleRoyaleLanguageConfigHandler.class ),
 	
 	COMMAND_HANDLER ( BattleRoyaleCommandHandler.class ),
+	PLACEHOLDER_NODE_REGISTRY ( PlaceholderNodeRegistry.class ),
+	PLACEHOLDER_HANDLER ( PlaceholderHandler.class ),
 	DATA_STORAGE_HANDLER ( DataStorageHandler.class ),
 	PLAYER_HANDLER ( PlayerHandler.class ),
 	TEAM_HANDLER ( TeamHandler.class ),
@@ -129,9 +134,10 @@ public enum EnumPluginHandler {
 	COMPASS_HANDLER ( CompassBarHandler.class ),
 	COMPASS_CONFIGURATION_HANDLER ( CompassBarConfigHandler.class ),
 	
-	QUALITY_ARMORY_COMPATIBILITY_HANDLER ( QualityArmoryCompatibilityHandler.class , ( ) -> {
-		return Bukkit.getPluginManager ( ).isPluginEnabled ( "QualityArmory" );
-	} ),
+	SCOREBOARD_HANDLER ( ScoreboardHandler.class ),
+	
+	QUALITY_ARMORY_COMPATIBILITY_HANDLER (
+			QualityArmoryCompatibilityHandler.class , PluginUtil :: isQualityArmoryEnabled ),
 	
 	;
 	
@@ -144,11 +150,8 @@ public enum EnumPluginHandler {
 	}
 	
 	private EnumPluginHandler ( Class < ? extends PluginHandler > clazz ) {
-		this ( clazz , new Callable < Boolean > ( ) {
-			@Override
-			public Boolean call ( ) throws Exception {
-				return Boolean.TRUE; // no special checks are required by default.
-			}
+		this ( clazz , ( ) -> {
+			return Boolean.TRUE; // no special checks are required by default.
 		} );
 	}
 	
