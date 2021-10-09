@@ -1,5 +1,6 @@
 package es.outlook.adriansrj.battleroyale.scoreboard;
 
+import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
 import es.outlook.adriansrj.battleroyale.player.Player;
 
 /**
@@ -19,8 +20,16 @@ public class ScoreboardSimple extends ScoreboardBase {
 			handle.set ( 0 , "Hola" );
 			handle.set ( 1 , "" );
 			handle.set ( 2 , "Como estas" );
+			handle.set ( 3 , "" );
+			handle.set ( 4 , setPlaceholders ( "Arena limit: %br_arena_limit%" ) );
+			handle.set ( 5 , setPlaceholders ( "Arena count: %br_arena_count%" ) );
+			handle.set ( 6 , setPlaceholders ( "Arena state: %br_arena_state%" ) );
 			
 			super.update ( );
 		}
+	}
+	
+	private String setPlaceholders ( String text ) {
+		return PlaceholderHandler.getInstance ( ).setPlaceholders ( player.getPlayer ( ) , text );
 	}
 }

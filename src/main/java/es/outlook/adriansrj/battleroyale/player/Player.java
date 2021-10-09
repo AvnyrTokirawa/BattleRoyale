@@ -99,10 +99,13 @@ public final class Player extends PlayerWrapper {
 		this.last_handle  = last_handle;
 		this.data_storage = new PlayerDataStorage ( id , name );
 		
-		// default compass
-		this.compass = new CompassBarSimple ( this );
 		// default scoreboard
 		this.scoreboard = new ScoreboardSimple ( this );
+		// we would like to set it visible when the arena starts
+		this.scoreboard.setVisible ( false );
+		
+		// default compass
+		this.compass = new CompassBarSimple ( this );
 		// we would like to set it visible when the arena starts
 		this.compass.setVisible ( false );
 	}
@@ -292,7 +295,7 @@ public final class Player extends PlayerWrapper {
 		}
 	}
 	
-	public synchronized void setSpectatorTarget ( Player target ) {
+	public synchronized void setSpectatorTargetBR ( Player target ) {
 		Validate.isTrue ( isSpectator ( ) , "must be a spectator" );
 		Validate.notNull ( target , "target cannot be null" );
 		Validate.isTrue ( !Objects.equals ( target , this ) , "cannot self-spectate" );
@@ -313,13 +316,13 @@ public final class Player extends PlayerWrapper {
 	 * <b>Note that the target must be a player,
 	 * otherwise {@link UnsupportedOperationException} will be thrown</b>
 	 *
-	 * @see #setSpectatorTarget(Player)
+	 * @see #setSpectatorTargetBR(Player)
 	 * @param entity the entity to follow or null to reset
 	 */
 	@Override
 	public void setSpectatorTarget ( Entity entity ) {
 		if ( entity instanceof org.bukkit.entity.Player ) {
-			setSpectatorTarget ( Player.getPlayer ( entity.getUniqueId ( ) ) );
+			setSpectatorTargetBR ( Player.getPlayer ( entity.getUniqueId ( ) ) );
 		} else {
 			throw new UnsupportedOperationException ( "can only spectate players" );
 		}
@@ -350,7 +353,7 @@ public final class Player extends PlayerWrapper {
 		setCompass ( compass , true );
 	}
 	
-	public void setScoreboard ( Scoreboard scoreboard ) {
+	public void setScoreboardBR ( Scoreboard scoreboard ) {
 		if ( !Objects.equals ( Objects.requireNonNull (
 				scoreboard , "scoreboard cannot be null" ).getPlayer ( ) , this ) ) {
 			throw new IllegalArgumentException ( "this player and the owner of the scoreboard must match" );

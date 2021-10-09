@@ -1,11 +1,15 @@
 package es.outlook.adriansrj.battleroyale.placeholder.node;
 
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.placeholder.node.arena.ArenaPlaceholderNode;
 import es.outlook.adriansrj.battleroyale.placeholder.node.player.PlayerPlaceholderNode;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import org.apache.commons.lang3.Validate;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link PlaceholderNode} registry.
@@ -30,10 +34,11 @@ public final class PlaceholderNodeRegistry extends PluginHandler {
 		
 		// registering default nodes
 		registerNode ( new PlayerPlaceholderNode ( ) );
+		registerNode ( new ArenaPlaceholderNode ( ) );
 	}
 	
-	public Set < PlaceholderNode > getRegisteredNodes ( ) {
-		return Collections.unmodifiableSet ( new HashSet <> ( node_map.values ( ) ) );
+	public Collection < PlaceholderNode > getRegisteredNodes ( ) {
+		return Collections.unmodifiableMap ( node_map ).values ( );
 	}
 	
 	public boolean isRegistered ( PlaceholderNode node ) {

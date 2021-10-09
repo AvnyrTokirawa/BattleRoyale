@@ -51,7 +51,10 @@ public abstract class BusInstanceBase < C extends Bus > extends BusInstance < C 
 			
 			// route finished
 			if ( out_bounds && entered_bounds ) {
-				this.bus.finish ( );
+				if ( !this.bus.isFinished ( ) ) {
+					this.bus.finish ( );
+				}
+				
 				this.dispose ( );
 				return;
 			}

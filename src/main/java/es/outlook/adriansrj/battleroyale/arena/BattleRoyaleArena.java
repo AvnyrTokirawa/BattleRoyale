@@ -281,6 +281,11 @@ public class BattleRoyaleArena {
 		border.getPlayers ( ).add ( br_player );
 		border.refresh ( );
 		
+		// scoreboard
+		if ( br_player.getBRScoreboard ( ) != null ) {
+			br_player.getBRScoreboard ( ).setVisible ( !spectator );
+		}
+		
 		// compass
 		if ( br_player.getCompass ( ) != null ) {
 			br_player.getCompass ( ).setVisible ( !spectator );

@@ -9,8 +9,7 @@ import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.EnumMap;
 import java.util.concurrent.Callable;
 
 /**
@@ -19,6 +18,10 @@ import java.util.concurrent.Callable;
  * @author AdrianSR / 06/10/2021 / 09:45 a. m.
  */
 public final class PlaceholderHandler extends PluginHandler {
+	
+	public static PlaceholderHandler getInstance ( ) {
+		return getPluginHandler ( PlaceholderHandler.class );
+	}
 	
 	/**
 	 * Enumerates the supported processors.
@@ -57,7 +60,7 @@ public final class PlaceholderHandler extends PluginHandler {
 		}
 	}
 	
-	private final Map < Processor, PlaceholderProcessor > processors = new HashMap <> ( );
+	private final EnumMap < Processor, PlaceholderProcessor > processors = new EnumMap <> ( Processor.class );
 	
 	/**
 	 * Constructs the plugin handler.
@@ -68,19 +71,13 @@ public final class PlaceholderHandler extends PluginHandler {
 		super ( plugin );
 		
 		// initializing processors
-		System.out.println ( ">>>>>>> PlaceholderHandler: 0" );
 		for ( Processor processor : Processor.values ( ) ) {
-			System.out.println ( ">>>>>>> PlaceholderHandler: 1: " + processor );
 			try {
-				System.out.println ( ">>>>>>> PlaceholderHandler: 2: " + processor );
 				if ( processor.canInitialize ( ) ) {
-					System.out.println ( ">>>>>>> PlaceholderHandler: 3: " + processor );
 					processors.put ( processor ,
 									 processor.clazz.getConstructor ( ).newInstance ( ) );
-					System.out.println ( ">>>>>>> PlaceholderHandler: 4: " + processor );
 				}
 			} catch ( Exception ex ) {
-				System.out.println ( ">>>>>>> PlaceholderHandler: 5: " + processor );
 				ex.printStackTrace ( );
 			}
 		}

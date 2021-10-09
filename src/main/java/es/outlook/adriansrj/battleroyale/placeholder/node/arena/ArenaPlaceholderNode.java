@@ -26,11 +26,11 @@ public class ArenaPlaceholderNode extends PlaceholderNode {
 		BattleRoyaleArena arena     = br_player != null ? br_player.getArena ( ) : null;
 		
 		if ( arena != null ) {
-			if ( params.toLowerCase ( ).startsWith ( COUNT_IDENTIFIER ) ) {
+			if ( params.toLowerCase ( ).startsWith ( COUNT_IDENTIFIER ) ) { // br_arena_count
 				return String.valueOf ( arena.getCount ( ) );
-			} else if ( params.toLowerCase ( ).startsWith ( LIMIT_IDENTIFIER ) ) {
+			} else if ( params.toLowerCase ( ).startsWith ( LIMIT_IDENTIFIER ) ) { // br_arena_limit
 				return String.valueOf ( arena.getMode ( ).getMaxPlayers ( ) );
-			} else if ( params.toLowerCase ( ).startsWith ( STATE_IDENTIFIER ) ) {
+			} else if ( params.toLowerCase ( ).startsWith ( STATE_IDENTIFIER ) ) { // br_arena_state
 				return arena.getState ( ).getLanguage ( ).getAsStringStripColors ( );
 			}
 		}

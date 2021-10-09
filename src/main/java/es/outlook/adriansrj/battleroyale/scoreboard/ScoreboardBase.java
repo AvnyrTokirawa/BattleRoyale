@@ -18,6 +18,7 @@ public abstract class ScoreboardBase extends Scoreboard {
 		
 		// initializing handle
 		this.handle = new ScoreScoreboard ( StringUtil.EMPTY );
+		this.handle.addViewersByUniqueId ( player.getUniqueId ( ) );
 	}
 	
 	@Override
@@ -28,7 +29,11 @@ public abstract class ScoreboardBase extends Scoreboard {
 	@Override
 	public void setVisible ( boolean visible ) {
 		if ( handle != null ) {
-			handle.addViewersByUniqueId ( player.getUniqueId ( ) );
+			if ( visible ) {
+				handle.addViewersByUniqueId ( player.getUniqueId ( ) );
+			} else {
+				handle.removeViewerByUniqueId ( player.getUniqueId ( ) );
+			}
 		}
 	}
 	
