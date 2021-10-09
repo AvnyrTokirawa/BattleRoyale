@@ -30,16 +30,19 @@ public enum EnumLanguage implements ConfigurationEntry {
 										"hh'h' mm'm' ss's'" ),
 	
 	ARENA_STATE_WAITING_WORD ( "arena.state.waiting-word" ,
-							   "waiting state word. colors will be ignored" , "Waiting" ),
+							   "arena waiting state word. colors will be ignored" , "Waiting" ),
 	
 	ARENA_STATE_RUNNING_WORD ( "arena.state.running-word" ,
-							   "running state word. colors will be ignored" , "Running" ),
+							   "arena running state word. colors will be ignored" , "Running" ),
 	
 	ARENA_STATE_RESTARTING_WORD ( "arena.state.restarting-word" ,
-								  "restarting state word. colors will be ignored" , "Restarting" ),
+								  "arena restarting state word. colors will be ignored" , "Restarting" ),
 	
 	ARENA_STATE_STOPPED_WORD ( "arena.state.stopped-word" ,
-							   "stopped state word. colors will be ignored" , "Stopped" ),
+							   "arena stopped state word. colors will be ignored" , "Stopped" ),
+	
+	ARENA_BORDER_STATE_IDLE ( "arena.border.state.idle" ,
+							  "border idle state word. colors will be ignored" , "Idle" ),
 	
 	ARENA_SIGN_WAITING_TEXT ( "arena.sign.waiting-text" , "arena signs waiting text format. '\\n' supported" ,
 							  ChatColor.DARK_RED + "Battle Royale\n%s\n\n" + ChatColor.DARK_GREEN + "Waiting" ),

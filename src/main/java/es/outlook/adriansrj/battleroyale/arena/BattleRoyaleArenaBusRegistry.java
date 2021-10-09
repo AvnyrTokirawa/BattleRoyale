@@ -5,7 +5,7 @@ import es.outlook.adriansrj.battleroyale.bus.BusInstance;
 import es.outlook.adriansrj.battleroyale.bus.dragon.BusDragon;
 import es.outlook.adriansrj.battleroyale.bus.dragon.BusDragonInstance;
 import es.outlook.adriansrj.battleroyale.enums.EnumBusConfiguration;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.math.RandomUtil;
 import org.jetbrains.annotations.NotNull;
 

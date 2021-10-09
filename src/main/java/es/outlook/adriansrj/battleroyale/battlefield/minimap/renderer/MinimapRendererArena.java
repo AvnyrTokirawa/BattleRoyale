@@ -1,7 +1,7 @@
 package es.outlook.adriansrj.battleroyale.battlefield.minimap.renderer;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapCursor;

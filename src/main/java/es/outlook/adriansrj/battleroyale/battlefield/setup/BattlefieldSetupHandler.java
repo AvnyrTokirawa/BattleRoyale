@@ -3,7 +3,7 @@ package es.outlook.adriansrj.battleroyale.battlefield.setup;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import es.outlook.adriansrj.battleroyale.battlefield.Battlefield;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 
 import java.io.File;

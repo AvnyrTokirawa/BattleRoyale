@@ -12,7 +12,7 @@ import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.WorldUtil;
 import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
 import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;

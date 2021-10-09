@@ -1,7 +1,7 @@
 package es.outlook.adriansrj.battleroyale.battlefield.setup;
 
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;

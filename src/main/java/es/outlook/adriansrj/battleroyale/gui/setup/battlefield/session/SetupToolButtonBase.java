@@ -5,7 +5,7 @@ import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSessi
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupTool;
 import es.outlook.adriansrj.battleroyale.enums.EnumBattleMapSetupTool;
 import es.outlook.adriansrj.battleroyale.enums.EnumInternalLanguage;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.menu.item.action.ActionItem;
 import es.outlook.adriansrj.core.menu.item.action.ItemActionAdapter;
 import org.bukkit.inventory.ItemStack;

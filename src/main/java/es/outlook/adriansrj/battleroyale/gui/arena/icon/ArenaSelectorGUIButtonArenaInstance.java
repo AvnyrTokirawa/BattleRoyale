@@ -6,7 +6,7 @@ import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.gui.GUIIconInstance;
 import es.outlook.adriansrj.battleroyale.gui.GUIInstance;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.core.menu.action.ItemClickAction;
 import org.bukkit.inventory.ItemStack;

@@ -2,7 +2,7 @@ package es.outlook.adriansrj.battleroyale.parachute;
 
 import es.outlook.adriansrj.battleroyale.parachute.custom.ParachuteCustom;
 import es.outlook.adriansrj.battleroyale.parachute.plugin.ParachuteQAV;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.NamespacedKey;
 import es.outlook.adriansrj.battleroyale.util.Validate;

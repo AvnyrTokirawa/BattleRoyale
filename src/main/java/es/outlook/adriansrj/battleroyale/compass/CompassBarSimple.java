@@ -1,7 +1,7 @@
 package es.outlook.adriansrj.battleroyale.compass;
 
 import es.outlook.adriansrj.battleroyale.enums.EnumCompassConfiguration;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;

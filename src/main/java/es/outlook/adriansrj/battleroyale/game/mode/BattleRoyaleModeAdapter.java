@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.game.mode;
 
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 
 /**
  * Adapted implementation of {@link BattleRoyaleMode}.

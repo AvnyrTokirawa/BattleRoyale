@@ -1,7 +1,7 @@
 package es.outlook.adriansrj.battleroyale.bus.pet;
 
 import es.outlook.adriansrj.battleroyale.bus.Bus;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.core.util.reflection.general.EnumReflection;
 import es.outlook.adriansrj.core.util.yaml.YamlUtil;

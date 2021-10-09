@@ -4,7 +4,7 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumParachuteConfiguration;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerCloseParachuteEvent;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.math.DirectionUtil;
 import es.outlook.adriansrj.core.util.reflection.bukkit.EntityReflection;
 import me.zombie_striker.qav.VehicleEntity;

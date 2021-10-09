@@ -3,7 +3,7 @@ package es.outlook.adriansrj.battleroyale.enums;
 import es.outlook.adriansrj.battleroyale.bus.BusRegistry;
 import es.outlook.adriansrj.battleroyale.parachute.Parachute;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteRegistry;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.NamespacedKey;
 
 /**

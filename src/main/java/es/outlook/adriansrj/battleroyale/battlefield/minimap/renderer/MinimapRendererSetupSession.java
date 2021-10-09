@@ -4,7 +4,7 @@ import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldConfiguration;
 import es.outlook.adriansrj.battleroyale.battlefield.bus.BusSpawn;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupResult;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.core.util.math.DirectionUtil;
 import org.bukkit.World;

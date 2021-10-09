@@ -2,7 +2,7 @@ package es.outlook.adriansrj.battleroyale.lobby;
 
 import es.outlook.adriansrj.battleroyale.compass.CompassBar;
 import es.outlook.adriansrj.battleroyale.enums.EnumLobbyConfiguration;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.entity.EntityUtil;
 import es.outlook.adriansrj.core.util.world.GameRuleType;
 import org.bukkit.Bukkit;

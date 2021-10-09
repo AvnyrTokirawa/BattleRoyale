@@ -9,7 +9,7 @@ import es.outlook.adriansrj.battleroyale.event.player.PlayerDeathEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerJumpOffBusEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerOpenParachuteEvent;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.VehicleUtil;
 import es.outlook.adriansrj.core.enums.EnumMessageType;
 import es.outlook.adriansrj.core.handler.PluginHandler;

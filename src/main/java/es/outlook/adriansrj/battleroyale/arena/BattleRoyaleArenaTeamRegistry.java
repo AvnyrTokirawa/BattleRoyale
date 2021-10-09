@@ -1,16 +1,17 @@
 package es.outlook.adriansrj.battleroyale.arena;
 
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
-import es.outlook.adriansrj.battleroyale.player.Team;
+import es.outlook.adriansrj.battleroyale.game.player.Team;
 import es.outlook.adriansrj.battleroyale.util.mode.BattleRoyaleModeUtil;
 import es.outlook.adriansrj.core.util.function.FunctionUtil;
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Stream;
 
 /**
@@ -20,8 +21,8 @@ import java.util.stream.Stream;
  */
 public final class BattleRoyaleArenaTeamRegistry implements Iterable < Team > {
 	
-	private final Set < Team >      handle = Collections.synchronizedSet ( new CopyOnWriteArraySet <> ( ) );
-	private final BattleRoyaleArena arena;
+	private final ConcurrentLinkedQueue < Team > handle = new ConcurrentLinkedQueue <> ( );
+	private final BattleRoyaleArena              arena;
 	
 	BattleRoyaleArenaTeamRegistry ( BattleRoyaleArena arena ) {
 		this.arena = arena;
@@ -99,7 +100,9 @@ public final class BattleRoyaleArenaTeamRegistry implements Iterable < Team > {
 	 * @return whether the team was successfully registered or not.
 	 */
 	public boolean registerTeam ( Team team ) {
-		return handle.add ( Objects.requireNonNull ( team , "team cannot be null" ) );
+		Validate.notNull ( team , "team cannot be null" );
+		
+		return !handle.contains ( team ) && handle.add ( team );
 	}
 	
 	/**
@@ -113,6 +116,29 @@ public final class BattleRoyaleArenaTeamRegistry implements Iterable < Team > {
 	}
 	
 	/**
+	 * Gets the numeric id of the provided {@link Team} within this registry.
+	 * <br>
+	 * This id is useful for differentiating teams, as it is actually
+	 * the index of the team within this registry.
+	 *
+	 * @param team the team to get.
+	 * @return the numeric id (index within this team) of the provided team.
+	 */
+	public int getNumericId ( Team team ) {
+		Validate.notNull ( team , "team cannot be null" );
+		int id = 0;
+		
+		for ( Team other : handle ) {
+			if ( Objects.equals ( team , other ) ) {
+				return id;
+			} else {
+				id++;
+			}
+		}
+		return id;
+	}
+	
+	/**
 	 * Clears this registry.
 	 */
 	public void clear ( ) {
@@ -120,16 +146,16 @@ public final class BattleRoyaleArenaTeamRegistry implements Iterable < Team > {
 	}
 	
 	/**
-	 * Gets an unmodifiable view of the handle {@link Set} that holds the teams in this registry.
+	 * Gets an unmodifiable view of the handle {@link Collection} that holds the teams in this registry.
 	 * <br>
-	 * <b>Note that any attempt to modify the returned set will result in a
+	 * <b>Note that any attempt to modify the returned collection will result in a
 	 * exception as it is unmodifiable.</b>
 	 *
-	 * @return the {@link Set} that holds the teams in this registry,
+	 * @return the {@link Collection} that holds the teams in this registry,
 	 * wrapped in a <b>unmodifiable</b> view.
 	 */
-	public Set < Team > getHandle ( ) {
-		return Collections.unmodifiableSet ( handle );
+	public Collection < Team > getHandle ( ) {
+		return Collections.unmodifiableCollection ( handle );
 	}
 	
 	@NotNull

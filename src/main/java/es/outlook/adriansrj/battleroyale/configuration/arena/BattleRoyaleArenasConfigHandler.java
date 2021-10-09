@@ -115,9 +115,9 @@ public final class BattleRoyaleArenasConfigHandler extends ScalableConfiguration
 		
 		if ( section != null ) {
 			for ( String key : section.getKeys ( false ) ) {
-				if ( section.isConfigurationSection ( key ) ) {
-					ConfigurationSection arena_section = section.getConfigurationSection ( key );
-					
+				ConfigurationSection arena_section = section.getConfigurationSection ( key );
+				
+				if ( arena_section != null ) {
 					// mode
 					String           mode_file_name = arena_section.getString ( Constants.MODE_KEY );
 					BattleRoyaleMode mode           = null;
@@ -188,7 +188,7 @@ public final class BattleRoyaleArenasConfigHandler extends ScalableConfiguration
 		}
 	}
 	
-	protected void logInvalidConfiguration ( String arena , String message ) {
+	private void logInvalidConfiguration ( String arena , String message ) {
 		ConsoleUtil.sendPluginMessage (
 				ChatColor.RED , "The configuration of the arena '"
 						+ arena + "' is invalid: " + message , plugin );

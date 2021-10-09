@@ -11,7 +11,7 @@ import es.outlook.adriansrj.battleroyale.gui.setting.SettingsGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.team.TeamSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.dependency.MavenDependency;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.player.PlayerWrapper;

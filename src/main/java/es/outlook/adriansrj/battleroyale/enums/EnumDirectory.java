@@ -37,6 +37,16 @@ public enum EnumDirectory {
 	LOBBY_DIRECTORY ( "lobby" , true ),
 	
 	/**
+	 * Directory that stores the arenas.
+	 */
+	ARENA_DIRECTORY ( "arena" , true ),
+	
+	/**
+	 * Directory that stores the scoreboard configurations.
+	 */
+	SCOREBOARD_DIRECTORY ( "scoreboard" , true ),
+	
+	/**
 	 * Directory that stores the buses.
 	 */
 	BUS_DIRECTORY ( "bus" , false ),

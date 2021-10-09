@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.world.border;
 
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.server.Version;
 import org.bukkit.World;
 

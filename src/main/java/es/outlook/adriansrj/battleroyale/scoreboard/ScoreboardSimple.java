@@ -1,7 +1,7 @@
 package es.outlook.adriansrj.battleroyale.scoreboard;
 
 import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 
 /**
  *

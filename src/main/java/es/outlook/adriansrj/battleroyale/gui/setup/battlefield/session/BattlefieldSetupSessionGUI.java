@@ -3,7 +3,7 @@ package es.outlook.adriansrj.battleroyale.gui.setup.battlefield.session;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupHandler;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.menu.ItemMenu;
 import es.outlook.adriansrj.core.menu.size.ItemMenuSize;

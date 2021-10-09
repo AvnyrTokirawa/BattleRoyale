@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.event.player;
 
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityDamageEvent;
 

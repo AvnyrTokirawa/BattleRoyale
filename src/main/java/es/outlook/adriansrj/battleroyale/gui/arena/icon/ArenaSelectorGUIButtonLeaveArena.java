@@ -3,7 +3,7 @@ package es.outlook.adriansrj.battleroyale.gui.arena.icon;
 import es.outlook.adriansrj.battleroyale.gui.GUIButton;
 import es.outlook.adriansrj.battleroyale.gui.GUIInstance;
 import es.outlook.adriansrj.battleroyale.gui.arena.ArenaSelectorGUIIconType;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;

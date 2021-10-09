@@ -1,7 +1,7 @@
 package es.outlook.adriansrj.battleroyale.bus.dragon;
 
 import es.outlook.adriansrj.battleroyale.bus.Bus;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 
 /**
  * Bus dragon configuration.

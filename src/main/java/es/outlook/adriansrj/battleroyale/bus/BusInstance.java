@@ -2,7 +2,7 @@ package es.outlook.adriansrj.battleroyale.bus;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.battlefield.bus.BusSpawn;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.util.Vector;
 

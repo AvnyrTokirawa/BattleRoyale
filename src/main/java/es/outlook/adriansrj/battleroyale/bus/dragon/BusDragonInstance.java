@@ -4,7 +4,7 @@ import es.outlook.adriansrj.battleroyale.bus.BusInstanceBase;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerJumpOffBusEvent;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.PluginUtil;
 import es.outlook.adriansrj.battleroyale.util.VehicleUtil;
 import es.outlook.adriansrj.battleroyale.util.packet.interceptor.entity.PacketEntityTeleportInterceptorProtocolLib;

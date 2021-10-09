@@ -3,7 +3,7 @@ package es.outlook.adriansrj.battleroyale.enums;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupTool;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.tool.*;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.reflection.general.ConstructorReflection;
 
 import java.lang.reflect.InvocationTargetException;

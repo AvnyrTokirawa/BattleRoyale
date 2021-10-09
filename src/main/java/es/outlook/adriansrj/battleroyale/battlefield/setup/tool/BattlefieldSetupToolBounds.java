@@ -4,7 +4,7 @@ import es.outlook.adriansrj.battleroyale.battlefield.minimap.Minimap;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.renderer.MinimapRendererSetupSession;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
 import es.outlook.adriansrj.battleroyale.enums.EnumInternalLanguage;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.MiniMapUtil;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;

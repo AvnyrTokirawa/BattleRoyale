@@ -1,10 +1,8 @@
 package es.outlook.adriansrj.battleroyale.parachute.custom;
 
 import es.outlook.adriansrj.battleroyale.parachute.Parachute;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
-import es.outlook.adriansrj.core.util.itemstack.banner.BannerColor;
-import es.outlook.adriansrj.core.util.itemstack.wool.WoolColor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.configuration.ConfigurationSection;

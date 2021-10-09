@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.parachute;
 
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import org.apache.commons.lang3.Validate;
 
 /**

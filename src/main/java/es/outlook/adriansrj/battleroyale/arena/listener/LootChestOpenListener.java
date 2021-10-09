@@ -2,8 +2,8 @@ package es.outlook.adriansrj.battleroyale.arena.listener;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumLootContainer;
-import es.outlook.adriansrj.battleroyale.loot.LootConfiguration;
-import es.outlook.adriansrj.battleroyale.loot.LootConfigurationContainer;
+import es.outlook.adriansrj.battleroyale.game.loot.LootConfiguration;
+import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationContainer;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.core.util.console.ConsoleUtil;

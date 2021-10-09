@@ -12,9 +12,9 @@ import es.outlook.adriansrj.battleroyale.battlefield.minimap.renderer.MinimapRen
 import es.outlook.adriansrj.battleroyale.enums.EnumBattleMapSetupTool;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
 import es.outlook.adriansrj.battleroyale.enums.EnumWorldGenerator;
-import es.outlook.adriansrj.battleroyale.loot.LootConfigurationRegistry;
+import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationRegistry;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.*;
 import es.outlook.adriansrj.battleroyale.util.file.FileUtil;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;

@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.compass;
 
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 
 /**
  * Battle royale <b>RPG-compass bar</b> like.

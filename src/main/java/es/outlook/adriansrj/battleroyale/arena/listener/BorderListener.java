@@ -3,7 +3,7 @@ package es.outlook.adriansrj.battleroyale.arena.listener;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.event.border.BorderShrinkChangeEvent;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.configurable.duration.ConfigurableDuration;
 import org.apache.commons.lang3.time.DurationFormatUtils;

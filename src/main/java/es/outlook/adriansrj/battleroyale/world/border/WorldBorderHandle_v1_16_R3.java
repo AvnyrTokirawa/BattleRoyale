@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.world.border;
 
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.reflection.bukkit.BukkitReflection;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
 import net.minecraft.server.v1_16_R3.PacketPlayOutWorldBorder;

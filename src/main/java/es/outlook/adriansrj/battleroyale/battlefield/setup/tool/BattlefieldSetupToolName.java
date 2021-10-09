@@ -3,7 +3,7 @@ package es.outlook.adriansrj.battleroyale.battlefield.setup.tool;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
 import es.outlook.adriansrj.battleroyale.enums.EnumInternalLanguage;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.StringUtil;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;

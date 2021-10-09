@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.gui;
 
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.core.menu.action.ItemClickAction;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;

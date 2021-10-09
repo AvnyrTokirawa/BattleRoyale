@@ -1,7 +1,7 @@
 package es.outlook.adriansrj.battleroyale.parachute.plugin;
 
 import es.outlook.adriansrj.battleroyale.parachute.Parachute;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
 import me.zombie_striker.qav.api.QualityArmoryVehicles;

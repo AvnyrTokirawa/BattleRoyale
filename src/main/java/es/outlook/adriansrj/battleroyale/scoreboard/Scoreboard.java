@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.scoreboard;
 
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 
 /**
  * Battle royale contextual scoreboard.

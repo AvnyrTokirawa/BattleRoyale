@@ -3,8 +3,8 @@ package es.outlook.adriansrj.battleroyale.data;
 import es.outlook.adriansrj.battleroyale.cosmetic.Cosmetic;
 import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.enums.EnumStat;
-import es.outlook.adriansrj.battleroyale.player.Player;
-import es.outlook.adriansrj.battleroyale.player.PlayerDataStorage;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.PlayerDataStorage;
 import es.outlook.adriansrj.battleroyale.util.NamespacedKey;
 
 import java.util.Map;

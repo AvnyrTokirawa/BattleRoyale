@@ -50,4 +50,22 @@ public abstract class PlaceholderNode {
 			return null;
 		}
 	}
+	
+	/**
+	 * Extracts the identifier of the provided placeholder.
+	 * <br>
+	 * Examples:
+	 * <blockquote><pre>
+	 * extractIdentifier( "br_team_id" ) returns "team_id" (<b>'br_'</b> extracted)
+	 * extractIdentifier( "team_id" ) returns "id" (<b>'id_'</b> extracted)
+	 * </pre></blockquote>
+	 *
+	 * @param placeholder the placeholder to extract from.
+	 * @return the placeholder without the first identifier.
+	 */
+	protected String extractIdentifier ( String placeholder ) {
+		int separator_index = placeholder.indexOf ( '_' );
+		return separator_index != -1 && placeholder.length ( ) > 1
+				? placeholder.substring ( separator_index + 1 ) : placeholder;
+	}
 }

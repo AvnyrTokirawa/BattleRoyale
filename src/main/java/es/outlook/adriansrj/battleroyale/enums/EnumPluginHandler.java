@@ -22,12 +22,15 @@ import es.outlook.adriansrj.battleroyale.configuration.gui.settings.SettingsGUIs
 import es.outlook.adriansrj.battleroyale.configuration.gui.teamselector.TeamGUIsLanguageConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.lang.BattleRoyaleLanguageConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.lobby.BattleRoyaleLobbyConfigHandler;
-import es.outlook.adriansrj.battleroyale.configuration.loot.BattleRoyaleLootConfigHandler;
+import es.outlook.adriansrj.battleroyale.configuration.loot.LootConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.main.MainConfigurationHandler;
 import es.outlook.adriansrj.battleroyale.configuration.parachute.ParachuteConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.parachute.ParachutesConfigHandler;
+import es.outlook.adriansrj.battleroyale.configuration.scoreboard.ScoreboardConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.vehicle.BattleRoyaleVehiclesConfigHandler;
 import es.outlook.adriansrj.battleroyale.data.DataStorageHandler;
+import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationRegistry;
+import es.outlook.adriansrj.battleroyale.game.player.*;
 import es.outlook.adriansrj.battleroyale.gui.arena.ArenaSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setting.SettingsGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setting.bus.BusSettingsGUIHandler;
@@ -42,7 +45,6 @@ import es.outlook.adriansrj.battleroyale.gui.spectator.SpectatorGUI;
 import es.outlook.adriansrj.battleroyale.gui.team.TeamGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.team.TeamSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
-import es.outlook.adriansrj.battleroyale.loot.LootConfigurationRegistry;
 import es.outlook.adriansrj.battleroyale.packet.factory.PacketFactoryService;
 import es.outlook.adriansrj.battleroyale.packet.reader.PacketReaderService;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
@@ -50,7 +52,7 @@ import es.outlook.adriansrj.battleroyale.parachute.ParachuteHandler;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteRegistry;
 import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
 import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderNodeRegistry;
-import es.outlook.adriansrj.battleroyale.player.*;
+import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardConfigurationRegistry;
 import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardHandler;
 import es.outlook.adriansrj.battleroyale.util.PluginUtil;
 import es.outlook.adriansrj.battleroyale.vehicle.VehiclesConfigurationRegistry;
@@ -103,7 +105,7 @@ public enum EnumPluginHandler {
 	LOBBY_HANDLER ( BattleRoyaleLobbyHandler.class ),
 	
 	LOOT_CONFIGURATION_REGISTRY ( LootConfigurationRegistry.class ),
-	LOOT_CONFIGURATION_HANDLER ( BattleRoyaleLootConfigHandler.class ),
+	LOOT_CONFIGURATION_HANDLER ( LootConfigHandler.class ),
 	
 	VEHICLES_CONFIGURATION_REGISTRY ( VehiclesConfigurationRegistry.class ),
 	VEHICLES_CONFIGURATION_HANDLER ( BattleRoyaleVehiclesConfigHandler.class ),
@@ -134,7 +136,9 @@ public enum EnumPluginHandler {
 	COMPASS_HANDLER ( CompassBarHandler.class ),
 	COMPASS_CONFIGURATION_HANDLER ( CompassBarConfigHandler.class ),
 	
+	SCOREBOARD_CONFIGURATION_REGISTRY ( ScoreboardConfigurationRegistry.class ),
 	SCOREBOARD_HANDLER ( ScoreboardHandler.class ),
+	SCOREBOARD_CONFIGURATION_HANDLER ( ScoreboardConfigHandler.class ),
 	
 	QUALITY_ARMORY_COMPATIBILITY_HANDLER (
 			QualityArmoryCompatibilityHandler.class , PluginUtil :: isQualityArmoryEnabled ),

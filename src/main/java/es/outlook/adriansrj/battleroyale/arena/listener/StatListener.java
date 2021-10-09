@@ -4,7 +4,7 @@ import es.outlook.adriansrj.battleroyale.enums.EnumStat;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerDeathEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerKnockedOutEvent;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 

@@ -7,7 +7,7 @@ import es.outlook.adriansrj.battleroyale.compatibility.PluginCompatibilityHandle
 import es.outlook.adriansrj.battleroyale.event.player.PlayerCloseParachuteEvent;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import me.zombie_striker.qg.api.QACustomItemInteractEvent;
 import me.zombie_striker.qg.api.QAWeaponDamageEntityEvent;
 import org.bukkit.entity.Entity;

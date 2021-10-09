@@ -3,7 +3,7 @@ package es.outlook.adriansrj.battleroyale.battlefield.setup.tool;
 import es.outlook.adriansrj.battleroyale.battlefield.bus.BusSpawn;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.math.MathUtil;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;

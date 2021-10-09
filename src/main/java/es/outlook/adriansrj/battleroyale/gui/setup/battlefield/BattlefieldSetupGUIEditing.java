@@ -5,7 +5,7 @@ import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldRegistry;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupHandler;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.menu.custom.book.BookItemMenu;
 import es.outlook.adriansrj.core.menu.item.action.ActionItem;
 import es.outlook.adriansrj.core.menu.size.ItemMenuSize;

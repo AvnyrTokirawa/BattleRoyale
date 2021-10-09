@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.gui;
 
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.StringUtil;
 import org.bukkit.configuration.ConfigurationSection;
 

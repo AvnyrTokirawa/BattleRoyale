@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.compass;
 
-import es.outlook.adriansrj.battleroyale.player.Player;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.math.DirectionUtil;
 import org.bukkit.Bukkit;
