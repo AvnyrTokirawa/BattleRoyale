@@ -9,24 +9,24 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Border shrinking succession.
+ * Border resizing succession.
  *
  * @author AdrianSR / 06/09/2021 / 11:03 a. m.
  */
 public class BattlefieldBorderSuccession implements Configurable {
 	
-	@ConfigurableCollectionEntry ( subsection = "points", subsectionprefix = "shrink-point-" )
-	protected final Set < BattlefieldBorderShrink > points = new LinkedHashSet <> ( );
+	@ConfigurableCollectionEntry ( subsection = "points", subsectionprefix = "resizing-point-" )
+	protected final Set < BattlefieldBorderResize > points = new LinkedHashSet <> ( );
 	
 	/**
-	 * Constructs the succession from the provided shrinking points.
+	 * Constructs the succession from the provided resizing points.
 	 * <br>
 	 * <b>Note that the invalid points will be ignored.<b/>
 	 *
-	 * @param points the shrinking points.
+	 * @param points the resizing points.
 	 */
-	public BattlefieldBorderSuccession ( BattlefieldBorderShrink... points ) {
-		Arrays.stream ( points ).filter ( BattlefieldBorderShrink :: isValid )
+	public BattlefieldBorderSuccession ( BattlefieldBorderResize... points ) {
+		Arrays.stream ( points ).filter ( BattlefieldBorderResize :: isValid )
 				.forEach ( this.points :: add );
 	}
 	
@@ -34,13 +34,13 @@ public class BattlefieldBorderSuccession implements Configurable {
 		// empty succession; can be loaded from config though
 	}
 	
-	public Set < BattlefieldBorderShrink > getPoints ( ) {
+	public Set < BattlefieldBorderResize > getPoints ( ) {
 		return points;
 	}
 	
 	@Override
 	public boolean isValid ( ) {
-		return points.stream ( ).anyMatch ( BattlefieldBorderShrink :: isValid );
+		return points.stream ( ).anyMatch ( BattlefieldBorderResize :: isValid );
 	}
 	
 	@Override

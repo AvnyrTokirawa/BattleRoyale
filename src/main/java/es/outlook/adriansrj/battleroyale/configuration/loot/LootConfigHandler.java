@@ -15,6 +15,7 @@ import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -27,7 +28,7 @@ public final class LootConfigHandler extends ConfigurationHandler {
 	private static final LootConfiguration DEFAULT_LOOT_CONFIGURATION;
 	
 	static {
-		Map < EnumLootContainer, LootConfigurationContainer > containers = new HashMap <> ( );
+		Map < EnumLootContainer, LootConfigurationContainer > containers = new EnumMap <> ( EnumLootContainer.class );
 		
 		// initial
 		Map < String, LootConfigurationEntry > initial = new HashMap <> ( );
@@ -45,6 +46,8 @@ public final class LootConfigHandler extends ConfigurationHandler {
 		chest.put ( "iron-sword" , new LootConfigurationEntry ( UniversalMaterial.IRON_SWORD , 1 ) );
 		
 		containers.put ( EnumLootContainer.CHEST , new LootConfigurationContainer ( chest ) );
+		
+		// TODO: air supply
 		
 		DEFAULT_LOOT_CONFIGURATION = new LootConfiguration ( containers );
 	}

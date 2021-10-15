@@ -1,12 +1,14 @@
 package es.outlook.adriansrj.battleroyale.arena.listener;
 
+import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderResize;
+import es.outlook.adriansrj.battleroyale.enums.EnumArenaBorderState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
-import es.outlook.adriansrj.battleroyale.event.border.BorderShrinkChangeEvent;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.event.border.BorderResizeChangeEvent;
+import es.outlook.adriansrj.battleroyale.event.border.BorderStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
-import es.outlook.adriansrj.core.util.Duration;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.util.time.TimeUtil;
 import es.outlook.adriansrj.core.util.configurable.duration.ConfigurableDuration;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
@@ -22,33 +24,40 @@ public final class BorderListener extends BattleRoyaleArenaListener {
 	}
 	
 	// this event handler will announce the beginning of
-	// a new shrink point.
+	// a new resize point.
 	@EventHandler ( priority = EventPriority.LOWEST )
-	public void onShrinkChange ( BorderShrinkChangeEvent event ) {
-		ConfigurableDuration idle_time = event.getShrink ( ).getIdleTime ( );
+	public void onPointChange ( BorderResizeChangeEvent event ) {
+		ConfigurableDuration idle_time = event.getResize ( ).getIdleTime ( );
 		
 		if ( idle_time != null && idle_time.toSeconds ( ) > 0L ) {
 			for ( Player player : event.getBorder ( ).getArena ( ).getPlayers ( ) ) {
-				String format;
-				
-				if ( idle_time.toHours ( ) > 0 ) { // hours, minutes and seconds
-					format = EnumLanguage.TIME_FORMAT_HOURS_MINUTES_SECONDS.getAsString ( );
-				} else if ( idle_time.toMinutes ( ) > 0 ) { // minutes and seconds
-					format = EnumLanguage.TIME_FORMAT_MINUTES_SECONDS.getAsString ( );
-				} else { // seconds
-					format = EnumLanguage.TIME_FORMAT_SECONDS.getAsString ( );
-				}
-				
-				player.sendTitle ( EnumLanguage.BORDER_TIME_SHRINK_ANNOUNCEMENT_TITLE.getAsString ( ) ,
-								   String.format (
-										   EnumLanguage.BORDER_TIME_SHRINK_ANNOUNCEMENT_SUBTITLE.getAsString ( ) ,
-										   formatTime ( format , idle_time ) ) ,
-								   10 , 80 , 10 );
+				player.sendTitle (
+						EnumLanguage.BORDER_STATE_RESIZE_IN_ANNOUNCEMENT_TITLE.getAsString ( ) ,
+						String.format ( EnumLanguage.BORDER_STATE_RESIZE_IN_ANNOUNCEMENT_SUBTITLE.getAsString ( ) ,
+										TimeUtil.formatTime ( idle_time ) ) ,
+						10 , 80 , 10 );
 			}
 		}
 	}
 	
-	private String formatTime ( String format , Duration duration ) {
-		return DurationFormatUtils.formatDuration ( duration.toMillis ( ) , format , false );
+	// this event handler will send a warning announcement
+	// when the border starts resizing.
+	@EventHandler ( priority = EventPriority.LOWEST )
+	public void onStartResizing ( BorderStateChangeEvent event ) {
+		BattlefieldBorderResize point = event.getBorder ( ).getPoint ( );
+		
+		if ( event.getState ( ) == EnumArenaBorderState.RESIZING && point != null ) {
+			ConfigurableDuration resizing_time = point.getTime ( );
+			
+			if ( resizing_time != null && resizing_time.toSeconds ( ) > 0L ) {
+				for ( Player player : event.getBorder ( ).getArena ( ).getPlayers ( ) ) {
+					player.sendTitle (
+							EnumLanguage.BORDER_STATE_RESIZING_ANNOUNCEMENT_TITLE.getAsString ( ) ,
+							String.format ( EnumLanguage.BORDER_STATE_RESIZING_ANNOUNCEMENT_SUBTITLE.getAsString ( ) ,
+											TimeUtil.formatTime ( resizing_time ) ) ,
+							10 , 80 , 10 );
+				}
+			}
+		}
 	}
 }

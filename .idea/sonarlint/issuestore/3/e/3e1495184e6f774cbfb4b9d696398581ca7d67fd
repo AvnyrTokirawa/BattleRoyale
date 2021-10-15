@@ -1,13 +1,7 @@
 
 N
-java:S1481h"3Remove this unused "current_radius" local variable.(Ü£–öıÿÿÿÿ
-n
-java:S3776ƒ"RRefactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.(´­Âùÿÿÿÿ
-R	java:S125"<This block of commented-out lines of code should be removed.(ÎÜö‰
+java:S1481l"3Remove this unused "current_radius" local variable.(Ü£–öıÿÿÿÿ
 L
-java:S1481¿"0Remove this unused "radius_left" local variable.(›Ú‘…ùÿÿÿÿ
+java:S1481Ã"0Remove this unused "radius_left" local variable.(›Ú‘…ùÿÿÿÿ
 L
-java:S1481Ü"0Remove this unused "radius_left" local variable.(›Ú‘…ùÿÿÿÿ
-h
-java:S3776ë"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(‰÷ÄW
-R	java:S125Œ"<This block of commented-out lines of code should be removed.(ØÉ–ª
+java:S1481à"0Remove this unused "radius_left" local variable.(›Ú‘…ùÿÿÿÿ

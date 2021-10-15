@@ -31,6 +31,11 @@ public final class PacketFactoryService extends PluginHandler implements PacketF
 	}
 	
 	@Override
+	public Object createEntityAttachPacket ( int entity_id , int leash_holder_id ) {
+		return handle.createEntityAttachPacket ( entity_id , leash_holder_id );
+	}
+	
+	@Override
 	protected boolean isAllowMultipleInstances ( ) {
 		return false;
 	}

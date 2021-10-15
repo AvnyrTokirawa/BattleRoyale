@@ -3,8 +3,8 @@ package es.outlook.adriansrj.battleroyale.arena.listener;
 import es.outlook.adriansrj.battleroyale.enums.EnumStat;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerDeathEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerKnockedOutEvent;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
@@ -28,12 +28,10 @@ public final class StatListener extends BattleRoyaleArenaListener {
 		Player knocker = event.getKnocker ( );
 		
 		if ( knocker != null ) {
-			knocker.getDataStorage ( ).incrementStat (
-					EnumStat.KNOCKED_ENEMIES , 1 , true );
+			incrementStat ( knocker , EnumStat.KNOCKED_ENEMIES );
 		}
 		
-		player.getDataStorage ( ).incrementStat (
-				EnumStat.TIMES_KNOCKED , 1 , true );
+		incrementStat ( player , EnumStat.TIMES_KNOCKED );
 	}
 	
 	// event handler responsible for
@@ -44,11 +42,14 @@ public final class StatListener extends BattleRoyaleArenaListener {
 		Player killer = event.getKiller ( );
 		
 		if ( killer != null ) {
-			killer.getDataStorage ( ).incrementStat (
-					EnumStat.KILLS , 1 , true );
+			incrementStat ( killer , EnumStat.KILLS );
 		}
 		
-		player.getDataStorage ( ).incrementStat (
-				EnumStat.DEATHS , 1 , true );
+		incrementStat ( player , EnumStat.DEATHS );
+	}
+	
+	private void incrementStat ( Player player , EnumStat stat ) {
+		player.getDataStorage ( ).incrementStat ( stat , 1 , true );
+		player.getDataStorage ( ).incrementTempStat ( stat , 1 );
 	}
 }

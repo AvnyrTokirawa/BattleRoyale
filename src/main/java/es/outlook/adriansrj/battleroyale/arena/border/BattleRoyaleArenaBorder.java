@@ -1,21 +1,23 @@
 package es.outlook.adriansrj.battleroyale.arena.border;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
-import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderShrink;
+import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderResize;
 import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderSuccession;
 import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderSuccessionRandom;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaBorderState;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
-import es.outlook.adriansrj.battleroyale.event.border.BorderShrinkChangeEvent;
+import es.outlook.adriansrj.battleroyale.event.border.BorderResizeChangeEvent;
 import es.outlook.adriansrj.battleroyale.event.border.BorderStateChangeEvent;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.math.Location2D;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.world.border.WorldBorder;
 import org.bukkit.util.Vector;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.Executors;
@@ -32,11 +34,11 @@ public class BattleRoyaleArenaBorder {
 	/**
 	 * @author AdrianSR / 06/09/2021 / 01:52 p. m.
 	 */
-	protected static class BorderShrinkTask implements Runnable {
+	protected static class BorderResizeTask implements Runnable {
 		
 		protected final BattleRoyaleArenaBorder           border;
 		protected       ScheduledExecutorService          executor;
-		protected       Stack < BattlefieldBorderShrink > points;
+		protected       Stack < BattlefieldBorderResize > points;
 		
 		protected long   idle_time;
 		protected long   time;
@@ -46,7 +48,7 @@ public class BattleRoyaleArenaBorder {
 		protected double start_x;
 		protected double start_z;
 		
-		public BorderShrinkTask ( BattleRoyaleArenaBorder border , ScheduledExecutorService executor ) {
+		public BorderResizeTask ( BattleRoyaleArenaBorder border , ScheduledExecutorService executor ) {
 			this.border   = border;
 			this.executor = executor;
 			
@@ -73,7 +75,7 @@ public class BattleRoyaleArenaBorder {
 						this.idle_time = System.currentTimeMillis ( );
 						
 						// firing change event
-						new BorderShrinkChangeEvent (
+						new BorderResizeChangeEvent (
 								border , border.previous_point , border.point ).callSafe ( );
 					} else {
 						this.setState ( EnumArenaBorderState.STOPPED );
@@ -153,7 +155,7 @@ public class BattleRoyaleArenaBorder {
 			return ( 1.0D - normal ) * minimum + normal * maximum;
 		}
 		
-		protected Vector getPointLocation ( BattlefieldBorderShrink point ) {
+		protected Vector getPointLocation ( BattlefieldBorderResize point ) {
 			Location2D relocatable = point.getLocation ( );
 			
 			return border.arena.getFullBounds ( ).project ( new Vector (
@@ -163,7 +165,8 @@ public class BattleRoyaleArenaBorder {
 		protected void setState ( EnumArenaBorderState state ) {
 			if ( border.state != state ) {
 				EnumArenaBorderState previous_state = border.state;
-				border.state = state;
+				border.state      = state;
+				border.state_time = System.currentTimeMillis ( );
 				
 				if ( previous_state != null ) {
 					new BorderStateChangeEvent ( border , previous_state , border.state ).callSafe ( );
@@ -177,16 +180,18 @@ public class BattleRoyaleArenaBorder {
 	
 	// state
 	protected ScheduledExecutorService          executor;
-	protected Stack < BattlefieldBorderShrink > points;
-	protected BattlefieldBorderShrink           previous_point;
-	protected BattlefieldBorderShrink           point;
+	protected Stack < BattlefieldBorderResize > points;
+	protected BattlefieldBorderResize           previous_point;
+	protected BattlefieldBorderResize           point;
 	protected EnumArenaBorderState              state;
+	protected long                              state_time;
 	protected boolean                           started;
 	
 	public BattleRoyaleArenaBorder ( BattleRoyaleArena arena ) {
-		this.handle = new WorldBorder ( arena.getWorld ( ) );
-		this.arena  = arena;
-		this.state  = EnumArenaBorderState.IDLE;
+		this.handle     = new WorldBorder ( arena.getWorld ( ) );
+		this.arena      = arena;
+		this.state      = EnumArenaBorderState.STOPPED;
+		this.state_time = System.currentTimeMillis ( );
 		
 		this.recalculatePoints ( );
 	}
@@ -203,16 +208,37 @@ public class BattleRoyaleArenaBorder {
 		return state;
 	}
 	
+	/**
+	 * Gets how long the border has been in the state returned by {@link #getState()}.
+	 *
+	 * @return state time in milliseconds.
+	 */
+	public long getStateTime ( ) {
+		return state_time;
+	}
+	
 	public boolean isStarted ( ) {
 		return started;
 	}
 	
-	public BattlefieldBorderShrink getPreviousPoint ( ) {
+	public BattlefieldBorderResize getPreviousPoint ( ) {
 		return previous_point;
 	}
 	
-	public BattlefieldBorderShrink getPoint ( ) {
+	public BattlefieldBorderResize getPoint ( ) {
 		return point;
+	}
+	
+	public List < BattlefieldBorderResize > getPoints ( ) {
+		return Collections.unmodifiableList ( points );
+	}
+	
+	public double getCurrentSize ( ) {
+		return handle.getSize ( );
+	}
+	
+	public double getFutureSize ( ) {
+		return point != null ? point.getRadius ( ) : handle.getSize ( );
 	}
 	
 	public ZoneBounds getCurrentBounds ( ) {
@@ -221,16 +247,11 @@ public class BattleRoyaleArenaBorder {
 	}
 	
 	public ZoneBounds getFutureBounds ( ) {
-		if ( point != null ) {
-			Location2D relocatable = point.getLocation ( );
-			Vector location = arena.getFullBounds ( ).project ( new Vector (
-					relocatable.getX ( ) , 0 , relocatable.getZ ( ) ) );
-			
-			return new ZoneBounds ( new Location2I ( ( int ) location.getX ( ) , ( int ) location.getZ ( ) ) ,
-									( int ) Math.round ( point.getRadius ( ) ) );
-		} else {
-			return null;
-		}
+		return point != null ? getBounds ( point ) : null;
+	}
+	
+	public ZoneBounds getPreviousBounds ( ) {
+		return previous_point != null ? getBounds ( previous_point ) : null;
 	}
 	
 	public void start ( ) {
@@ -249,14 +270,14 @@ public class BattleRoyaleArenaBorder {
 		handle.setCenter ( bounds_center.getX ( ) , bounds_center.getZ ( ) );
 		handle.setSize ( bounds.getSize ( ) );
 		
-		// schedule shrinking
+		// schedule resizing
 		executor = Executors.newSingleThreadScheduledExecutor ( );
 		
 		if ( points != null && points.size ( ) > 0 ) {
-			executor.scheduleAtFixedRate ( new BorderShrinkTask ( this , executor ) ,
+			executor.scheduleAtFixedRate ( new BorderResizeTask ( this , executor ) ,
 										   70L , 70L , TimeUnit.MILLISECONDS );
 		} else {
-			// shrink succession invalid or not set. we need
+			// resize succession invalid or not set. we need
 			// to regularly notify players about world border,
 			// so lets schedule a task for that.
 			executor.scheduleAtFixedRate ( handle :: refresh , 1L , 1L , TimeUnit.SECONDS );
@@ -287,23 +308,32 @@ public class BattleRoyaleArenaBorder {
 	}
 	
 	protected void recalculatePoints ( ) {
-		// here we're creating a copy of the shrink succession, as it could probably
+		// here we're creating a copy of the resize succession, as it could probably
 		// be a BattlefieldBorderSuccessionRandom, and the method recalculate() might
 		// be called, resulting in a completely different succession.
-		BattlefieldBorderSuccession shrink_succession = arena.getBattlefield ( )
-				.getConfiguration ( ).getBorderShrinkSuccession ( );
+		BattlefieldBorderSuccession resize_succession = arena.getBattlefield ( )
+				.getConfiguration ( ).getBorderResizeSuccession ( );
 		
-		if ( shrink_succession != null ) {
+		if ( resize_succession != null ) {
 			this.points = new Stack <> ( );
 			
 			// it's a random succession, so let's recalculate it.
-			if ( shrink_succession instanceof BattlefieldBorderSuccessionRandom ) {
-				( ( BattlefieldBorderSuccessionRandom ) shrink_succession )
+			if ( resize_succession instanceof BattlefieldBorderSuccessionRandom ) {
+				( ( BattlefieldBorderSuccessionRandom ) resize_succession )
 						.recalculate ( arena.getFullBounds ( ) );
 			}
 			
-			shrink_succession.getPoints ( ).stream ( )
-					.filter ( BattlefieldBorderShrink :: isValid ).forEach ( this.points :: add );
+			resize_succession.getPoints ( ).stream ( )
+					.filter ( BattlefieldBorderResize :: isValid ).forEach ( this.points :: add );
 		}
+	}
+	
+	protected ZoneBounds getBounds ( BattlefieldBorderResize point ) {
+		Location2D relocatable = point.getLocation ( );
+		Vector location = arena.getFullBounds ( ).project ( new Vector (
+				relocatable.getX ( ) , 0 , relocatable.getZ ( ) ) );
+		
+		return new ZoneBounds ( new Location2I ( ( int ) location.getX ( ) , ( int ) location.getZ ( ) ) ,
+								( int ) Math.round ( point.getRadius ( ) ) );
 	}
 }

@@ -9,10 +9,11 @@ import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaLeaveEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaSetEvent;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.battleroyale.util.WorldUtil;
 import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
 import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
@@ -26,7 +27,6 @@ import es.outlook.adriansrj.core.util.server.Version;
 import es.outlook.adriansrj.core.util.sound.UniversalSound;
 import es.outlook.adriansrj.core.util.world.GameRuleDisableDaylightCycle;
 import org.apache.commons.io.FileDeleteStrategy;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -94,28 +94,32 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 		return Collections.unmodifiableSet ( new HashSet <> ( arena_map.values ( ) ) );
 	}
 	
-	public BattleRoyaleArena createArena ( String name , World world , Battlefield battlefield ,
-			BattleRoyaleMode mode )
-			throws IllegalStateException {
-		Validate.notNull ( world , "world cannot be null" );
-		Validate.notNull ( battlefield , "battlefield cannot be null" );
-		Validate.notNull ( mode , "mode cannot be null" );
-		
-		if ( arena_map.values ( ).stream ( )
-				.anyMatch ( arena -> Objects.equals ( name , arena.getName ( ) ) ) ) {
-			throw new IllegalArgumentException ( "another arena with the same name already exists" );
-		}
-		
-		return new BattleRoyaleArena ( name , world , battlefield , mode );
-	}
-	
-	public void createArena ( String name , File world_folder , Battlefield battlefield , BattleRoyaleMode mode ,
+	// -------------
+	public void createArena ( String name , File world_folder , BattleRoyaleArenaConfiguration configuration ,
 			final Consumer < BattleRoyaleArena > callback ) throws IllegalStateException {
 		Validate.notNull ( world_folder , "world folder cannot be null" );
 		Validate.isTrue ( StringUtil.isBlank ( FilenameUtil.getExtension ( world_folder.getName ( ) ) ) ,
 						  "world folder must be a valid directory" );
-		Validate.notNull ( battlefield , "battlefield cannot be null" );
+		Validate.notNull ( configuration , "configuration cannot be null" );
 		
+		// we will create a copy of the configuration,
+		// so we can safely set values.
+		final BattleRoyaleArenaConfiguration final_configuration =
+				new BattleRoyaleArenaConfiguration ( configuration );
+		
+		// here we're just faking the world name, so
+		// it will not throw an exception for being invalid;
+		// this will work properly as we're going to load the world for
+		// the provided world folder, so we don't actually need the
+		// world/world name provided by the configuration.
+		if ( final_configuration.getWorld ( ) == null
+				&& StringUtil.isBlank ( final_configuration.getWorldName ( ) ) ) {
+			final_configuration.setWorld ( world_folder.getName ( ) );
+		}
+		
+		Validate.isValid ( final_configuration , "configuration cannot be invalid" );
+		
+		// make sure not exists
 		if ( arena_map.values ( ).stream ( )
 				.anyMatch ( arena -> Objects.equals ( name , arena.getName ( ) ) ) ) {
 			throw new IllegalArgumentException ( "another arena with the same name already exists" );
@@ -128,24 +132,93 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 		}
 		
 		if ( Bukkit.isPrimaryThread ( ) ) {
-			callback.accept ( register (
-					new BattleRoyaleArena ( name , loadWorld ( world_folder ) , battlefield , mode ) ) );
+			final_configuration.setWorld ( loadWorld ( world_folder ) );
+			
+			callback.accept ( register ( new BattleRoyaleArena ( name , final_configuration ) ) );
 		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> callback.accept ( register (
-					new BattleRoyaleArena ( name , loadWorld ( world_folder ) , battlefield , mode ) ) ) );
+			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
+				final_configuration.setWorld ( loadWorld ( world_folder ) );
+				
+				callback.accept ( register ( new BattleRoyaleArena ( name , final_configuration ) ) );
+			} );
 		}
 	}
+	// -------------
 	
+	// -------------
+	public void createArena ( String name , File world_folder , Battlefield battlefield , BattleRoyaleMode mode ,
+			final Consumer < BattleRoyaleArena > callback ) throws IllegalStateException {
+		Validate.notNull ( world_folder , "world folder cannot be null" );
+		Validate.isTrue ( StringUtil.isBlank ( FilenameUtil.getExtension ( world_folder.getName ( ) ) ) ,
+						  "world folder must be a valid directory" );
+		Validate.notNull ( battlefield , "battlefield cannot be null" );
+		Validate.isValid ( Validate.notNull ( mode , "mode cannot be null" ) , "mode cannot be invalid" );
+		
+		BattleRoyaleArenaConfiguration configuration = new BattleRoyaleArenaConfiguration ( );
+		
+		configuration.setBattlefield ( battlefield );
+		configuration.setMode ( mode );
+		
+		createArena ( name , world_folder , configuration , callback );
+	}
+	// -------------
+	
+	// -------------
 	public void createArena ( String name , String world_name , Battlefield battlefield , BattleRoyaleMode mode ,
 			Consumer < BattleRoyaleArena > callback ) throws IllegalStateException {
 		createArena ( name , new File ( EnumDirectory.BATTLEFIELD_TEMP_DIRECTORY.getDirectory ( ) ,
 										world_name ) , battlefield , mode , callback );
 	}
 	
+	// -------------
 	public void createArena ( String world_name , Battlefield battlefield , BattleRoyaleMode mode ,
 			Consumer < BattleRoyaleArena > callback ) throws IllegalStateException {
 		createArena ( world_name , world_name , battlefield , mode , callback );
 	}
+	// -------------
+	
+	// -------------
+	public void createArena ( String name , BattleRoyaleArenaConfiguration configuration ,
+			final Consumer < BattleRoyaleArena > callback ) throws IllegalStateException {
+		Validate.notBlank ( name , "name cannot be null/empty" );
+		Validate.isValid ( Validate.notNull ( configuration , "configuration cannot be null" ) ,
+						   "configuration cannot be invalid" );
+		
+		// make sure not exists
+		if ( arena_map.values ( ).stream ( )
+				.anyMatch ( arena -> Objects.equals ( name , arena.getName ( ) ) ) ) {
+			throw new IllegalArgumentException ( "another arena with the same name already exists" );
+		}
+		
+		if ( configuration.getWorld ( ) != null ) {
+			callback.accept ( register ( new BattleRoyaleArena ( name , configuration ) ) );
+		} else {
+			if ( StringUtil.isNotBlank ( configuration.getWorldName ( ) ) ) { // world must be loaded
+				createArena ( name , new File ( EnumDirectory.BATTLEFIELD_TEMP_DIRECTORY.getDirectoryMkdirs ( ) ,
+												configuration.getWorldName ( ) ) , configuration , callback );
+			} else {
+				throw new IllegalStateException ( "configuration returned a null world, and a blank world name" );
+			}
+		}
+	}
+	// -------------
+	
+	// -------------
+	public void createArena ( String name , World world , Battlefield battlefield , BattleRoyaleMode mode ,
+			final Consumer < BattleRoyaleArena > callback ) throws IllegalStateException {
+		Validate.notNull ( world , "world cannot be null" );
+		Validate.notNull ( battlefield , "battlefield cannot be null" );
+		Validate.isValid ( Validate.notNull ( mode , "mode cannot be null" ) , "mode cannot be invalid" );
+		
+		BattleRoyaleArenaConfiguration configuration = new BattleRoyaleArenaConfiguration ( );
+		
+		configuration.setBattlefield ( battlefield );
+		configuration.setMode ( mode );
+		configuration.setWorld ( world );
+		
+		createArena ( name , configuration , callback );
+	}
+	// -------------
 	
 	private BattleRoyaleArena register ( BattleRoyaleArena arena ) {
 		arena_map.put ( arena.getUniqueId ( ) , arena );

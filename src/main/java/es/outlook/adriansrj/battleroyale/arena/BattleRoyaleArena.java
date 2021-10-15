@@ -1,5 +1,7 @@
 package es.outlook.adriansrj.battleroyale.arena;
 
+import es.outlook.adriansrj.battleroyale.arena.airsupply.AirSupplyGenerator;
+import es.outlook.adriansrj.battleroyale.arena.bombing.BombingZoneGenerator;
 import es.outlook.adriansrj.battleroyale.arena.border.BattleRoyaleArenaBorder;
 import es.outlook.adriansrj.battleroyale.battlefield.Battlefield;
 import es.outlook.adriansrj.battleroyale.battlefield.bus.BusSpawn;
@@ -8,16 +10,17 @@ import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLootContainer;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.exception.WorldRegionLimitReached;
-import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
-import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
-import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfiguration;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationContainer;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.game.player.Team;
+import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
+import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.MiniMapUtil;
+import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.util.mode.BattleRoyaleModeUtil;
@@ -26,7 +29,6 @@ import es.outlook.adriansrj.core.util.console.ConsoleUtil;
 import es.outlook.adriansrj.core.util.entity.EntityUtil;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import es.outlook.adriansrj.core.util.math.RandomUtil;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -51,13 +53,16 @@ public class BattleRoyaleArena {
 		EXECUTOR_SERVICE = Executors.newWorkStealingPool ( );
 	}
 	
-	protected final UUID                    id;
-	protected final String                  name;
-	protected       World                   world;
-	protected final Battlefield             battlefield;
-	protected final BattleRoyaleMode        mode;
-	protected final BattleRoyaleArenaRegion region;
-	protected final BattleRoyaleArenaBorder border;
+	protected final UUID                           id;
+	protected final String                         name;
+	protected final BattleRoyaleArenaConfiguration configuration;
+	protected       World                          world;
+	protected final Battlefield                    battlefield;
+	protected final BattleRoyaleMode               mode;
+	protected final BattleRoyaleArenaRegion        region;
+	protected final BattleRoyaleArenaBorder        border;
+	protected final AirSupplyGenerator             air_supplies;
+	protected final BombingZoneGenerator           bombing_zones;
 	
 	/** bus registry */
 	protected final BattleRoyaleArenaBusRegistry  bus_registry;
@@ -70,15 +75,20 @@ public class BattleRoyaleArena {
 	/** whether the battlefield is prepared */
 	protected volatile boolean        prepared;
 	
-	protected BattleRoyaleArena ( String name , World world , Battlefield battlefield , BattleRoyaleMode mode )
-			throws IllegalStateException {
+	protected BattleRoyaleArena ( String name , BattleRoyaleArenaConfiguration configuration ) throws IllegalStateException {
+		Validate.isValid ( Validate.notNull ( configuration , "configuration cannot be null" ) ,
+						   "configuration cannot be invalid" );
+		
 		this.id            = UUID.randomUUID ( );
 		this.name          = Objects.requireNonNull ( name , "name cannot be null" );
-		this.world         = world;
-		this.battlefield   = battlefield;
-		this.mode          = mode;
+		this.configuration = new BattleRoyaleArenaConfiguration ( configuration );
+		this.world         = Validate.notNull ( configuration.getWorld ( ) , "world cannot be null" );
+		this.battlefield   = Validate.notNull ( configuration.getBattlefield ( ) , "battlefield cannot be null" );
+		this.mode          = Validate.notNull ( configuration.getMode ( ) , "mode cannot be null" );
 		this.region        = new BattleRoyaleArenaRegion ( this );
 		this.border        = new BattleRoyaleArenaBorder ( this );
+		this.air_supplies  = new AirSupplyGenerator ( this );
+		this.bombing_zones = new BombingZoneGenerator ( this );
 		this.team_registry = new BattleRoyaleArenaTeamRegistry ( this );
 		this.prepared      = false;
 		
@@ -100,6 +110,10 @@ public class BattleRoyaleArena {
 	
 	public String getName ( ) {
 		return name;
+	}
+	
+	public BattleRoyaleArenaConfiguration getConfiguration ( ) {
+		return new BattleRoyaleArenaConfiguration ( configuration ); // safe copy
 	}
 	
 	public World getWorld ( ) {
@@ -128,6 +142,14 @@ public class BattleRoyaleArena {
 	
 	public BattleRoyaleArenaBorder getBorder ( ) {
 		return border;
+	}
+	
+	public AirSupplyGenerator getAirSupplyGenerator ( ) {
+		return air_supplies;
+	}
+	
+	public BombingZoneGenerator getBombingZoneGenerator ( ) {
+		return bombing_zones;
 	}
 	
 	/**
@@ -489,6 +511,7 @@ public class BattleRoyaleArena {
 	
 	protected synchronized void restartModules ( ) {
 		this.border.restart ( );
+		this.air_supplies.restart ( );
 		this.team_registry.clear ( );
 		
 		if ( bus_registry != null ) {

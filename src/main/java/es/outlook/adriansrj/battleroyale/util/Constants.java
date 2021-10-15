@@ -80,18 +80,24 @@ public class Constants {
 	public static final String PARACHUTE_NAMESPACE       = "parachute";
 	public static final String PARACHUTE_COLOR_NAMESPACE = "parachute-color";
 	
+	// ---------- text
+	
+	public static final String HEART_TEXT = String.valueOf ( ( char ) 10084 );
+	
 	// ---------- packet class names
 	
 	public static final String PACKET_IN_ARM_ANIMATION_NAME              = "PacketPlayInArmAnimation";
 	public static final String PACKET_IN_POSITION_NAME                   = "PacketPlayInPosition";
 	public static final String PACKET_IN_LOOK_NAME                       = "PacketPlayInPositionLook";
 	public static final String PACKET_OUT_ENTITY_TELEPORT_NAME           = "PacketPlayOutEntityTeleport";
+	public static final String PACKET_OUT_ATTACH_ENTITY_NAME             = "PacketPlayOutAttachEntity";
 	public static final String PACKET_OUT_ENTITY_RELATIVE_MOVE_NAME      = "PacketPlayOutRelEntityMove";
 	public static final String PACKET_OUT_ENTITY_RELATIVE_MOVE_LOOK_NAME = "PacketPlayOutRelEntityMoveLook";
 	
 	// ---------- packet-related classes
 	
 	public static final Class < ? > PACKET_OUT_ENTITY_TELEPORT_CLASS;
+	public static final Class < ? > PACKET_OUT_ATTACH_ENTITY_CLASS;
 	
 	public static final Class < ? >       PACKET_CLASS;
 	public static final Method            PACKET_WRITE_DATA_METHOD;
@@ -105,6 +111,9 @@ public class Constants {
 		try {
 			PACKET_OUT_ENTITY_TELEPORT_CLASS = ClassReflection.getMinecraftClass (
 					PACKET_OUT_ENTITY_TELEPORT_NAME , "network.protocol.game" );
+			
+			PACKET_OUT_ATTACH_ENTITY_CLASS = ClassReflection.getMinecraftClass (
+					PACKET_OUT_ATTACH_ENTITY_NAME , "network.protocol.game" );
 			
 			// class/constructor/method names may vary depending on version of the server
 			PACKET_CLASS                       = ClassReflection.getMinecraftClass (

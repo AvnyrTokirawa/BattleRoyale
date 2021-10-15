@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public class BattlefieldConfiguration implements Configurable {
 	
-	protected static final String BORDER_SHRINK_KEY = "border-shrink";
+	protected static final String BORDER_RESIZE_KEY = "border-resizing";
 	
 	/**
 	 * Loads the {@link BattlefieldConfiguration} in the provided {@link ConfigurationSection}.
@@ -57,8 +57,8 @@ public class BattlefieldConfiguration implements Configurable {
 	@ConfigurableCollectionEntry ( subsection = "vehicle-spawns", subsectionprefix = "spawn-" )
 	protected final Set < ConfigurableVector > vehicle_spawns = new HashSet <> ( );
 	
-	/** border shrink succession */
-	protected BattlefieldBorderSuccession border_shrink;
+	/** border resizing succession */
+	protected BattlefieldBorderSuccession border_resize;
 	
 	/** loot configuration */
 	@ConfigurableEntry ( key = "loot-configuration" )
@@ -67,6 +67,18 @@ public class BattlefieldConfiguration implements Configurable {
 	/** loot chests */
 	@ConfigurableCollectionEntry ( subsection = "loot-chests", subsectionprefix = "loot-chest-" )
 	protected final Set < ConfigurableVector > loot_chests = new HashSet <> ( );
+	
+	/** air supply */
+	@ConfigurableEntry ( key = "air-supply.maximum" )
+	protected int air_supply_max;
+	@ConfigurableEntry ( key = "air-supply.minimum" )
+	protected int air_supply_min;
+	
+	/** bombing zone */
+	@ConfigurableEntry ( key = "bombing-zone.maximum" )
+	protected int bombing_zone_max;
+	@ConfigurableEntry ( key = "bombing-zone.minimum" )
+	protected int bombing_zone_min;
 	
 	public BattlefieldConfiguration ( ) {
 		// to be loaded
@@ -164,7 +176,7 @@ public class BattlefieldConfiguration implements Configurable {
 	
 	// ----- loot configuration
 	
-	public String getLootConfigurationName ( ) {
+	public String getLootConfigurationFilename ( ) {
 		return loot_configuration;
 	}
 	
@@ -222,28 +234,71 @@ public class BattlefieldConfiguration implements Configurable {
 				|| this.loot_chests.remove ( new ConfigurableVector ( location ) );
 	}
 	
-	// ----- border shrink succession
+	// ----- border resizing succession
 	
-	public BattlefieldBorderSuccession getBorderShrinkSuccession ( ) {
-		return border_shrink;
+	public BattlefieldBorderSuccession getBorderResizeSuccession ( ) {
+		return border_resize;
 	}
 	
-	public void setBorderShrinkSuccession ( BattlefieldBorderSuccession shrink_succession ) {
-		this.border_shrink = shrink_succession;
+	public void setBorderResizeSuccession ( BattlefieldBorderSuccession resize_succession ) {
+		this.border_resize = resize_succession;
+	}
+	
+	// ----- air supply
+	
+	public void setAirSupplyMax ( int air_supply_max ) {
+		this.air_supply_max = air_supply_max;
+		this.airSupplyCheck ( );
+	}
+	
+	public void setAirSupplyMin ( int air_supply_min ) {
+		this.air_supply_min = air_supply_min;
+		this.airSupplyCheck ( );
+	}
+	
+	public int getAirSupplyMax ( ) {
+		return air_supply_max;
+	}
+	
+	public int getAirSupplyMin ( ) {
+		return air_supply_min;
+	}
+	
+	// ----- bombing zone
+	
+	public int getBombingZoneMax ( ) {
+		return bombing_zone_max;
+	}
+	
+	public int getBombingZoneMin ( ) {
+		return bombing_zone_min;
+	}
+	
+	public void setBombingZoneMax ( int bombing_zone_max ) {
+		this.bombing_zone_max = bombing_zone_max;
+		this.bombingZoneCheck ( );
+	}
+	
+	public void setBombingZoneMin ( int bombing_zone_min ) {
+		this.bombing_zone_min = bombing_zone_min;
+		this.bombingZoneCheck ( );
 	}
 	
 	@Override
 	public BattlefieldConfiguration load ( ConfigurationSection section ) {
 		loadEntries ( section );
 		
-		// border shrink
-		if ( section.isConfigurationSection ( BORDER_SHRINK_KEY ) ) {
-			ConfigurationSection border_shrink_section = section.getConfigurationSection ( BORDER_SHRINK_KEY );
+		// border resize
+		if ( section.isConfigurationSection ( BORDER_RESIZE_KEY ) ) {
+			ConfigurationSection border_resize_section = section.getConfigurationSection ( BORDER_RESIZE_KEY );
 			
-			if ( ( border_shrink = new BattlefieldBorderSuccessionRandom ( border_shrink_section ) ).isInvalid ( ) ) {
-				this.border_shrink = new BattlefieldBorderSuccession ( ).load ( border_shrink_section );
+			if ( ( border_resize = new BattlefieldBorderSuccessionRandom ( border_resize_section ) ).isInvalid ( ) ) {
+				this.border_resize = new BattlefieldBorderSuccession ( ).load ( border_resize_section );
 			}
 		}
+		
+		// fixing air supply values
+		this.airSupplyCheck ( );
 		return this;
 	}
 	
@@ -283,5 +338,29 @@ public class BattlefieldConfiguration implements Configurable {
 	@Override
 	public boolean isInvalid ( ) {
 		return !isValid ( );
+	}
+	
+	/**
+	 * Fixes the {@link #air_supply_max} and {@link #air_supply_min} values;
+	 * ensuring that {@link #air_supply_max} is actually higher than {@link #air_supply_min}.
+	 */
+	protected void airSupplyCheck ( ) {
+		int air_supply_max = Math.max ( this.air_supply_max , this.air_supply_min );
+		int air_supply_min = Math.min ( this.air_supply_max , this.air_supply_min );
+		
+		this.air_supply_max = Math.max ( air_supply_max , 0 );
+		this.air_supply_min = Math.max ( air_supply_min , 0 );
+	}
+	
+	/**
+	 * Fixes the {@link #bombing_zone_max} and {@link #bombing_zone_min} values;
+	 * ensuring that {@link #bombing_zone_max} is actually higher than {@link #bombing_zone_min}.
+	 */
+	protected void bombingZoneCheck ( ) {
+		int air_supply_max = Math.max ( this.bombing_zone_max , this.bombing_zone_min );
+		int air_supply_min = Math.min ( this.bombing_zone_max , this.bombing_zone_min );
+		
+		this.bombing_zone_max = Math.max ( air_supply_max , 0 );
+		this.bombing_zone_min = Math.max ( air_supply_min , 0 );
 	}
 }

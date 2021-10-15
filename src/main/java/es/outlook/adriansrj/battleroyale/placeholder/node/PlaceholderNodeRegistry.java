@@ -2,7 +2,9 @@ package es.outlook.adriansrj.battleroyale.placeholder.node;
 
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.placeholder.node.arena.ArenaPlaceholderNode;
+import es.outlook.adriansrj.battleroyale.placeholder.node.date.DatePlaceholderNode;
 import es.outlook.adriansrj.battleroyale.placeholder.node.player.PlayerPlaceholderNode;
+import es.outlook.adriansrj.battleroyale.placeholder.node.team.TeamPlaceholderNode;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import org.apache.commons.lang3.Validate;
 
@@ -34,7 +36,9 @@ public final class PlaceholderNodeRegistry extends PluginHandler {
 		
 		// registering default nodes
 		registerNode ( new PlayerPlaceholderNode ( ) );
+		registerNode ( new TeamPlaceholderNode ( ) );
 		registerNode ( new ArenaPlaceholderNode ( ) );
+		registerNode ( new DatePlaceholderNode ( ) );
 	}
 	
 	public Collection < PlaceholderNode > getRegisteredNodes ( ) {

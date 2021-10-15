@@ -150,9 +150,10 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 			death_location_map.put ( player.getUniqueId ( ) , player.getLocation ( ) );
 			
 			// firing event
-			EntityDamageEvent      last_damage = player.getLastDamageCause ( );
-			PlayerDeathEvent.Cause cause       = PlayerDeathEvent.Cause.of ( last_damage.getCause ( ) );
-			Player                 br_killer   = null;
+			EntityDamageEvent last_damage = player.getLastDamageCause ( );
+			PlayerDeathEvent.Cause cause = last_damage != null
+					? PlayerDeathEvent.Cause.of ( last_damage.getCause ( ) ) : null;
+			Player br_killer = null;
 			
 			if ( last_damage instanceof EntityDamageByEntityEvent ) {
 				// the player was killed by another player
@@ -251,9 +252,8 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 	private int getPosition ( Player player ) {
 		return player.getArena ( ).getTeamRegistry ( ).getHandle ( ).stream ( )
 				.map ( team -> team.getPlayers ( ).stream ( )
-						.filter ( alive -> alive.hasTeam ( ) && !alive.isSpectator ( )
-								&& !Objects.equals ( alive , player )
-								&& alive.getBukkitPlayerOptional ( ).isPresent ( ) )
+						.filter ( alive -> !Objects.equals ( alive , player ) )
+						.filter ( Player :: isPlaying )
 						.count ( ) )
 				.reduce ( 0L , Long :: sum ).intValue ( );
 	}

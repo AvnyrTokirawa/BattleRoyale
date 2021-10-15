@@ -8,7 +8,7 @@ package es.outlook.adriansrj.battleroyale.enums;
 public enum EnumArenaBorderState {
 	
 	/**
-	 * The border is temporarily stopped until the next shrinking point begins.
+	 * The border is temporarily stopped until the next resizing point begins.
 	 */
 	IDLE,
 	
@@ -18,7 +18,7 @@ public enum EnumArenaBorderState {
 	RESIZING,
 	
 	/**
-	 * The border is stopped since the shrinking succession has finished.
+	 * The border is stopped since the resizing succession has finished.
 	 */
 	STOPPED;
 }

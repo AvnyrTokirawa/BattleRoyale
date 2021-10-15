@@ -107,9 +107,10 @@ public class Material implements NBTSerializable {
 		root.put ( "Name" , StringBinaryTag.of ( namespaced_id ) );
 		
 		if ( this.properties.size ( ) > 0 ) {
-			this.properties.forEach ( ( property_name , property_value ) ->
-											  properties.put ( property_name ,
-															   StringBinaryTag.of ( property_value ) ) );
+			this.properties.forEach (
+					( property_name , property_value ) ->
+							properties.put ( property_name ,
+											 StringBinaryTag.of ( property_value ) ) );
 			
 			root.put ( "Properties" , CompoundBinaryTag.from ( properties ) );
 		}

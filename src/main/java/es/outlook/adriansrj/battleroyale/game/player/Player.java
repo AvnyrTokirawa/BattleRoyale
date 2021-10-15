@@ -101,8 +101,7 @@ public final class Player extends PlayerWrapper {
 		
 		// default scoreboard
 		this.scoreboard = new ScoreboardSimple ( this );
-		// we would like to set it visible when the arena starts
-		this.scoreboard.setVisible ( false );
+		this.scoreboard.setVisible ( true );
 		
 		// default compass
 		this.compass = new CompassBarSimple ( this );
@@ -136,6 +135,10 @@ public final class Player extends PlayerWrapper {
 	
 	public synchronized boolean isSpectator ( ) {
 		return spectator;
+	}
+	
+	public synchronized boolean isPlaying ( ) {
+		return hasTeam ( ) && !isSpectator ( ) && isOnline ( );
 	}
 	
 	//	@Override
@@ -253,6 +256,9 @@ public final class Player extends PlayerWrapper {
 			}
 			
 			this.arena = arena;
+			
+			// resetting temporal stats
+			data_storage.resetTempStats ( );
 			
 			// firing event
 			new PlayerArenaSetEvent ( this , arena ).call ( );
@@ -378,28 +384,33 @@ public final class Player extends PlayerWrapper {
 	}
 	
 	private synchronized void dirtyCheck ( ) {
+		// TODO:
 		if ( data_storage.dirty ) {
 			// updating bus
-			{
+			Bus bus_configuration = data_storage.getSetting ( Bus.class , EnumPlayerSetting.BUS );
+			
+			if ( this.bus == null || !Objects.equals ( bus_configuration , this.bus.getConfiguration ( ) ) ) {
 				if ( bus != null && bus.isStarted ( ) ) {
 					final BusInstance < ? > final_bus = this.bus;
 					
 					SchedulerUtil.runTask ( final_bus :: restart );
 				}
 				
-				Bus               configuration = data_storage.getSetting ( Bus.class , EnumPlayerSetting.BUS );
-				BusInstance < ? > instance      = configuration.createInstance ( this );
+				BusInstance < ? > instance = bus_configuration.createInstance ( this );
 				
 				if ( instance == null ) {
 					throw new IllegalStateException (
-							configuration.getClass ( ).getName ( ) + " returned a null instance" );
+							bus_configuration.getClass ( ).getName ( ) + " returned a null instance" );
 				}
 				
 				this.bus = instance;
 			}
 			
 			// updating parachute
-			{
+			Parachute parachute_configuration = data_storage.getSetting (
+					Parachute.class , EnumPlayerSetting.PARACHUTE );
+			
+			if ( this.parachute == null || !Objects.equals ( parachute_configuration , this.parachute.getConfiguration ( ) ) ) {
 				boolean was_open = parachute != null && parachute.isOpen ( );
 				
 				if ( was_open ) {
@@ -408,13 +419,11 @@ public final class Player extends PlayerWrapper {
 					SchedulerUtil.runTask ( final_parachute :: close );
 				}
 				
-				Parachute configuration = data_storage.getSetting (
-						Parachute.class , EnumPlayerSetting.PARACHUTE );
-				ParachuteInstance instance = configuration.createInstance ( this );
+				ParachuteInstance instance = parachute_configuration.createInstance ( this );
 				
 				if ( instance == null ) {
 					throw new IllegalStateException (
-							configuration.getClass ( ).getName ( ) + " returned a null instance" );
+							parachute_configuration.getClass ( ).getName ( ) + " returned a null instance" );
 				}
 				
 				this.parachute = instance;

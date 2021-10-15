@@ -103,7 +103,7 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 			// start manipulator
 			start_manipulator = world.spawn ( start_location.toLocation ( world ).add ( 0 , -0.5D , 0 ) ,
 											  ArmorStand.class );
-			start_manipulator.setHelmet ( UniversalMaterial.RED_WOOL.getItemStack ( ) );
+			start_manipulator.getEquipment ( ).setHelmet ( UniversalMaterial.RED_WOOL.getItemStack ( ) );
 			start_manipulator.setVisible ( false );
 			start_manipulator.setGravity ( false );
 			start_manipulator.setMetadata ( MANIPULATOR_START_METADATA_KEY ,
@@ -121,7 +121,7 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 			Vector door_point_location = calculateDoorPointLocation ( );
 			
 			door_manipulator = world.spawn ( door_point_location.toLocation ( world ) , ArmorStand.class );
-			door_manipulator.setHelmet ( UniversalMaterial.GREEN_WOOL.getItemStack ( ) );
+			door_manipulator.getEquipment ( ).setHelmet ( UniversalMaterial.GREEN_WOOL.getItemStack ( ) );
 			door_manipulator.setVisible ( false );
 			door_manipulator.setGravity ( false );
 			door_manipulator.setMetadata ( MANIPULATOR_METADATA_KEY ,

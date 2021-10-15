@@ -6,6 +6,6 @@ package es.outlook.adriansrj.battleroyale.enums;
  * @author AdrianSR / 09/10/2021 / 05:22 p. m.
  */
 public enum EnumScoreboardPlugin {
-
-	FEATHERBOARD ,
+	
+	FEATHERBOARD,
 }

@@ -1,6 +1,8 @@
 package es.outlook.adriansrj.battleroyale.enums;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
+import es.outlook.adriansrj.battleroyale.arena.airsupply.AirSupplyGeneratorHandler;
+import es.outlook.adriansrj.battleroyale.arena.bombing.BombingZoneGeneratorHandler;
 import es.outlook.adriansrj.battleroyale.arena.border.BattleRoyaleArenaBorderHandler;
 import es.outlook.adriansrj.battleroyale.arena.sign.BattleRoyaleArenaSignHandler;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldRegistry;
@@ -120,6 +122,8 @@ public enum EnumPluginHandler {
 	ARENA_SIGN_CONFIGURATION_HANDLER ( BattleRoyaleArenaSignConfigHandler.class ),
 	ARENA_SIGN_CONTAINER_HANDLER ( BattleRoyaleArenaSignContainerHandler.class ),
 	ARENA_BORDER_HANDLER ( BattleRoyaleArenaBorderHandler.class ),
+	ARENA_AIR_SUPPLY_HANDLER ( AirSupplyGeneratorHandler.class ),
+	ARENA_BOMBING_ZONE_HANDLER ( BombingZoneGeneratorHandler.class ),
 	
 	MINIMAP_HANDLER ( MinimapHandler.class ),
 	

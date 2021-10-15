@@ -23,7 +23,7 @@ public final class BattlefieldSetupSessionGUI extends PluginHandler {
 	// bus spawns
 	// player spawns
 	// vehicle spawns
-	// border shrink
+	// border resize
 	// spawns
 	// loot configuration
 	// loot chests

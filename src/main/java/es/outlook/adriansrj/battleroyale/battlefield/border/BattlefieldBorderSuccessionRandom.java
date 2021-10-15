@@ -11,6 +11,10 @@ import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * Border random shrinking succession.
+ * <br>
+ * <b>Note that this class will only generate shrinking successions.</b>
+ * This means that it will not generate points that will make the border
+ * grow, but instead, will generate points that will make the border shrink.
  *
  * @author AdrianSR / 06/09/2021 / 11:09 a. m.
  */
@@ -109,7 +113,7 @@ public class BattlefieldBorderSuccessionRandom extends BattlefieldBorderSuccessi
 			long   time      = times[ i ];
 			long   idle_time = idle_times[ i ];
 			
-			this.points.add ( new BattlefieldBorderShrink (
+			this.points.add ( new BattlefieldBorderResize (
 					eye_locations[ i ] , radius , damage ,
 					Duration.ofMilliseconds ( time ) ,
 					Duration.ofMilliseconds ( idle_time ) ) );

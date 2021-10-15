@@ -10,6 +10,7 @@ import es.outlook.adriansrj.core.util.math.Vector2I;
 import es.outlook.adriansrj.core.util.math.Vector3I;
 import es.outlook.adriansrj.core.util.server.Version;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.map.*;
@@ -158,8 +159,8 @@ public abstract class MinimapRenderer extends MapRenderer {
 		// caching zoom
 		zoom_cache.put ( player.getUniqueId ( ) , zoom );
 		
-		// here we're going to add cursors, but first we have to clear the cursors of
-		// the last render.
+		// here we're going to add cursors, but first we have to clear
+		// the cursors of the last render.
 		clearCursors ( canvas );
 		render ( canvas , display_bounds , player );
 		
@@ -214,12 +215,27 @@ public abstract class MinimapRenderer extends MapRenderer {
 			out_bounds = true;
 		}
 		
-		if ( out_bounds ? clip_out_of_bounds : true ) {
+		if ( !out_bounds || clip_out_of_bounds ) {
 			return new MapLocation ( x , y , ( byte ) ( 1 + ( DirectionUtil.normalize (
 					location.getYaw ( ) ) / 360.0F ) * 15 ) );
 		} else {
 			return null;
 		}
+	}
+	
+	/**
+	 * Projects the given location {@link Vector} to a {@link MapLocation} between the specified {@link ZoneBounds}.
+	 *
+	 * @param location           the location vector.
+	 * @param yaw                the horizontal orientation.
+	 * @param zone_bounds        the zone.
+	 * @param clip_out_of_bounds whether to clip locations out of bounds.
+	 *
+	 * @return the corresponding map location, or null if off of limits and <strong>clip_off_limits</strong> is false.
+	 */
+	protected MapLocation project ( Vector location , float yaw , ZoneBounds zone_bounds , boolean clip_out_of_bounds ) {
+		return project ( location.toLocation (
+				Bukkit.getWorlds ( ).get ( 0 ) , yaw , 0.0F ) , zone_bounds , clip_out_of_bounds );
 	}
 	
 	/**

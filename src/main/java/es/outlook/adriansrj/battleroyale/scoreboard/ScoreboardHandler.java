@@ -30,7 +30,7 @@ public final class ScoreboardHandler extends PluginHandler {
 		Bukkit.getScheduler ( ).runTaskTimerAsynchronously ( plugin , ( )
 				-> Player.getPlayers ( ).stream ( ).map ( Player :: getBRScoreboard )
 				.filter ( Objects :: nonNull ).filter ( Scoreboard :: isVisible )
-				.forEach ( Scoreboard :: update ) , 0L , 20L );
+				.forEach ( Scoreboard :: update ) , 0L , 15L );
 	}
 	
 	@Override

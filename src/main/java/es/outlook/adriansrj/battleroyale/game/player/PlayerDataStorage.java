@@ -22,11 +22,13 @@ public final class PlayerDataStorage {
 	private final String name;
 	
 	// stat map
-	private final Map < EnumStat, Integer >                stat_values    = new EnumMap <> ( EnumStat.class );
+	private final Map < EnumStat, Integer >                stat_values      = new EnumMap <> ( EnumStat.class );
+	// temporal stat map
+	private final Map < EnumStat, Integer >                temp_stat_values = new EnumMap <> ( EnumStat.class );
 	// setting map
-	private final Map < EnumPlayerSetting, NamespacedKey > setting_values = new EnumMap <> ( EnumPlayerSetting.class );
+	private final Map < EnumPlayerSetting, NamespacedKey > setting_values   = new EnumMap <> ( EnumPlayerSetting.class );
 	// purchased cosmetics
-	private final Set < Cosmetic < ? > >                   cosmetics      = new HashSet <> ( );
+	private final Set < Cosmetic < ? > >                   cosmetics        = new HashSet <> ( );
 	
 	// flag that determines whether something has changed and
 	// an update might be required.
@@ -40,6 +42,7 @@ public final class PlayerDataStorage {
 		// will never return null.
 		for ( EnumStat stat_type : EnumStat.values ( ) ) {
 			stat_values.put ( stat_type , 0 );
+			temp_stat_values.put ( stat_type , 0 );
 		}
 	}
 	
@@ -61,8 +64,16 @@ public final class PlayerDataStorage {
 		return Collections.unmodifiableMap ( stat_values );
 	}
 	
+	public Map < EnumStat, Integer > getTempStats ( ) {
+		return Collections.unmodifiableMap ( temp_stat_values );
+	}
+	
 	public int getStat ( EnumStat stat_type ) {
 		return stat_values.get ( stat_type );
+	}
+	
+	public int getTempStat ( EnumStat stat_type ) {
+		return temp_stat_values.get ( stat_type );
 	}
 	
 	public void setStat ( EnumStat stat_type , int value , boolean upload ) {
@@ -71,8 +82,6 @@ public final class PlayerDataStorage {
 		
 		this.stat_values.put ( stat_type , value );
 		this.dirty = true;
-		
-		System.out.println ( "Stat " + stat_type + " set to " + value + " | upload = " + upload );
 		
 		// then uploading
 		if ( upload && EnumMainConfiguration.ENABLE_DATABASE.getAsBoolean ( ) ) {
@@ -85,6 +94,14 @@ public final class PlayerDataStorage {
 		}
 	}
 	
+	public void setTempStat ( EnumStat stat_type , int value ) {
+		Validate.notNull ( stat_type , "stat type cannot be null" );
+		Validate.isTrue ( value >= 0 , "value must be >= 0" );
+		
+		this.temp_stat_values.put ( stat_type , value );
+		this.dirty = true;
+	}
+	
 	public void setStat ( EnumStat stat_type , int value ) {
 		setStat ( stat_type , value , false );
 	}
@@ -93,6 +110,12 @@ public final class PlayerDataStorage {
 		Validate.notNull ( stat_type , "stat type cannot be null" );
 		
 		setStat ( stat_type , Math.max ( getStat ( stat_type ) + amount , 0 ) , upload );
+	}
+	
+	public void incrementTempStat ( EnumStat stat_type , int amount ) {
+		Validate.notNull ( stat_type , "stat type cannot be null" );
+		
+		setTempStat ( stat_type , Math.max ( getTempStat ( stat_type ) + amount , 0 ) );
 	}
 	
 	public void incrementStat ( EnumStat stat_type , int amount ) {
@@ -105,6 +128,12 @@ public final class PlayerDataStorage {
 		setStat ( stat_type , Math.max ( getStat ( stat_type ) - amount , 0 ) , upload );
 	}
 	
+	public void decrementTempStat ( EnumStat stat_type , int amount ) {
+		Validate.notNull ( stat_type , "stat type cannot be null" );
+		
+		setTempStat ( stat_type , Math.max ( getTempStat ( stat_type ) - amount , 0 ) );
+	}
+	
 	public void decrementStat ( EnumStat stat_type , int amount ) {
 		decrementStat ( stat_type , amount , false );
 	}
@@ -115,6 +144,20 @@ public final class PlayerDataStorage {
 				this.setStat ( stat_type , value );
 			}
 		} );
+	}
+	
+	public void setTempStats ( Map < EnumStat, Integer > stat_values ) {
+		stat_values.forEach ( ( stat_type , value ) -> {
+			if ( value >= 0 ) {
+				this.setTempStat ( stat_type , value );
+			}
+		} );
+	}
+	
+	public void resetTempStats ( ) {
+		for ( EnumStat stat_type : EnumStat.values ( ) ) {
+			temp_stat_values.put ( stat_type , 0 );
+		}
 	}
 	
 	// ------- settings

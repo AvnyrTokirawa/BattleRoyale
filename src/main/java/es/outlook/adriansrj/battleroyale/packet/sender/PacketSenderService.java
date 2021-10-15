@@ -87,6 +87,11 @@ public final class PacketSenderService extends PluginHandler implements PacketSe
 	}
 	
 	@Override
+	public void sendEntityAttachPacket ( Player player , int id , int leash_holder_id ) {
+		handle.sendEntityAttachPacket ( player , id , leash_holder_id );
+	}
+	
+	@Override
 	public void sendUpdatePacket ( Player player , Entity entity ) {
 		handle.sendUpdatePacket ( player , entity );
 	}

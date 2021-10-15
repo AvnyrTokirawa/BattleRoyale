@@ -1,5 +1,6 @@
 package es.outlook.adriansrj.battleroyale.packet.factory;
 
+import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityAttach;
 import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityTeleport;
 import es.outlook.adriansrj.core.util.server.Version;
 import org.bukkit.util.Vector;
@@ -23,6 +24,8 @@ public interface PacketFactoryServiceHandle {
 		}
 	}
 	
+	// ------ entity teleport packet
+	
 	Object createEntityTeleportPacket ( int entity_id , boolean on_ground , double x , double y ,
 			double z , float yaw , float pitch );
 	
@@ -33,5 +36,13 @@ public interface PacketFactoryServiceHandle {
 				wrapper.getEntityId ( ) , wrapper.isOnGround ( ) ,
 				location.getX ( ) , location.getY ( ) , location.getZ ( ) ,
 				wrapper.getYaw ( ) , wrapper.getPitch ( ) );
+	}
+	
+	// ------ attach entity packet
+	
+	Object createEntityAttachPacket ( int entity_id , int leash_holder_id );
+	
+	default Object createEntityAttachPacket ( PacketOutEntityAttach wrapper ) {
+		return createEntityAttachPacket ( wrapper.getEntityId ( ) , wrapper.getLeashHolderId ( ) );
 	}
 }

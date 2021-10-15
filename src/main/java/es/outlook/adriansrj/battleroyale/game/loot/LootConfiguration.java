@@ -8,6 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +25,8 @@ public class LootConfiguration implements Configurable {
 		return of ( YamlConfigurationComments.loadConfiguration ( file ) );
 	}
 	
-	protected final Map < EnumLootContainer, LootConfigurationContainer > containers = new HashMap <> ( );
+	protected final Map < EnumLootContainer, LootConfigurationContainer > containers =
+			new EnumMap <> ( EnumLootContainer.class );
 	
 	public LootConfiguration ( Map < EnumLootContainer, LootConfigurationContainer > containers ) {
 		containers.forEach ( ( key , value ) -> {

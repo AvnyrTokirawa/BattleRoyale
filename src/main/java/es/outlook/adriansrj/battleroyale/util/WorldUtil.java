@@ -4,8 +4,10 @@ import es.outlook.adriansrj.battleroyale.world.chunk.EmptyChunkGenerator;
 import es.outlook.adriansrj.core.util.world.GameRuleType;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.block.Block;
 
 import java.io.File;
+import java.util.function.Predicate;
 
 /**
  * @author AdrianSR / 03/09/2021 / 02:11 p. m.
@@ -42,5 +44,23 @@ public class WorldUtil extends es.outlook.adriansrj.core.util.world.WorldUtil {
 		} else {
 			return null;
 		}
+	}
+	
+	/**
+	 *
+	 * @param world
+	 * @param x
+	 * @param z
+	 * @return the highest or null.
+	 */
+	public static Block getHighestBlockAt ( World world , int x , int z , Predicate < Block > filter ) {
+		for ( int y = world.getMaxHeight ( ) - 1 ; y >= 0 ; y-- ) {
+			Block block = world.getBlockAt ( x , y , z );
+			
+			if ( filter.test ( block ) ) {
+				return block;
+			}
+		}
+		return null;
 	}
 }
