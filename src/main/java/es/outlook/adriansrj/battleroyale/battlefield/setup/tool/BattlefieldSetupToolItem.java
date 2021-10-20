@@ -47,6 +47,11 @@ public abstract class BattlefieldSetupToolItem extends BattlefieldSetupTool {
 					BattlefieldSetupToolItem.this.onActionPerform ( player , action , event );
 				}
 			}
+			
+			@Override
+			public EventPriority getPriority ( ) {
+				return EventPriority.HIGHEST;
+			}
 		};
 		
 		ActionItemHandler.register ( item );

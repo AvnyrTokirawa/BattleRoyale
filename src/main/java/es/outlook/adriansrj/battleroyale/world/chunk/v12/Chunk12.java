@@ -89,15 +89,15 @@ public class Chunk12 implements Chunk {
 	
 	@Override
 	public void recalculateHeightmap ( ) {
-		for ( int x = 0; x < 16; x++ ) {
-			for ( int z = 0; z < 16; z++ ) {
+		for ( int x = 0 ; x < 16 ; x++ ) {
+			for ( int z = 0 ; z < 16 ; z++ ) {
 				section:
-				for ( int si = sections.length - 1; si > 0; si-- ) {
+				for ( int si = sections.length - 1 ; si > 0 ; si-- ) {
 					ChunkSection12 section = sections[ si ];
 					int            base_y  = si << 4; // section min y
-
+					
 					if ( section != null && !section.isEmpty ( ) ) {
-						for ( int y = 15; y > 0; y-- ) {
+						for ( int y = 15 ; y > 0 ; y-- ) {
 							if ( section.getBlockId ( x , y , z ) > 0 ) {
 								heightmap.setHeight ( x , z , base_y + y );
 								break section;
@@ -271,7 +271,7 @@ public class Chunk12 implements Chunk {
 		List < CompoundBinaryTag > sections = new ArrayList <> ( );
 		
 		for ( ChunkSection12 section : this.sections ) {
-			if ( section != null && ! section.isEmpty ( ) ) {
+			if ( section != null && !section.isEmpty ( ) ) {
 				sections.add ( section.toNBT ( ) );
 			}
 		}
@@ -284,8 +284,8 @@ public class Chunk12 implements Chunk {
 					ByteBinaryTag.of ( ( byte ) ( terrain_populated ? 1 : 0 ) ) );
 		level.put ( NBTConstants.Pre13.CHUNK_LIGHT_POPULATED_TAG ,
 					ByteBinaryTag.of ( ( byte ) ( light_populated ? 1 : 0 ) ) );
-		level.put ( NBTConstants.Pre13.CHUNK_ENTITIES_TAG , ListBinaryTag.empty ( ) /* TODO */ );
-		level.put ( NBTConstants.Pre13.CHUNK_TILE_ENTITIES_TAG , ListBinaryTag.empty ( ) /* TODO */ );
+		level.put ( NBTConstants.Pre13.CHUNK_ENTITIES_TAG , ListBinaryTag.empty ( ) );
+		level.put ( NBTConstants.Pre13.CHUNK_TILE_ENTITIES_TAG , ListBinaryTag.empty ( ) );
 		
 		root.put ( NBTConstants.Pre13.CHUNK_LEVEL_TAG , CompoundBinaryTag.from ( level ) );
 		root.put ( NBTConstants.Pre13.CHUNK_DATA_VERSION_TAG , IntBinaryTag.of ( data_version ) );

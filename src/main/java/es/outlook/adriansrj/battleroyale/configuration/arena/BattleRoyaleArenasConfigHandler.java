@@ -154,9 +154,6 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 			// must load arenas asynchronously as the server could crash
 			// since the shapes of the arenas could probably be huge.
 			final String resulting_name = name.trim ( );
-			//			final Battlefield      resulting_battlefield = battlefield;
-			//			final BattleRoyaleMode resulting_mode        = mode;
-			//			final String           resulting_world_name  = configuration.getWorldName ( ).trim ( );
 			
 			ConsoleUtil.sendPluginMessage ( ChatColor.YELLOW , "Loading arena '" + resulting_name
 					+ "' ..." , plugin );

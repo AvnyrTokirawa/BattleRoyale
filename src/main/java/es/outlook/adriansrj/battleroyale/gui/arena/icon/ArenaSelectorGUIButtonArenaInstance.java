@@ -4,11 +4,12 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.gui.GUIIconInstance;
 import es.outlook.adriansrj.battleroyale.gui.GUIInstance;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.core.menu.action.ItemClickAction;
+import es.outlook.adriansrj.core.util.StringUtil;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -67,7 +68,8 @@ public class ArenaSelectorGUIButtonArenaInstance extends GUIIconInstance {
 		if ( arena != null ) {
 			// display name
 			ItemStackUtil.setName ( icon , String.format (
-					configuration.getDisplayNameFormat ( ) , arena.getName ( ) ) );
+					configuration.getDisplayNameFormat ( ) ,
+					StringUtil.capitalize ( arena.getName ( ).toLowerCase ( ) ) ) );
 			
 			// description
 			List < String > description = configuration.getDescriptionFormat ( );

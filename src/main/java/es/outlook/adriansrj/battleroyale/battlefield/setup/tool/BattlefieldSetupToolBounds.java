@@ -65,6 +65,8 @@ public class BattlefieldSetupToolBounds extends BattlefieldSetupToolItem {
 	@Override
 	protected void onActionPerform ( org.bukkit.entity.Player player ,
 			ActionItem.EnumAction action , PlayerInteractEvent event ) {
+		event.setCancelled ( true ); // must cancel interaction
+		
 		Block block = event.getClickedBlock ( );
 		Vector corner = block != null ? block.getLocation ( ).toVector ( )
 				: player.getLocation ( ).toVector ( );
