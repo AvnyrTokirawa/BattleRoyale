@@ -35,7 +35,7 @@ public class AirSupplyGenerator {
 		
 		this.min   = configuration.getAirSupplyMin ( );
 		this.max   = configuration.getAirSupplyMax ( );
-		this.count = Math.max ( min , RandomUtil.nextInt ( max ) );
+		this.count = max > 0 ? Math.max ( min , RandomUtil.nextInt ( max ) ) : 0;
 	}
 	
 	public BattleRoyaleArena getArena ( ) {

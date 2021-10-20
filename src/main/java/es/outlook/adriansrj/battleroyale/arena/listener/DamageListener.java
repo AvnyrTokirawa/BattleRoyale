@@ -3,9 +3,10 @@ package es.outlook.adriansrj.battleroyale.arena.listener;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.game.player.Team;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -26,7 +27,22 @@ public final class DamageListener extends BattleRoyaleArenaListener {
 		super ( plugin );
 	}
 	
-	// event handler responsible for knocking players
+	// event handler is responsible for stopping
+	// damage in players that should not receive damage.
+	@EventHandler ( priority = EventPriority.HIGHEST, ignoreCancelled = true )
+	public void onDamage ( EntityDamageEvent event ) {
+		if ( !( event.getEntity ( ) instanceof org.bukkit.entity.Player ) ) { return; }
+		
+		org.bukkit.entity.Player player    = ( org.bukkit.entity.Player ) event.getEntity ( );
+		Player                   br_player = Player.getPlayer ( player );
+		
+		if ( br_player.isInArena ( )
+				&& ( br_player.isSpectator ( ) || player.getGameMode ( ) == GameMode.SPECTATOR ) ) {
+			event.setCancelled ( true );
+		}
+	}
+	
+	// event handler is responsible for knocking players
 	// when the health is too low.
 	@EventHandler ( priority = EventPriority.HIGHEST, ignoreCancelled = true )
 	public void onKnock ( EntityDamageEvent event ) {
@@ -35,7 +51,7 @@ public final class DamageListener extends BattleRoyaleArenaListener {
 		org.bukkit.entity.Player player    = ( org.bukkit.entity.Player ) event.getEntity ( );
 		Player                   br_player = Player.getPlayer ( player );
 		
-		if ( knockCheck ( br_player ) && player.getHealth ( ) - event.getFinalDamage ( ) <= 0.0D ) {
+		if ( br_player.isInArena ( ) && knockCheck ( br_player ) && player.getHealth ( ) - event.getFinalDamage ( ) <= 0.0D ) {
 			event.setCancelled ( true );
 			
 			// knocking out

@@ -5,8 +5,7 @@ import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
 import org.bukkit.configuration.ConfigurationSection;
 
 /**
- * TODO: Description
- * </p>
+ * Plugin main configuration.
  *
  * @author AdrianSR / 22/08/2021 / Time: 09:19 p. m.
  */
@@ -32,6 +31,30 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 	DATABASE_MONGODB_HOST ( "database.mongodb.host" , "MongoDB database host." , "host name" ),
 	DATABASE_MONGODB_PORT ( "database.mongodb.port" , "MongoDB database port." , 27017 ),
 	DATABASE_MONGODB_DATABASE ( "database.mongodb.database" , "MongoDB database name (Required)." , "database name" ),
+	
+	// game
+	GAME_ENHANCED_DROPS_ENABLE ( "game.enhanced-drops.enable" , "if enabled, drops will be enhanced. " +
+			"\ndropped items will have a better looking, " +
+			"\nmaking it really easy for players to know " +
+			"\nwhat they are grabbing from ground. " +
+			"\nnote that if this option is enabled, the loot chests " +
+			"\nwill be replaced by items directly spawned on the ground." +
+			"\nWARNING:" +
+			"\nenabling this option could reduce the performance." +
+			"\nnote that dropping lots of items on the ground" +
+			"\nmight be stressful for the server." , false ),
+	
+	GAME_ENHANCED_DROPS_VISIBLE_NAME ( "game.enhanced-drops.visible-name" ,
+									   "if enabled, the name if the item will be visible" , true ),
+	
+	GAME_ENHANCED_DROPS_CUSTOM_MODEL ( "game.enhanced-drops.custom-model" ,
+									   "if disabled, the vanilla drops will be used instead, " +
+											   "\nbut keeping the nametag of the item." , true ),
+	
+	GAME_ENHANCED_DROPS_LOOT_CONTAINER_ONLY ( "game.enhanced-drops.loot-container-only" ,
+											  "if enabled, only the drops coming from a" +
+													  "\na loot container (loot chest, air supply, etc...)" +
+													  "\nwill be affected. (recommended)" , true ),
 	
 	;
 	

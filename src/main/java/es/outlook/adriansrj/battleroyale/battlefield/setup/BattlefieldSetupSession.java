@@ -5,6 +5,7 @@ import es.outlook.adriansrj.battleroyale.battlefield.Battlefield;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldConfiguration;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldShape;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldShapePart;
+import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderSuccession;
 import es.outlook.adriansrj.battleroyale.battlefield.bus.BusSpawn;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.Minimap;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.generator.MinimapGenerator;
@@ -13,8 +14,9 @@ import es.outlook.adriansrj.battleroyale.enums.EnumBattleMapSetupTool;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
 import es.outlook.adriansrj.battleroyale.enums.EnumWorldGenerator;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationRegistry;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.util.*;
 import es.outlook.adriansrj.battleroyale.util.file.FileUtil;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
@@ -44,7 +46,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
@@ -57,7 +58,7 @@ public class BattlefieldSetupSession {
 	protected static final ExecutorService EXECUTOR_SERVICE;
 	
 	static {
-		EXECUTOR_SERVICE = Executors.newWorkStealingPool ( );
+		EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getWorkStealingPool ( );
 	}
 	
 	// this creator is for cases where the input is a battlefield.
@@ -284,7 +285,6 @@ public class BattlefieldSetupSession {
 	protected String                   name;
 	protected ZoneBounds               bounds;
 	protected Minimap                  minimap;
-	protected String                   loot_configuration;
 	protected BattlefieldConfiguration configuration;
 	protected BattlefieldSetupResult   result;
 	
@@ -325,7 +325,7 @@ public class BattlefieldSetupSession {
 	public synchronized BattlefieldSetupResult getResult ( ) {
 		if ( result == null &&
 				( name != null && bounds != null && minimap != null ) ) {
-			result = new BattlefieldSetupResultBase ( name , bounds , minimap , loot_configuration , configuration );
+			result = new BattlefieldSetupResultBase ( name , bounds , minimap , configuration );
 		}
 		
 		return result;
@@ -402,9 +402,7 @@ public class BattlefieldSetupSession {
 	}
 	
 	public boolean addBusSpawn ( BusSpawn spawn ) {
-		if ( configuration == null ) {
-			this.configuration = new BattlefieldConfiguration ( );
-		}
+		this.configurationCheck ( );
 		
 		if ( configuration.addBusSpawn ( spawn ) ) {
 			saveConfiguration ( );
@@ -434,9 +432,7 @@ public class BattlefieldSetupSession {
 	// ----- player spawns
 	
 	public boolean addPlayerSpawn ( Vector location ) {
-		if ( configuration == null ) {
-			this.configuration = new BattlefieldConfiguration ( );
-		}
+		this.configurationCheck ( );
 		
 		if ( configuration.addPlayerSpawn ( bounds.unproject ( location ) ) ) {
 			saveConfiguration ( );
@@ -465,9 +461,7 @@ public class BattlefieldSetupSession {
 	// ----- vehicle spawns
 	
 	public boolean addVehicleSpawn ( Vector location ) {
-		if ( configuration == null ) {
-			this.configuration = new BattlefieldConfiguration ( );
-		}
+		this.configurationCheck ( );
 		
 		if ( configuration.addVehicleSpawn ( bounds.unproject ( location ) ) ) {
 			saveConfiguration ( );
@@ -496,9 +490,7 @@ public class BattlefieldSetupSession {
 	// ----- loot chests
 	
 	public boolean addLootChest ( Vector location ) {
-		if ( configuration == null ) {
-			this.configuration = new BattlefieldConfiguration ( );
-		}
+		this.configurationCheck ( );
 		
 		if ( configuration.addLootChest ( bounds.unproject ( location ) ) ) {
 			saveConfiguration ( );
@@ -734,6 +726,42 @@ public class BattlefieldSetupSession {
 		exportSchematic ( null );
 	}
 	
+	// ----- border resize succession
+	
+	public void setBorderResizeSuccession ( BattlefieldBorderSuccession resize_succession ) {
+		this.configurationCheck ( );
+		this.configuration.setBorderResizeSuccession ( resize_succession );
+		this.saveConfiguration ( );
+	}
+	
+	// ----- air supply
+	
+	public void setAirSupplyMax ( int air_supply_max ) {
+		this.configurationCheck ( );
+		this.configuration.setAirSupplyMax ( air_supply_max );
+		this.saveConfiguration ( );
+	}
+	
+	public void setAirSupplyMin ( int air_supply_min ) {
+		this.configurationCheck ( );
+		this.configuration.setAirSupplyMin ( air_supply_min );
+		this.saveConfiguration ( );
+	}
+	
+	// ----- bombing zone
+	
+	public void setBombingZoneMax ( int bombing_zone_max ) {
+		this.configurationCheck ( );
+		this.configuration.setBombingZoneMax ( bombing_zone_max );
+		this.saveConfiguration ( );
+	}
+	
+	public void setBombingZoneMin ( int bombing_zone_min ) {
+		this.configurationCheck ( );
+		this.configuration.setBombingZoneMin ( bombing_zone_min );
+		this.saveConfiguration ( );
+	}
+	
 	// ----- vehicles configuration
 	
 	/**
@@ -746,10 +774,7 @@ public class BattlefieldSetupSession {
 	 * @param configuration_name the name of the configuration of the vehicles.
 	 */
 	public void setVehiclesConfiguration ( String configuration_name ) {
-		if ( configuration == null ) {
-			this.configuration = new BattlefieldConfiguration ( );
-		}
-		
+		this.configurationCheck ( );
 		this.configuration.setVehiclesConfiguration ( configuration_name );
 		this.saveConfiguration ( );
 	}
@@ -766,10 +791,7 @@ public class BattlefieldSetupSession {
 	 * @param loot_configuration_name the name of the loot configuration.
 	 */
 	public void setLootConfiguration ( String loot_configuration_name ) {
-		if ( configuration == null ) {
-			this.configuration = new BattlefieldConfiguration ( );
-		}
-		
+		this.configurationCheck ( );
 		this.configuration.setLootConfiguration ( loot_configuration_name );
 		this.saveConfiguration ( );
 	}
@@ -861,6 +883,12 @@ public class BattlefieldSetupSession {
 		// disposing tools
 		tool_map.values ( ).stream ( ).filter ( BattlefieldSetupTool :: isActive )
 				.forEach ( BattlefieldSetupTool :: dispose );
+	}
+	
+	protected void configurationCheck ( ) {
+		if ( configuration == null ) {
+			this.configuration = new BattlefieldConfiguration ( );
+		}
 	}
 	
 	protected void saveConfiguration ( ) {

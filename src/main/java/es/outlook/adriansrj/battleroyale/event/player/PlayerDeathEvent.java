@@ -220,21 +220,37 @@ public class PlayerDeathEvent extends PlayerEventCancellable {
 	protected final Player  killer;
 	protected final Cause   cause;
 	protected final boolean cancellable;
+	protected       boolean keep_level;
+	protected       boolean keep_inventory;
+	protected       String  death_message;
 	
-	public PlayerDeathEvent ( Player player , Player killer , Cause cause , boolean cancellable ) {
+	public PlayerDeathEvent ( Player player , Player killer , Cause cause , String death_message , boolean cancellable ) {
 		super ( player );
 		
-		this.killer      = killer;
-		this.cause       = cause;
-		this.cancellable = cancellable;
+		this.killer        = killer;
+		this.cause         = cause;
+		this.death_message = death_message;
+		this.cancellable   = cancellable;
 	}
 	
-	public PlayerDeathEvent ( Player player , Cause cause , boolean cancellable ) {
-		this ( player , null , cause , cancellable );
+	public PlayerDeathEvent ( Player player , Cause cause , String death_message , boolean cancellable ) {
+		this ( player , null , cause , death_message , cancellable );
 	}
 	
 	public Cause getCause ( ) {
 		return cause;
+	}
+	
+	public boolean isKeepLevel ( ) {
+		return keep_level;
+	}
+	
+	public boolean isKeepInventory ( ) {
+		return keep_inventory;
+	}
+	
+	public String getDeathMessage ( ) {
+		return death_message;
 	}
 	
 	public Player getKiller ( ) {
@@ -264,6 +280,18 @@ public class PlayerDeathEvent extends PlayerEventCancellable {
 	@Override
 	public boolean isCancelled ( ) {
 		return cancellable && super.isCancelled ( );
+	}
+	
+	public void setDeathMessage ( String death_message ) {
+		this.death_message = death_message;
+	}
+	
+	public void setKeepLevel ( boolean keep_level ) {
+		this.keep_level = keep_level;
+	}
+	
+	public void setKeepInventory ( boolean keep_inventory ) {
+		this.keep_inventory = keep_inventory;
 	}
 	
 	@Override

@@ -2,8 +2,8 @@ package es.outlook.adriansrj.battleroyale.gui.setup.battlefield.session;
 
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupHandler;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.menu.ItemMenu;
 import es.outlook.adriansrj.core.menu.size.ItemMenuSize;
@@ -18,17 +18,7 @@ public final class BattlefieldSetupSessionGUI extends PluginHandler {
 		return getPluginHandler ( BattlefieldSetupSessionGUI.class );
 	}
 	
-	// name
-	// bounds
-	// bus spawns
-	// player spawns
-	// vehicle spawns
-	// border resize
-	// spawns
-	// loot configuration
-	// loot chests
-	
-	protected final ItemMenu handle;
+	private final ItemMenu handle;
 	
 	/**
 	 * Constructs the plugin handler.
@@ -38,7 +28,7 @@ public final class BattlefieldSetupSessionGUI extends PluginHandler {
 	public BattlefieldSetupSessionGUI ( BattleRoyale plugin ) {
 		super ( plugin );
 		
-		this.handle = new ItemMenu ( ChatColor.BLACK + "Battlefield Setup" , ItemMenuSize.THREE_LINE );
+		this.handle = new ItemMenu ( ChatColor.BLACK + "Battlefield Setup" , ItemMenuSize.FIVE_LINE );
 		this.handle.registerListener ( plugin );
 	}
 	
@@ -52,7 +42,7 @@ public final class BattlefieldSetupSessionGUI extends PluginHandler {
 		this.handle.update ( player );
 	}
 	
-	protected void build ( Player player ) {
+	private void build ( Player player ) {
 		this.handle.clear ( );
 		
 		BattlefieldSetupHandler handler = BattlefieldSetupHandler.getInstance ( );
@@ -64,23 +54,26 @@ public final class BattlefieldSetupSessionGUI extends PluginHandler {
 			this.handle.setItem ( 12 , new SetBoundsButton ( ) );
 			
 			if ( session.getResult ( ) != null && session.getResult ( ).getBounds ( ) != null ) {
-				this.handle.setItem ( 14 , new SetBusSpawnsButton ( ) );
-				this.handle.setItem ( 16 , new SetPlayerSpawnsButton ( ) );
-				this.handle.setItem ( 19 , new SetLootChestsButton ( ) );
-				this.handle.setItem ( 21 , new SetVehicleSpawnsButton ( ) );
+				this.handle.setItem ( 14 , new SetBorderButton ( ) );
+				this.handle.setItem ( 16 , new SetBusSpawnsButton ( ) );
+				this.handle.setItem ( 19 , new SetPlayerSpawnsButton ( ) );
+				this.handle.setItem ( 21 , new SetLootChestsButton ( ) );
+				this.handle.setItem ( 23 , new SetAirSupplyButton ( ) );
+				this.handle.setItem ( 25 , new SetBombingZoneButton ( ) );
+				this.handle.setItem ( 28 , new SetVehicleSpawnsButton ( ) );
 				
 				// vehicles configuration
 				SetVehiclesConfigurationButton vehicles_configuration = new SetVehiclesConfigurationButton ( );
 				
 				if ( vehicles_configuration.available ( ) ) {
-					this.handle.setItem ( 23 , vehicles_configuration );
+					this.handle.setItem ( 30 , vehicles_configuration );
 				}
 				
 				// loot configuration
 				SetLootConfigurationButton loot_configuration = new SetLootConfigurationButton ( );
 				
 				if ( loot_configuration.available ( ) ) {
-					this.handle.setItem ( 25 , loot_configuration );
+					this.handle.setItem ( 32 , loot_configuration );
 				}
 			}
 		}

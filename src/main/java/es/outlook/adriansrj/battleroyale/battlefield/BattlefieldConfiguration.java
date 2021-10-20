@@ -58,6 +58,7 @@ public class BattlefieldConfiguration implements Configurable {
 	protected final Set < ConfigurableVector > vehicle_spawns = new HashSet <> ( );
 	
 	/** border resizing succession */
+	@ConfigurableEntry ( key = BORDER_RESIZE_KEY )
 	protected BattlefieldBorderSuccession border_resize;
 	
 	/** loot configuration */
@@ -246,39 +247,107 @@ public class BattlefieldConfiguration implements Configurable {
 	
 	// ----- air supply
 	
+	/**
+	 * Gets the maximum number of air supply drops that can
+	 * be generated in the arena.
+	 * <br>
+	 * The number of air supplies that are going to be dropped
+	 * are based on the size of the current resizing point. This
+	 * means that the bigger the current zone is, the greater
+	 * the number of air supplies to drop will be.
+	 *
+	 * @return the maximum number of air supply drops that can be generated in the arena.
+	 */
+	public int getAirSupplyMax ( ) {
+		return air_supply_max;
+	}
+	
+	/**
+	 * Gets the minimum number of air supply drops that can
+	 * be generated in the arena.
+	 * <br>
+	 * The number of air supplies that are going to be dropped
+	 * are based on the size of the current resizing point. This
+	 * means that the bigger the current zone is, the greater
+	 * the number of air supplies to drop will be.
+	 *
+	 * @return the minimum number of air supply drops that can be generated in the arena.
+	 */
+	public int getAirSupplyMin ( ) {
+		return air_supply_min;
+	}
+	
+	/**
+	 * Sets the maximum number of air supply drops that can
+	 * be generated in the arena.
+	 * <br>
+	 * The number of air supplies that are going to be dropped
+	 * are based on the size of the current resizing point. This
+	 * means that the bigger the current zone is, the greater
+	 * the number of air supplies to drop will be.
+	 *
+	 * @param air_supply_max the maximum number of air supply drops that can be generated in the arena.
+	 */
 	public void setAirSupplyMax ( int air_supply_max ) {
 		this.air_supply_max = air_supply_max;
 		this.airSupplyCheck ( );
 	}
 	
+	/**
+	 * Sets the minimum number of air supply drops that can
+	 * be generated in the arena.
+	 * <br>
+	 * The number of air supplies that are going to be dropped
+	 * are based on the size of the current resizing point. This
+	 * means that the bigger the current zone is, the greater
+	 * the number of air supplies to drop will be.
+	 *
+	 * @param air_supply_min the minimum number of air supply drops that can be generated in the arena.
+	 */
 	public void setAirSupplyMin ( int air_supply_min ) {
 		this.air_supply_min = air_supply_min;
 		this.airSupplyCheck ( );
 	}
 	
-	public int getAirSupplyMax ( ) {
-		return air_supply_max;
-	}
-	
-	public int getAirSupplyMin ( ) {
-		return air_supply_min;
-	}
-	
 	// ----- bombing zone
 	
+	/**
+	 * Gets the maximum number of bombing zones that can
+	 * be generated each time a new border resizing point starts.
+	 *
+	 * @return the maximum number of bombing zones that can be generated.
+	 */
 	public int getBombingZoneMax ( ) {
 		return bombing_zone_max;
 	}
 	
+	/**
+	 * Gets the minimum number of bombing zones that can
+	 * be generated each time a new border resizing point starts.
+	 *
+	 * @return the minimum number of bombing zones that can be generated.
+	 */
 	public int getBombingZoneMin ( ) {
 		return bombing_zone_min;
 	}
 	
+	/**
+	 * Sets the maximum number of bombing zones that can
+	 * be generated each time a new border resizing point starts.
+	 *
+	 * @param bombing_zone_max the maximum number of bombing zones that can be generated.
+	 */
 	public void setBombingZoneMax ( int bombing_zone_max ) {
 		this.bombing_zone_max = bombing_zone_max;
 		this.bombingZoneCheck ( );
 	}
 	
+	/**
+	 * Sets the minimum number of bombing zones that can
+	 * be generated each time a new border resizing point starts.
+	 *
+	 * @param bombing_zone_min the minimum number of bombing zones that can be generated.
+	 */
 	public void setBombingZoneMin ( int bombing_zone_min ) {
 		this.bombing_zone_min = bombing_zone_min;
 		this.bombingZoneCheck ( );

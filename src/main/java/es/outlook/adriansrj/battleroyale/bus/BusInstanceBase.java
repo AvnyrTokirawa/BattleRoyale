@@ -1,15 +1,13 @@
 package es.outlook.adriansrj.battleroyale.bus;
 
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
-import es.outlook.adriansrj.battleroyale.util.Constants;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.core.util.math.DirectionUtil;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Base battle royale bus implementation.
@@ -21,18 +19,15 @@ public abstract class BusInstanceBase < C extends Bus > extends BusInstance < C 
 	/**
 	 * @author AdrianSR / 08/09/2021 / 02:05 p. m.
 	 */
-	protected static class BusDisplacementTask implements Runnable {
+	protected static class BusDisplacementTask extends BukkitRunnable {
 		
-		protected final BusInstanceBase < ? >    bus;
-		protected       ScheduledExecutorService executor;
+		protected final BusInstanceBase < ? > bus;
+		protected final Vector                direction;
+		protected final ZoneBounds            bounds;
+		protected       boolean               entered_bounds;
 		
-		protected final Vector     direction;
-		protected final ZoneBounds bounds;
-		protected       boolean    entered_bounds;
-		
-		public BusDisplacementTask ( BusInstanceBase < ? > bus , ScheduledExecutorService executor ) {
+		public BusDisplacementTask ( BusInstanceBase < ? > bus ) {
 			this.bus       = bus;
-			this.executor  = executor;
 			this.direction = DirectionUtil.getDirection ( bus.getSpawn ( ).getYaw ( ) , 0.0F );
 			this.bounds    = bus.getArena ( ).getFullBounds ( );
 			
@@ -72,17 +67,16 @@ public abstract class BusInstanceBase < C extends Bus > extends BusInstance < C 
 		}
 		
 		protected void dispose ( ) {
-			// shutting down executor
-			executor.shutdown ( );
-			executor = null;
+			// shutting down
+			cancel ( );
 		}
 	}
 	
-	protected final C                        configuration;
-	protected       boolean                  started;
-	protected       ScheduledExecutorService executor;
-	protected       Vector                   location;
-	protected       boolean                  finished;
+	protected final C                   configuration;
+	protected       boolean             started;
+	protected       BusDisplacementTask displacement_task;
+	protected       Vector              location;
+	protected       boolean             finished;
 	
 	protected BusInstanceBase ( C configuration ) {
 		this.configuration = configuration;
@@ -146,10 +140,8 @@ public abstract class BusInstanceBase < C extends Bus > extends BusInstance < C 
 		this.location = getArena ( ).getFullBounds ( ).project ( getSpawn ( ).getStartLocation ( ) );
 		
 		// scheduling displacement task
-		executor = Executors.newSingleThreadScheduledExecutor ( );
-		executor.scheduleAtFixedRate ( new BusDisplacementTask ( this , executor ) ,
-									   Constants.BUS_DISPLACEMENT_EXECUTOR_PERIOD ,
-									   Constants.BUS_DISPLACEMENT_EXECUTOR_PERIOD , TimeUnit.MILLISECONDS );
+		this.displacement_task = new BusDisplacementTask ( this );
+		this.displacement_task.runTaskTimerAsynchronously ( BattleRoyale.getInstance ( ) , 0L , 0L );
 	}
 	
 	@Override
@@ -162,10 +154,10 @@ public abstract class BusInstanceBase < C extends Bus > extends BusInstance < C 
 		
 		this.finished = true;
 		
-		// disposing executor
-		if ( executor != null ) {
-			executor.shutdownNow ( );
-			executor = null;
+		// shutting down displacement task
+		if ( displacement_task != null ) {
+			displacement_task.cancel ( );
+			displacement_task = null;
 		}
 	}
 	
@@ -174,9 +166,9 @@ public abstract class BusInstanceBase < C extends Bus > extends BusInstance < C 
 		this.started  = false;
 		this.finished = false;
 		
-		if ( executor != null ) {
-			executor.shutdownNow ( );
-			executor = null;
+		if ( displacement_task != null ) {
+			displacement_task.cancel ( );
+			displacement_task = null;
 		}
 	}
 }

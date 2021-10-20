@@ -1,24 +1,26 @@
 
 z
-java:S3077Ş"WUse a thread-safe type; adding "volatile" is not enough to make this field thread-safe.(Ú³Œÿÿÿÿÿ8›×‚ôÂ/
+java:S3077Õ"WUse a thread-safe type; adding "volatile" is not enough to make this field thread-safe.(Ú³Œÿÿÿÿÿ8›×‚ôÂ/
 u
-java:S3008ˆ"WRename this field "ENTITY_COUNT" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ê‹½„8¡×‚ôÂ/
+java:S3008‚"WRename this field "ENTITY_COUNT" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ê‹½„8¡×‚ôÂ/
 O
-java:S1602À",Remove useless curly braces around statement(Ëñãøÿÿÿÿ8©×‚ôÂ/
-V	java:S106ù"9Replace this use of System.out or System.err by a logger.(øç»©8¯×‚ôÂ/
-V	java:S106ş"9Replace this use of System.out or System.err by a logger.(²ºÇÎ8°×‚ôÂ/
-[	java:S106ƒ"9Replace this use of System.out or System.err by a logger.(®ñÜ§ÿÿÿÿÿ8±×‚ôÂ/
-V	java:S106ˆ"9Replace this use of System.out or System.err by a logger.(Îã¼Í8±×‚ôÂ/
-[	java:S106–"9Replace this use of System.out or System.err by a logger.(ÒÎ•¤ıÿÿÿÿ8³×‚ôÂ/
+java:S1602·",Remove useless curly braces around statement(Ëñãøÿÿÿÿ8©×‚ôÂ/
+V	java:S106ğ"9Replace this use of System.out or System.err by a logger.(øç»©8°×‚ôÂ/
+V	java:S106õ"9Replace this use of System.out or System.err by a logger.(²ºÇÎ8±×‚ôÂ/
+[	java:S106ú"9Replace this use of System.out or System.err by a logger.(®ñÜ§ÿÿÿÿÿ8±×‚ôÂ/
+V	java:S106ÿ"9Replace this use of System.out or System.err by a logger.(Îã¼Í8³×‚ôÂ/
+[	java:S106"9Replace this use of System.out or System.err by a logger.(ÒÎ•¤ıÿÿÿÿ8´×‚ôÂ/
 W
-java:S1874œ"4Remove this use of "setPassenger"; it is deprecated.(€ûò»şÿÿÿÿ8´×‚ôÂ/
-[	java:S106Ÿ"9Replace this use of System.out or System.err by a logger.(Ë²èòøÿÿÿÿ8´×‚ôÂ/
-V	java:S106¨"9Replace this use of System.out or System.err by a logger.(–À×”8¸×‚ôÂ/
-[	java:S106Ë"9Replace this use of System.out or System.err by a logger.(·÷»Éÿÿÿÿÿ8»×‚ôÂ/
-[	java:S106ä"9Replace this use of System.out or System.err by a logger.(œ¼Àïúÿÿÿÿ8½×‚ôÂ/
+java:S1874“"4Remove this use of "setPassenger"; it is deprecated.(€ûò»şÿÿÿÿ8´×‚ôÂ/
+[	java:S106–"9Replace this use of System.out or System.err by a logger.(Ë²èòøÿÿÿÿ8¸×‚ôÂ/
+V	java:S106Ÿ"9Replace this use of System.out or System.err by a logger.(–À×”8»×‚ôÂ/
+[	java:S106Â"9Replace this use of System.out or System.err by a logger.(·÷»Éÿÿÿÿÿ8½×‚ôÂ/
+[	java:S106Û"9Replace this use of System.out or System.err by a logger.(œ¼Àïúÿÿÿÿ8Ç×‚ôÂ/
 J
-java:S1602 ",Remove useless curly braces around statement(®ı¶•8Ä×‚ôÂ/
-[	java:S106®"9Replace this use of System.out or System.err by a logger.(ğœÆ²øÿÿÿÿ8Ç×‚ôÂ/
-[	java:S106³"9Replace this use of System.out or System.err by a logger.(’éñüøÿÿÿÿ8Ç×‚ôÂ/
-K
-java:S1604¥"(Make this anonymous inner class a lambda(Î¾Æºüÿÿÿÿ8Î×‚ôÂ/
+java:S1602—",Remove useless curly braces around statement(®ı¶•8Ä×‚ôÂ/
+[	java:S106¥"9Replace this use of System.out or System.err by a logger.(ğœÆ²øÿÿÿÿ8Ç×‚ôÂ/
+[	java:S106ª"9Replace this use of System.out or System.err by a logger.(’éñüøÿÿÿÿ8©Ó×§È/
+R
+java:S1128"5Remove this unused import 'org.bukkit.entity.Entity'.(ßº¢õ8îâÖ¶È/
+Z
+java:S1128%"8Remove this unused import 'java.util.function.Consumer'.(Ì†ƒÔùÿÿÿÿ8îâÖ¶È/

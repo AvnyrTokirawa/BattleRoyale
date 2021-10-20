@@ -78,7 +78,7 @@ public class BombingZone {
 		
 		// calculating duration.
 		// the duration of the bombing zone will be between
-		// a 25% and 40% of the duration of the border idle-time.
+		// a 30% and 60% of the duration of the border idle-time.
 		alpha = Math.min ( 0.30D + Math.random ( ) , 0.60D );
 		
 		this.duration = Duration.ofMilliseconds (
@@ -159,7 +159,7 @@ public class BombingZone {
 		
 		if ( isValidPlace ( ) ) {
 			this.bomb_task = new ThrowingBombsTask ( this );
-			this.bomb_task.runTaskTimerAsynchronously ( BattleRoyale.getInstance ( ) , 5L , 5L );
+			this.bomb_task.runTaskTimer ( BattleRoyale.getInstance ( ) , 5L , 5L );
 		} else {
 			throw new IllegalStateException ( "not valid place" );
 		}

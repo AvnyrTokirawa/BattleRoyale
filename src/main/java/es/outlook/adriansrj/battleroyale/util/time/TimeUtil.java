@@ -4,6 +4,8 @@ import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.core.util.Duration;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Useful class for dealing with time.
  *
@@ -27,5 +29,44 @@ public class TimeUtil {
 		}
 		
 		return formatTime ( format , duration );
+	}
+	
+	/**
+	 * Matches a {@link TimeUnit} from its name or an alias.
+	 *
+	 * @param input the name.
+	 * @return the resulting time unit.
+	 */
+	public static TimeUnit matchTimeUnit ( String input ) {
+		switch ( input.toLowerCase ( ) ) {
+			case "s":
+			case "sec":
+			case "secs":
+			case "second":
+			case "seconds":
+				return TimeUnit.SECONDS;
+			
+			case "m":
+			case "min":
+			case "mins":
+			case "minute":
+			case "minutes":
+				return TimeUnit.MINUTES;
+			
+			case "h":
+			case "hr":
+			case "hrs":
+			case "hour":
+			case "hours":
+				return TimeUnit.HOURS;
+			
+			case "d":
+			case "day":
+			case "days":
+				return TimeUnit.DAYS;
+			
+			default:
+				return null;
+		}
 	}
 }

@@ -3,11 +3,12 @@ package es.outlook.adriansrj.battleroyale.parachute.custom;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumParachuteConfiguration;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerCloseParachuteEvent;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.packet.reader.PacketReaderService;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
 import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityTeleport;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.packet.interceptor.PacketInterceptorAcceptor;
 import es.outlook.adriansrj.battleroyale.util.packet.interceptor.PacketInterceptorInjector;
@@ -31,7 +32,6 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 import java.util.*;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -46,18 +46,11 @@ class ParachuteCustomInstanceHandle {
 	private static final ScheduledExecutorService              EXECUTOR_SERVICE;
 	
 	static {
-		EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor ( );
+		EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getSingleThreadScheduledExecutor ( );
 		PARACHUTE_SET    = Collections.synchronizedSet ( new HashSet <> ( ) );
 		
 		// parachutes life loop
 		Runnable life_loop = ( ) -> {
-			// we've to explicitly stop the executor as otherwise
-			// it would keep running even when the plugin is not enabled.
-			if ( !BattleRoyale.getInstance ( ).isEnabled ( ) ) {
-				EXECUTOR_SERVICE.shutdownNow ( );
-				return;
-			}
-			
 			synchronized ( PARACHUTE_SET ) {
 				PARACHUTE_SET.stream ( )
 						.filter ( handle -> handle.started && !handle.destroyed && handle.seat != null )
@@ -68,6 +61,7 @@ class ParachuteCustomInstanceHandle {
 			}
 		};
 		
+		// scheduling life loop
 		EXECUTOR_SERVICE.scheduleAtFixedRate (
 				life_loop ,
 				Constants.PARACHUTE_LIFE_LOOP_EXECUTOR_PERIOD ,
@@ -162,17 +156,14 @@ class ParachuteCustomInstanceHandle {
 			this.handle = ( ArmorStand ) PacketSenderService.getInstance ( ).sendSpawnEntityPacket (
 					player , EntityType.ARMOR_STAND , initial_location.getX ( ) , initial_location.getY ( ) ,
 					initial_location.getZ ( ) , initial_location.getYaw ( ) , initial_location.getPitch ( ) ,
-					new Consumer < Entity > ( ) {
-						@Override
-						public void accept ( Entity entity ) {
-							ArmorStand stand = ( ( ArmorStand ) entity );
-							
-							stand.setGravity ( false );
-							stand.setVisible ( false );
-							stand.setSmall ( true );
-							stand.getEquipment ( ).setHelmet ( shape );
-							EntityReflection.setSilent ( stand , true );
-						}
+					entity -> {
+						ArmorStand stand = ( ( ArmorStand ) entity );
+						
+						stand.setGravity ( false );
+						stand.setVisible ( false );
+						stand.setSmall ( true );
+						stand.getEquipment ( ).setHelmet ( shape );
+						EntityReflection.setSilent ( stand , true );
 					} );
 			this.id     = handle.getEntityId ( );
 			

@@ -81,10 +81,10 @@ public interface ConfigurationEntry {
 			return null;
 		}
 	}
-
-//	public default < T extends Enum < T > > T getAsEnum ( Class < T > clazz ) {
-//		return Enum.valueOf ( clazz , ( ( Enum < ? > ) getValue ( ) ).name ( ) );
-//	}
+	
+	//	public default < T extends Enum < T > > T getAsEnum ( Class < T > clazz ) {
+	//		return Enum.valueOf ( clazz , ( ( Enum < ? > ) getValue ( ) ).name ( ) );
+	//	}
 	
 	public default List < ? > getAsList ( ) {
 		if ( List.class.isAssignableFrom ( this.getValueType ( ) ) ) {

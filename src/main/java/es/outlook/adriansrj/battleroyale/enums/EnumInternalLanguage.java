@@ -49,6 +49,7 @@ public enum EnumInternalLanguage {
 	TOOL_PROMPT_BATTLEFIELD_NAME_USED ( ChatColor.RED + "Another battlefield with the same name already exists!" ),
 	TOOL_PROMPT_BATTLEFIELD_NAME_SET ( ChatColor.GREEN + "The name of this battlefield is now "
 											   + ChatColor.GOLD + "%s" ),
+	TOOL_PROMPT_BATTLEFIELD_BORDER_SET ( ChatColor.GREEN + "Battlefield border resizing succession set successfully!" ),
 	
 	TOOL_BOUNDS_MINIMAP_SET ( ChatColor.GREEN + "Battlefield minimap generated successfully!" ),
 	TOOL_BOUNDS_SCHEMATIC_SET ( ChatColor.GREEN + "Battlefield schematic exported successfully!" ),

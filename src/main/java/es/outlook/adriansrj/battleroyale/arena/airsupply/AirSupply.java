@@ -1,8 +1,10 @@
 package es.outlook.adriansrj.battleroyale.arena.airsupply;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
+import es.outlook.adriansrj.battleroyale.arena.drop.ItemDrop;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLootContainer;
+import es.outlook.adriansrj.battleroyale.enums.EnumMainConfiguration;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfiguration;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationContainer;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationEntry;
@@ -25,10 +27,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Chicken;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -334,6 +333,7 @@ public class AirSupply {
 					? loot_configuration.getContainer ( EnumLootContainer.CHEST ) : null;
 			
 			if ( container != null ) {
+				BattleRoyaleArena arena = es.outlook.adriansrj.battleroyale.game.player.Player.getPlayer ( player ).getArena ( );
 				Set < LootConfigurationEntry > contents = container.getRandomEntries ( Math.max ( RandomUtil.nextInt (
 						( container.getMaximum ( ) * ( inventory.getSize ( ) / 9 ) ) + 1 ) , 1 ) );
 				
@@ -341,8 +341,17 @@ public class AirSupply {
 				contents.stream ( )
 						.map ( entry -> player != null ? entry.toItemStack ( player ) : entry.toItemStack ( ) )
 						.filter ( Objects :: nonNull )
-						.forEach ( item -> chest_block.getWorld ( ).dropItem (
-								chest_block.getLocation ( ).add ( 0.5 , 0.5 , 0.5 ) , item ) );
+						.forEach ( item -> {
+							Item instance = chest_block.getWorld ( ).dropItem (
+									chest_block.getLocation ( ).add ( 0.5 , 0.5 , 0.5 ) , item );
+							
+							// enhanced drop
+							if ( EnumMainConfiguration.GAME_ENHANCED_DROPS_ENABLE.getAsBoolean ( )
+									&& EnumMainConfiguration.GAME_ENHANCED_DROPS_LOOT_CONTAINER_ONLY.getAsBoolean ( )
+									&& arena != null ) {
+								arena.getDropManager ( ).register ( new ItemDrop ( instance , arena ) );
+							}
+						} );
 			}
 		}
 		

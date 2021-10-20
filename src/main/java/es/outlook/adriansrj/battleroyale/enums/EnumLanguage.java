@@ -1,12 +1,14 @@
 package es.outlook.adriansrj.battleroyale.enums;
 
 import es.outlook.adriansrj.battleroyale.configuration.ConfigurationEntry;
+import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
 import es.outlook.adriansrj.core.util.StringUtil;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 /**
  * @author AdrianSR / 04/09/2021 / 03:21 p. m.
@@ -123,6 +125,80 @@ public enum EnumLanguage implements ConfigurationEntry {
 	KNOCKED_REVIVING_PROGRESS ( "knocked.reviving-progress" , "reviving progress title" ,
 								StringUtil.concatenate ( ChatColor.GOLD , ChatColor.BOLD ) + "%s" ),
 	
+	RESPAWN_COUNTDOWN_TITLE ( "respawn.countdown.title" ,
+							  "respawn countdown title" ,
+							  StringUtil.EMPTY ),
+	
+	RESPAWN_COUNTDOWN_SUBTITLE ( "respawn.countdown.subtitle" ,
+								 "respawn countdown subtitle" ,
+								 ChatColor.GOLD + "Respawning in %s" ),
+	
+	POSITION_WINNER_TITLE ( "position.winner.title" ,
+							"winner position title" ,
+							ChatColor.GREEN + "#1 WINNER" ),
+	
+	POSITION_WINNER_SUBTITLE ( "position.winner.subtitle" ,
+							   "winner position subtitle" ,
+							   ChatColor.GOLD + "Battle Royale" ),
+	
+	POSITION_GAME_OVER_TITLE ( "position.game-over.title" ,
+							   "game-over position title" ,
+							   ChatColor.DARK_RED + "#%d GAME OVER" ),
+	
+	POSITION_GAME_OVER_SUBTITLE ( "position.game-over.subtitle" ,
+								  "game-over position subtitle" ,
+								  ChatColor.GOLD + "Battle Royale" ),
+	
+	// -------- killed phrases
+	
+	KILLED_PHRASE_GENERAL ( "killed-phrase.general" ,
+							"general killed phrase" ,
+							ChatColor.WHITE + "%s" + ChatColor.GOLD + " killed " + ChatColor.WHITE + "%s." ),
+	
+	KILLED_PHRASE_SHOT ( "killed-phrase.shot" ,
+						 "phrase when a player is shot" ,
+						 ChatColor.WHITE + "%s" + ChatColor.GOLD + " shot " + ChatColor.WHITE + "%s" ),
+	
+	KILLED_PHRASE_PUSH ( "killed-phrase.push" ,
+						 "phrase when a player dies from a fall after being pushed" ,
+						 ChatColor.WHITE + "%s" + ChatColor.GOLD + " pushed " + ChatColor.WHITE + "%s" ),
+	
+	KILLED_PHRASE_VOID ( "killed-phrase.void" ,
+						 "phrase when a player is thrown into the void" ,
+						 ChatColor.WHITE + "%s" + ChatColor.GOLD + " threw "
+								 + ChatColor.WHITE + "%s " + ChatColor.GOLD + " into the void." ),
+	
+	KILLED_PHRASE_BLEEDING_OUT ( "killed-phrase.bleeding-out" ,
+								 "phrase when a player dies from bleeding out, after being knocked by a player" ,
+								 ChatColor.WHITE + "%s" + ChatColor.GOLD + " killed "
+										 + ChatColor.WHITE + "%s " + ChatColor.GOLD + " (bleeding out)." ),
+	
+	// -------- death phrases
+	
+	DEATH_PHRASE_GENERAL ( "death-phrase.general" ,
+						   "general death phrase" ,
+						   ChatColor.GOLD + "%s " + ChatColor.WHITE + "died." ),
+	
+	DEATH_PHRASE_FALL ( "death-phrase.fall" ,
+						"phrase when a player dies from falling from a high place" ,
+						ChatColor.GOLD + "%s " + ChatColor.WHITE + "fell from a high place." ),
+	
+	DEATH_PHRASE_VOID ( "death-phrase.void" ,
+						"phrase when a player dies from falling into the void" ,
+						ChatColor.GOLD + "%s " + ChatColor.WHITE + "fell into the void." ),
+	
+	DEATH_PHRASE_EXPLOSION ( "death-phrase.explosion" ,
+							 "phrase when a player dies in an explosion" ,
+							 ChatColor.GOLD + "%s " + ChatColor.WHITE + "died in an explosion." ),
+	
+	DEATH_PHRASE_BLEEDING_OUT ( "death-phrase.bleeding-out" ,
+								"phrase when a player dies from bleeding out" ,
+								ChatColor.GOLD + "%s " + ChatColor.WHITE + "died bleeding." ),
+	
+	DEATH_PHRASE_OUT_OF_BOUNDS ( "death-phrase.out-of-bounds" ,
+								 "phrase when a player dies from being out of bounds" ,
+								 ChatColor.GOLD + "%s " + ChatColor.WHITE + "died in the storm." ),
+	
 	TEAM_MEMBER_HEALTH_FORMAT_FINE ( "team.member.health.fine" ,
 									 "team member health text (when health is fine/full)" ,
 									 ChatColor.GREEN + Constants.HEART_TEXT + "%d %s" ),
@@ -138,6 +214,16 @@ public enum EnumLanguage implements ConfigurationEntry {
 	TEAM_MEMBER_HEALTH_FORMAT_DEAD ( "team.member.health.dead" ,
 									 "team member health text when dead" ,
 									 ChatColor.GRAY.toString ( ) + ChatColor.STRIKETHROUGH + "%s" ),
+	
+	// -------- auto starter
+	
+	AUTO_STARTER_STATE_WAITING ( "border.state.waiting" ,
+								 "auto-starter waiting state text format" ,
+								 "Required: " + ChatColor.GOLD + "%s" ),
+	
+	AUTO_STARTER_STATE_STARTING ( "border.state.starting" ,
+								  "auto-starter starting state text format" ,
+								  "Starting in: " + ChatColor.GREEN + "%s" ),
 	
 	;
 	
@@ -187,16 +273,12 @@ public enum EnumLanguage implements ConfigurationEntry {
 	
 	@Override
 	public String getAsString ( ) {
-		
-		if ( this == TEAM_MEMBER_HEALTH_FORMAT_DEAD ) {
-			System.out.println ( "ConfigurationEntry.super.getAsString ( ): " + ConfigurationEntry.super.getAsString ( ) );
-			System.out.println ( "StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) ): "
-										 + StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) ) );
-		}
-		
-		// TODO: full placeholders plugins support
-		return StringEscapeUtils.unescapeJava (
-				StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) ) );
+		return getAsString ( null );
+	}
+	
+	public String getAsString ( Player player ) {
+		return PlaceholderHandler.getInstance ( ).setPlaceholders ( player , StringEscapeUtils.unescapeJava (
+				StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) ) ) );
 	}
 	
 	public String getAsStringStripColors ( ) {

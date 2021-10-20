@@ -14,15 +14,10 @@ import es.outlook.adriansrj.battleroyale.util.math.Location2D;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.world.border.WorldBorder;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 /**
  * Battle royale arena border.
@@ -34,11 +29,10 @@ public class BattleRoyaleArenaBorder {
 	/**
 	 * @author AdrianSR / 06/09/2021 / 01:52 p. m.
 	 */
-	protected static class BorderResizeTask implements Runnable {
+	protected static class BorderResizeTask extends BukkitRunnable {
 		
 		protected final BattleRoyaleArenaBorder           border;
-		protected       ScheduledExecutorService          executor;
-		protected       Stack < BattlefieldBorderResize > points;
+		protected       Deque < BattlefieldBorderResize > points;
 		
 		protected long   idle_time;
 		protected long   time;
@@ -48,11 +42,10 @@ public class BattleRoyaleArenaBorder {
 		protected double start_x;
 		protected double start_z;
 		
-		public BorderResizeTask ( BattleRoyaleArenaBorder border , ScheduledExecutorService executor ) {
-			this.border   = border;
-			this.executor = executor;
+		public BorderResizeTask ( BattleRoyaleArenaBorder border ) {
+			this.border = border;
 			
-			this.points = new Stack <> ( );
+			this.points = new ArrayDeque <> ( );
 			this.points.addAll ( border.points );
 		}
 		
@@ -69,7 +62,7 @@ public class BattleRoyaleArenaBorder {
 				
 				if ( border.point == null ) {
 					if ( points.size ( ) > 0 ) {
-						this.border.point = points.remove ( 0 );
+						this.border.point = points.pop ( );
 						this.setState ( EnumArenaBorderState.IDLE );
 						
 						this.idle_time = System.currentTimeMillis ( );
@@ -146,9 +139,8 @@ public class BattleRoyaleArenaBorder {
 			points.clear ( );
 			points = null;
 			
-			// shutting down executor
-			executor.shutdown ( );
-			executor = null;
+			// shutting down
+			cancel ( );
 		}
 		
 		protected double lerp ( double minimum , double maximum , double normal ) {
@@ -179,8 +171,8 @@ public class BattleRoyaleArenaBorder {
 	protected final BattleRoyaleArena arena;
 	
 	// state
-	protected ScheduledExecutorService          executor;
-	protected Stack < BattlefieldBorderResize > points;
+	protected BukkitRunnable                    update_task;
+	protected Deque < BattlefieldBorderResize > points;
 	protected BattlefieldBorderResize           previous_point;
 	protected BattlefieldBorderResize           point;
 	protected EnumArenaBorderState              state;
@@ -229,8 +221,8 @@ public class BattleRoyaleArenaBorder {
 		return point;
 	}
 	
-	public List < BattlefieldBorderResize > getPoints ( ) {
-		return Collections.unmodifiableList ( points );
+	public Collection < BattlefieldBorderResize > getPoints ( ) {
+		return Collections.unmodifiableCollection ( points );
 	}
 	
 	public double getCurrentSize ( ) {
@@ -271,16 +263,20 @@ public class BattleRoyaleArenaBorder {
 		handle.setSize ( bounds.getSize ( ) );
 		
 		// schedule resizing
-		executor = Executors.newSingleThreadScheduledExecutor ( );
-		
 		if ( points != null && points.size ( ) > 0 ) {
-			executor.scheduleAtFixedRate ( new BorderResizeTask ( this , executor ) ,
-										   70L , 70L , TimeUnit.MILLISECONDS );
+			update_task = new BorderResizeTask ( this );
+			update_task.runTaskTimerAsynchronously ( BattleRoyale.getInstance ( ) , 0L , 0L );
 		} else {
 			// resize succession invalid or not set. we need
 			// to regularly notify players about world border,
 			// so lets schedule a task for that.
-			executor.scheduleAtFixedRate ( handle :: refresh , 1L , 1L , TimeUnit.SECONDS );
+			update_task = new BukkitRunnable ( ) {
+				@Override
+				public void run ( ) {
+					BattleRoyaleArenaBorder.this.refresh ( );
+				}
+			};
+			update_task.runTaskTimerAsynchronously ( BattleRoyale.getInstance ( ) , 20L , 20L );
 		}
 	}
 	
@@ -292,9 +288,8 @@ public class BattleRoyaleArenaBorder {
 		this.point          = null;
 		
 		// shutting down executor
-		if ( executor != null ) {
-			executor.shutdownNow ( );
-			executor = null;
+		if ( update_task != null && !update_task.isCancelled ( ) ) {
+			update_task.cancel ( );
 		}
 		
 		handle.getPlayers ( ).clear ( );
@@ -315,7 +310,7 @@ public class BattleRoyaleArenaBorder {
 				.getConfiguration ( ).getBorderResizeSuccession ( );
 		
 		if ( resize_succession != null ) {
-			this.points = new Stack <> ( );
+			this.points = new ArrayDeque <> ( );
 			
 			// it's a random succession, so let's recalculate it.
 			if ( resize_succession instanceof BattlefieldBorderSuccessionRandom ) {

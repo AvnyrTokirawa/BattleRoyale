@@ -1,6 +1,7 @@
 package es.outlook.adriansrj.battleroyale.battlefield.setup;
 
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldConfiguration;
+import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderSuccession;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.Minimap;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 
@@ -16,13 +17,11 @@ public interface BattlefieldSetupResult {
 	 *
 	 * @return the name of the battlefield.
 	 */
-	public String getName ( );
+	String getName ( );
 	
-	public ZoneBounds getBounds ( );
+	ZoneBounds getBounds ( );
 	
-	public Minimap getMinimap ( );
+	Minimap getMinimap ( );
 	
-	public String getLootConfigurationName ( );
-	
-	public BattlefieldConfiguration getConfiguration ( );
+	BattlefieldConfiguration getConfiguration ( );
 }

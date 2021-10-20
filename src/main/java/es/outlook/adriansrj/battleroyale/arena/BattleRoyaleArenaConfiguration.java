@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- *
+ * {@link BattleRoyaleArena} configuration.
  *
  * @author AdrianSR / 09/10/2021 / 06:54 p. m.
  */
@@ -275,12 +275,18 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		return autostart_enable;
 	}
 	
+	/**
+	 * Gets the required number of players/teams
+	 * to start the arena.
+	 *
+	 * @return required number of players/teams to start.
+	 */
 	public int getAutostartRequired ( ) {
 		return autostart_required;
 	}
 	
 	public ConfigurableDuration getAutostartCountdown ( ) {
-		return autostart_countdown;
+		return new ConfigurableDuration ( autostart_countdown );
 	}
 	
 	@Override

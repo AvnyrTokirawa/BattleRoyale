@@ -6,12 +6,13 @@ import es.outlook.adriansrj.battleroyale.configuration.ConfigurationHandler;
 import es.outlook.adriansrj.battleroyale.data.DataStorageHandler;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
 import es.outlook.adriansrj.battleroyale.enums.EnumPluginHandler;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.gui.arena.ArenaSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setting.SettingsGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.team.TeamSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.core.dependency.MavenDependency;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.player.PlayerWrapper;
@@ -348,18 +349,21 @@ public final class BattleRoyale extends PluginAdapter implements Listener {
 			ex.printStackTrace ( );
 		}
 		
+		// shutting down scheduled executors
+		ScheduledExecutorPool.getInstance ( ).clear ( );
+		
 		// cleaning temp folder
 		deleteTempFolder ( );
 	}
 	
-	protected void deleteTempFolder ( ) {
+	private void deleteTempFolder ( ) {
 		File folder = EnumDirectory.BATTLEFIELD_TEMP_DIRECTORY.getDirectory ( );
 		
 		try {
-			if ( !folder.delete ( ) ) {
+			if ( folder.exists ( ) ) {
 				FileDeleteStrategy.FORCE.delete ( folder );
 			}
-		} catch ( Throwable ex ) {
+		} catch ( Exception ex ) {
 			// ignored exception
 		}
 	}

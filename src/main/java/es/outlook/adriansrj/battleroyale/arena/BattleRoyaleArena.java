@@ -1,8 +1,10 @@
 package es.outlook.adriansrj.battleroyale.arena;
 
 import es.outlook.adriansrj.battleroyale.arena.airsupply.AirSupplyGenerator;
+import es.outlook.adriansrj.battleroyale.arena.autostarter.AutoStarter;
 import es.outlook.adriansrj.battleroyale.arena.bombing.BombingZoneGenerator;
 import es.outlook.adriansrj.battleroyale.arena.border.BattleRoyaleArenaBorder;
+import es.outlook.adriansrj.battleroyale.arena.drop.ItemDropManager;
 import es.outlook.adriansrj.battleroyale.battlefield.Battlefield;
 import es.outlook.adriansrj.battleroyale.battlefield.bus.BusSpawn;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.renderer.MinimapRendererArena;
@@ -18,6 +20,7 @@ import es.outlook.adriansrj.battleroyale.game.player.Team;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.MiniMapUtil;
 import es.outlook.adriansrj.battleroyale.util.Validate;
@@ -37,7 +40,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -45,12 +47,10 @@ import java.util.stream.Collectors;
  */
 public class BattleRoyaleArena {
 	
-	// TODO: when all the arenas in a certain world stops, the world must be restarted as well
-	
 	protected static final ExecutorService EXECUTOR_SERVICE;
 	
 	static {
-		EXECUTOR_SERVICE = Executors.newWorkStealingPool ( );
+		EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getNewWorkStealingPool ( );
 	}
 	
 	protected final UUID                           id;
@@ -61,8 +61,10 @@ public class BattleRoyaleArena {
 	protected final BattleRoyaleMode               mode;
 	protected final BattleRoyaleArenaRegion        region;
 	protected final BattleRoyaleArenaBorder        border;
+	protected final AutoStarter                    auto_starter;
 	protected final AirSupplyGenerator             air_supplies;
 	protected final BombingZoneGenerator           bombing_zones;
+	protected final ItemDropManager                drop_manager;
 	
 	/** bus registry */
 	protected final BattleRoyaleArenaBusRegistry  bus_registry;
@@ -87,8 +89,18 @@ public class BattleRoyaleArena {
 		this.mode          = Validate.notNull ( configuration.getMode ( ) , "mode cannot be null" );
 		this.region        = new BattleRoyaleArenaRegion ( this );
 		this.border        = new BattleRoyaleArenaBorder ( this );
+		
+		System.out.println ( name + " | configuration.isAutostartEnabled ( ): " + configuration.isAutostartEnabled ( ) );
+		
+		if ( configuration.isAutostartEnabled ( ) ) {
+			this.auto_starter = new AutoStarter ( this );
+		} else {
+			this.auto_starter = null;
+		}
+		
 		this.air_supplies  = new AirSupplyGenerator ( this );
 		this.bombing_zones = new BombingZoneGenerator ( this );
+		this.drop_manager  = new ItemDropManager ( this );
 		this.team_registry = new BattleRoyaleArenaTeamRegistry ( this );
 		this.prepared      = false;
 		
@@ -144,12 +156,27 @@ public class BattleRoyaleArena {
 		return border;
 	}
 	
+	/**
+	 * Gets the auto-starter responsible for
+	 * automatically start this arena.
+	 *
+	 * @return the auto-starter, or <b>null</b>
+	 * if disabled in this arena.
+	 */
+	public AutoStarter getAutoStarter ( ) {
+		return auto_starter;
+	}
+	
 	public AirSupplyGenerator getAirSupplyGenerator ( ) {
 		return air_supplies;
 	}
 	
 	public BombingZoneGenerator getBombingZoneGenerator ( ) {
 		return bombing_zones;
+	}
+	
+	public ItemDropManager getDropManager ( ) {
+		return drop_manager;
 	}
 	
 	/**
@@ -205,11 +232,15 @@ public class BattleRoyaleArena {
 	}
 	
 	public Set < Player > getPlayers ( ) {
-		return getPlayers ( true );
+		return getPlayers ( getState ( ) == EnumArenaState.RUNNING );
+	}
+	
+	public int getCount ( boolean world ) {
+		return getPlayers ( world ).size ( );
 	}
 	
 	public int getCount ( ) {
-		return getPlayers ( ).size ( );
+		return getCount ( getState ( ) == EnumArenaState.RUNNING );
 	}
 	
 	/**
@@ -511,6 +542,7 @@ public class BattleRoyaleArena {
 	
 	protected synchronized void restartModules ( ) {
 		this.border.restart ( );
+		this.auto_starter.restart ( );
 		this.air_supplies.restart ( );
 		this.team_registry.clear ( );
 		

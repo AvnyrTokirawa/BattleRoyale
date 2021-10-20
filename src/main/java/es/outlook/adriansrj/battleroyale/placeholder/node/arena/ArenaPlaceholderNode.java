@@ -1,6 +1,7 @@
 package es.outlook.adriansrj.battleroyale.placeholder.node.arena;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
+import es.outlook.adriansrj.battleroyale.arena.autostarter.AutoStarter;
 import es.outlook.adriansrj.battleroyale.arena.border.BattleRoyaleArenaBorder;
 import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderResize;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
@@ -43,8 +44,8 @@ public class ArenaPlaceholderNode extends PlaceholderNode {
 										.count ( ) )
 								.reduce ( 0L , Long :: sum ).intValue ( ) );
 			} else if ( params.toLowerCase ( ).startsWith ( "border" ) ) { // br_arena_border
-				BattleRoyaleArenaBorder border = arena.getBorder ( );
 				params = extractIdentifier ( params );
+				BattleRoyaleArenaBorder border = arena.getBorder ( );
 				
 				if ( params.toLowerCase ( ).startsWith ( "state" ) ) { // br_arena_border_state
 					BattlefieldBorderResize point = border.getPoint ( );
@@ -81,6 +82,48 @@ public class ArenaPlaceholderNode extends PlaceholderNode {
 					}
 				}
 				return null;
+			} else if ( params.toLowerCase ( ).startsWith ( "autostart" ) ) { // br_arena_autostart
+				System.out.println ( "params: " + params );
+				params = extractIdentifier ( params );
+				AutoStarter starter = arena.getAutoStarter ( );
+				
+				System.out.println ( "starter: " + starter );
+				if ( starter != null ) {
+					if ( params.toLowerCase ( ).startsWith ( "required" ) ) {  // br_arena_autostart_required
+						return String.valueOf ( arena.getConfiguration ( ).getAutostartRequired ( ) );
+					} else if ( params.toLowerCase ( ).startsWith ( "count" ) ) {  // br_arena_autostart_count
+						if ( arena.getMode ( ).isSolo ( ) ) {
+							return String.valueOf ( arena.getCount ( false ) );
+						} else {
+							return String.valueOf ( arena.getTeamRegistry ( ).stream ( ).filter (
+									team -> !team.isEmpty ( ) ).count ( ) );
+						}
+					} else if ( params.toLowerCase ( ).startsWith ( "state" ) ) {  // br_arena_autostart_state
+						if ( starter.isStarted ( ) ) {
+							Duration time_left = starter.getTimeLeft ( );
+							
+							return time_left != null ? String.format (
+									EnumLanguage.AUTO_STARTER_STATE_STARTING.getAsString ( ) ,
+									TimeUtil.formatTime ( time_left ) ) : null;
+						} else {
+							int required = arena.getConfiguration ( ).getAutostartRequired ( );
+							int count;
+							
+							if ( arena.getMode ( ).isSolo ( ) ) {
+								count = arena.getCount ( false );
+							} else {
+								count = ( int ) arena.getTeamRegistry ( ).stream ( ).filter (
+										team -> !team.isEmpty ( ) ).count ( );
+							}
+							
+							return String.format (
+									EnumLanguage.AUTO_STARTER_STATE_WAITING.getAsString ( ) ,
+									count + "/" + required );
+						}
+					}
+				} else {
+					return null;
+				}
 			}
 		}
 		

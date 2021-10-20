@@ -8,6 +8,7 @@ import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
 import es.outlook.adriansrj.battleroyale.game.mode.simple.SimpleBattleRoyaleMode;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.core.util.Duration;
@@ -21,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author AdrianSR / 03/09/2021 / 02:30 p. m.
@@ -32,7 +32,7 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 	private static final BattleRoyaleArenaConfiguration EXAMPLE_ARENA_CONFIGURATION;
 	
 	static {
-		EXECUTOR_SERVICE            = Executors.newWorkStealingPool ( );
+		EXECUTOR_SERVICE            = ScheduledExecutorPool.getInstance ( ).getWorkStealingPool ( );
 		EXAMPLE_ARENA_CONFIGURATION = new BattleRoyaleArenaConfiguration (
 				"battlefield name here" ,
 				"world-1" ,
@@ -153,18 +153,16 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 			
 			// must load arenas asynchronously as the server could crash
 			// since the shapes of the arenas could probably be huge.
-			final String           resulting_name        = name.trim ( );
-			final Battlefield      resulting_battlefield = battlefield;
-			final BattleRoyaleMode resulting_mode        = mode;
-			final String           resulting_world_name  = configuration.getWorldName ( ).trim ( );
+			final String resulting_name = name.trim ( );
+			//			final Battlefield      resulting_battlefield = battlefield;
+			//			final BattleRoyaleMode resulting_mode        = mode;
+			//			final String           resulting_world_name  = configuration.getWorldName ( ).trim ( );
 			
 			ConsoleUtil.sendPluginMessage ( ChatColor.YELLOW , "Loading arena '" + resulting_name
 					+ "' ..." , plugin );
 			
 			EXECUTOR_SERVICE.execute ( ( ) -> BattleRoyaleArenaHandler.getInstance ( ).createArena (
-					resulting_name , resulting_world_name ,
-					resulting_battlefield , resulting_mode ,
-					arena -> {
+					resulting_name , configuration , arena -> {
 						ConsoleUtil.sendPluginMessage ( ChatColor.GREEN , "Arena '"
 								+ arena.getName ( ) + "' successfully loaded." , plugin );
 						

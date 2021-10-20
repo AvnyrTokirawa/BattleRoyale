@@ -6,6 +6,7 @@ import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldShapePart;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.exception.WorldRegionLimitReached;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
@@ -29,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 
@@ -48,7 +48,10 @@ public class BattleRoyaleArenaRegion {
 	protected static final ExecutorService EXECUTOR_SERVICE;
 	
 	static {
-		EXECUTOR_SERVICE = Executors.newSingleThreadExecutor ( );
+		// we will try by using a work stealing pool.
+		// if this result in problems, then we will have
+		// to use a single thread executor instead.
+		EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getWorkStealingPool ( );
 	}
 	
 	/**

@@ -13,7 +13,7 @@ class SetNameButton extends SetupToolButtonBase {
 		super ( ChatColor.GOLD + "Set Name" , UniversalMaterial.NAME_TAG.getItemStack ( ) ,
 				"" ,
 				ChatColor.GRAY + "Click to set the name" ,
-				ChatColor.GRAY + "for this battlefield." );
+				ChatColor.GRAY + "of this battlefield." );
 	}
 	
 	@Override

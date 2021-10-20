@@ -56,7 +56,7 @@ public class BombingZoneGenerator {
 			// recalculating
 			next.clear ( );
 			
-			int count   = Math.min ( Math.max ( min , RandomUtil.nextInt ( max + 1 ) ) , max );
+			int count   = max > 0 ? Math.min ( Math.max ( min , RandomUtil.nextInt ( max + 1 ) ) , max ) : 0;
 			int attempt = 0;
 			
 			ZoneBounds bounds = previous_point != null

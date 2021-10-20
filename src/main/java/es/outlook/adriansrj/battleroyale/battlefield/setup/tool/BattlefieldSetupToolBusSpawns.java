@@ -2,9 +2,8 @@ package es.outlook.adriansrj.battleroyale.battlefield.setup.tool;
 
 import es.outlook.adriansrj.battleroyale.battlefield.bus.BusSpawn;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
-import es.outlook.adriansrj.battleroyale.util.Constants;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.math.MathUtil;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.core.item.ActionItem;
@@ -28,6 +27,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import xyz.xenondevs.particle.ParticleEffect;
@@ -35,9 +35,6 @@ import xyz.xenondevs.particle.data.color.RegularColor;
 
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author AdrianSR / 07/09/2021 / 07:20 p. m.
@@ -58,7 +55,7 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 		protected final BattlefieldSetupToolBusSpawns tool;
 		protected final Vector                        start_location;
 		protected final BukkitTask                    particle_displayer;
-		protected final ScheduledExecutorService      speed_executor;
+		protected final BukkitRunnable                speed_task;
 		protected       float                         yaw;
 		protected       double                        door_point_distance;
 		protected       double                        speed;
@@ -83,10 +80,13 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 			this.particle_displayer  = Bukkit.getScheduler ( ).runTaskTimer (
 					BattleRoyale.getInstance ( ) , this , 8L , 8L );
 			
-			this.speed_executor = Executors.newSingleThreadScheduledExecutor ( );
-			this.speed_executor.scheduleAtFixedRate (
-					this , Constants.BUS_DISPLACEMENT_EXECUTOR_PERIOD ,
-					Constants.BUS_DISPLACEMENT_EXECUTOR_PERIOD , TimeUnit.MILLISECONDS );
+			this.speed_task = new BukkitRunnable ( ) {
+				@Override
+				public void run ( ) {
+					SpawnManipulator.this.run ( );
+				}
+			};
+			this.speed_task.runTaskTimerAsynchronously ( BattleRoyale.getInstance ( ) , 0L , 0L );
 		}
 		
 		public BusSpawn getResult ( ) {
@@ -200,7 +200,7 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 			
 			if ( dispose ) {
 				particle_displayer.cancel ( );
-				speed_executor.shutdownNow ( );
+				speed_task.cancel ( );
 			}
 		}
 		

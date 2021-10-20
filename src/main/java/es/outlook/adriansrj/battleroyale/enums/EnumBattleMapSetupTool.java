@@ -17,6 +17,9 @@ public enum EnumBattleMapSetupTool {
 	SET_PLAYER_SPAWNS ( BattlefieldSetupToolPlayerSpawns.class ),
 	SET_VEHICLE_SPAWNS ( BattlefieldSetupToolVehicleSpawns.class ),
 	SET_NAME ( BattlefieldSetupToolName.class ),
+	SET_BORDER ( BattlefieldSetupToolBorder.class ),
+	SET_AIR_SUPPLY ( BattlefieldSetupToolAirSupply.class ),
+	SET_BOMBING_ZONE ( BattlefieldSetupToolBombingZone.class ),
 	SET_BOUNDS ( BattlefieldSetupToolBounds.class ),
 	SET_LOOT_CHESTS ( BattlefieldSetupToolLootChests.class ),
 	

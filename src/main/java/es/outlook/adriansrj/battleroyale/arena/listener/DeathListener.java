@@ -2,10 +2,12 @@ package es.outlook.adriansrj.battleroyale.arena.listener;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
+import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerDeathEvent;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.util.time.TimeUtil;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.console.ConsoleUtil;
@@ -15,11 +17,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -89,8 +93,13 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 					// the first time this task runs.
 					if ( left_pretty <= duration.toSeconds ( ) ) {
 						TitlesUtil.send (
-								player , "" ,
-								ChatColor.GOLD + "Respawning in " + left_pretty /* TODO: make configurable */ );
+								player ,
+								// title
+								String.format ( EnumLanguage.RESPAWN_COUNTDOWN_TITLE.getAsString ( ) ,
+												TimeUtil.formatTime ( Duration.ofSeconds ( left_pretty ) ) ) ,
+								// subtitle
+								String.format ( EnumLanguage.RESPAWN_COUNTDOWN_SUBTITLE.getAsString ( ) ,
+												TimeUtil.formatTime ( Duration.ofSeconds ( left_pretty ) ) ) );
 					}
 				}
 			} else {
@@ -121,7 +130,7 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		Player                   br_player = Player.getPlayer ( player );
 		BattleRoyaleArena        arena     = br_player.getArena ( );
 		
-		if ( arena.getState ( ) == EnumArenaState.RUNNING
+		if ( arena != null && arena.getState ( ) == EnumArenaState.RUNNING
 				&& br_player.hasTeam ( ) && !br_player.isSpectator ( ) ) {
 			int position = arena.getMode ( ).isRespawnEnabled ( )
 					? -1 : getPosition ( br_player ); // -1 if respawn is enabled.
@@ -161,17 +170,43 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 				
 				if ( uncast_killer instanceof org.bukkit.entity.Player ) {
 					br_killer = Player.getPlayer ( uncast_killer.getUniqueId ( ) );
+				} else if ( uncast_killer instanceof Projectile ) {
+					Projectile       projectile = ( Projectile ) uncast_killer;
+					ProjectileSource shooter    = projectile.getShooter ( );
+					
+					if ( shooter instanceof org.bukkit.entity.Player ) {
+						br_killer = Player.getPlayer ( ( org.bukkit.entity.Player ) shooter );
+					}
 				}
 			}
 			
-			// died bleeding out
-			if ( br_player.isKnocked ( ) && br_killer == null && cause == PlayerDeathEvent.Cause.CUSTOM ) {
-				cause     = PlayerDeathEvent.Cause.BLEEDING_OUT;
-				br_killer = br_player.getKnocker ( );
+			// battle royale custom causes
+			if ( br_killer == null && cause == PlayerDeathEvent.Cause.CUSTOM ) {
+				// died bleeding out
+				if ( br_player.isKnocked ( ) ) {
+					cause     = PlayerDeathEvent.Cause.BLEEDING_OUT;
+					br_killer = br_player.getKnocker ( );
+				}
+				// died out of bounds
+				else if ( !arena.getBorder ( ).getCurrentBounds ( ).contains ( player.getLocation ( ) ) ) {
+					cause = PlayerDeathEvent.Cause.OUT_OF_BOUNDS;
+				}
 			}
 			
 			// finally firing
-			new PlayerDeathEvent ( br_player , br_killer , cause , false ).call ( );
+			PlayerDeathEvent wrapper = new PlayerDeathEvent (
+					br_player , br_killer , cause , event.getDeathMessage ( ) , false );
+			
+			wrapper.setDeathMessage ( event.getDeathMessage ( ) );
+			wrapper.setKeepInventory ( event.getKeepInventory ( ) );
+			wrapper.setKeepLevel ( event.getKeepLevel ( ) );
+			
+			wrapper.call ( );
+			
+			// passing wrapper values
+			event.setDeathMessage ( wrapper.getDeathMessage ( ) );
+			event.setKeepInventory ( wrapper.isKeepInventory ( ) );
+			event.setKeepLevel ( wrapper.isKeepLevel ( ) );
 			
 			// position.
 			if ( position > 0 ) {
@@ -259,20 +294,20 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 	}
 	
 	private void sendPositionTitle ( org.bukkit.entity.Player player , int position ) {
-		// TODO: configurable titles
-		
 		// java's count starts from 0,
 		// mortal human's count starts from 1. :)
 		final int pretty_position = position + 1;
 		
 		if ( pretty_position == 1 ) {
 			TitlesUtil.send (
-					player , ChatColor.RED + String.format ( "#%d WINNER" , pretty_position ) ,
-					"" );
+					player ,
+					EnumLanguage.POSITION_WINNER_TITLE.getAsString ( ) ,
+					EnumLanguage.POSITION_WINNER_SUBTITLE.getAsString ( ) );
 		} else {
 			TitlesUtil.send (
-					player , ChatColor.RED + String.format ( "#%d GAME OVER" , pretty_position ) ,
-					"" );
+					player ,
+					String.format ( EnumLanguage.POSITION_GAME_OVER_TITLE.getAsString ( ) , pretty_position ) ,
+					String.format ( EnumLanguage.POSITION_GAME_OVER_SUBTITLE.getAsString ( ) , pretty_position ) );
 		}
 	}
 	

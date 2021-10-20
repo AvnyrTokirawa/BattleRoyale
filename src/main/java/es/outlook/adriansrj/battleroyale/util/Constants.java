@@ -53,8 +53,8 @@ public class Constants {
 	public static final String SCHEMATIC_HEIGHT_KEY = "Height";
 	public static final String SCHEMATIC_LENGTH_KEY = "Length";
 	
-	/** Update period of the displacement executor of the buses */
-	public static final long BUS_DISPLACEMENT_EXECUTOR_PERIOD    = 60L;
+	//	/** Update period of the displacement executor of the buses */
+	//	public static final long BUS_DISPLACEMENT_EXECUTOR_PERIOD    = 60L;
 	/** Parachute life-loop executor period */
 	public static final long PARACHUTE_LIFE_LOOP_EXECUTOR_PERIOD = 30L;
 	

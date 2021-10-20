@@ -2,8 +2,10 @@ package es.outlook.adriansrj.battleroyale.enums;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
 import es.outlook.adriansrj.battleroyale.arena.airsupply.AirSupplyGeneratorHandler;
+import es.outlook.adriansrj.battleroyale.arena.autostarter.AutoStarterHandler;
 import es.outlook.adriansrj.battleroyale.arena.bombing.BombingZoneGeneratorHandler;
 import es.outlook.adriansrj.battleroyale.arena.border.BattleRoyaleArenaBorderHandler;
+import es.outlook.adriansrj.battleroyale.arena.drop.ItemDropHandler;
 import es.outlook.adriansrj.battleroyale.arena.sign.BattleRoyaleArenaSignHandler;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldRegistry;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.MinimapHandler;
@@ -54,6 +56,7 @@ import es.outlook.adriansrj.battleroyale.parachute.ParachuteHandler;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteRegistry;
 import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
 import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderNodeRegistry;
+import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardConfigurationRegistry;
 import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardHandler;
 import es.outlook.adriansrj.battleroyale.util.PluginUtil;
@@ -72,6 +75,7 @@ public enum EnumPluginHandler {
 	PACKET_FACTORY_SERVICE ( PacketFactoryService.class ),
 	PACKET_READER_SERVICE ( PacketReaderService.class ),
 	PACKET_SENDER_SERVICE ( PacketSenderService.class ),
+	SCHEDULED_EXECUTOR_POOL ( ScheduledExecutorPool.class ),
 	MAIN_CONFIGURATION_HANDLER ( MainConfigurationHandler.class ),
 	LANGUAGE_CONFIGURATION_HANDLER ( BattleRoyaleLanguageConfigHandler.class ),
 	
@@ -122,8 +126,10 @@ public enum EnumPluginHandler {
 	ARENA_SIGN_CONFIGURATION_HANDLER ( BattleRoyaleArenaSignConfigHandler.class ),
 	ARENA_SIGN_CONTAINER_HANDLER ( BattleRoyaleArenaSignContainerHandler.class ),
 	ARENA_BORDER_HANDLER ( BattleRoyaleArenaBorderHandler.class ),
+	ARENA_AUTO_STARTER_HANDLER ( AutoStarterHandler.class ),
 	ARENA_AIR_SUPPLY_HANDLER ( AirSupplyGeneratorHandler.class ),
 	ARENA_BOMBING_ZONE_HANDLER ( BombingZoneGeneratorHandler.class ),
+	ARENA_ITEM_DROP_HANDLER ( ItemDropHandler.class ),
 	
 	MINIMAP_HANDLER ( MinimapHandler.class ),
 	
