@@ -41,6 +41,7 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 				null ,
 				true ,
 				15 ,
+				2 ,
 				5 ,
 				Duration.ofSeconds ( 15 )
 		);
@@ -107,7 +108,7 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 					// reviving not enabled, but respawn instead
 					.reviving ( false )
 					.respawn ( true )
-					.teamSelection ( true )
+					.teamSelection ( false )
 					.autofill ( true )
 					.redeploy ( true )
 					.build ( ) );

@@ -40,7 +40,8 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	protected static final String SCOREBOARD_KEY                          = "scoreboard.name";
 	protected static final String SCOREBOARD_PLUGIN_KEY                   = "scoreboard.plugin";
 	protected static final String ARENA_AUTO_START_ENABLE_KEY             = "auto-start.enable";
-	protected static final String ARENA_AUTO_START_REQUIRED_KEY           = "auto-start.required";
+	protected static final String ARENA_AUTO_START_REQUIRED_PLAYERS_KEY   = "auto-start.required.players";
+	protected static final String ARENA_AUTO_START_REQUIRED_TEAMS_KEY     = "auto-start.required.teams";
 	protected static final String ARENA_AUTO_START_COUNTDOWN_DISPLAY_KEY  = "auto-start.countdown.display";
 	protected static final String ARENA_AUTO_START_COUNTDOWN_DURATION_KEY = "auto-start.countdown.duration";
 	
@@ -80,9 +81,13 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 					"minimum number of players/teams is reached." )
 	protected boolean autostart_enable;
 	
-	@ConfigurableEntry ( key = ARENA_AUTO_START_REQUIRED_KEY, comment =
-			"the required number of players/teams to start arena." )
-	protected int autostart_required;
+	@ConfigurableEntry ( key = ARENA_AUTO_START_REQUIRED_PLAYERS_KEY, comment =
+			"the required number of players to start arena." )
+	protected int autostart_required_players;
+	
+	@ConfigurableEntry ( key = ARENA_AUTO_START_REQUIRED_TEAMS_KEY, comment =
+			"the required number of teams to start arena." )
+	protected int autostart_required_teams;
 	
 	@ConfigurableEntry ( key = ARENA_AUTO_START_COUNTDOWN_DISPLAY_KEY, comment =
 			"the count from which titles start to show." )
@@ -93,7 +98,8 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	protected ConfigurableDuration autostart_countdown_duration;
 	
 	public BattleRoyaleArenaConfiguration ( String battlefield_name , String world_name , String mode_filename ,
-			String scoreboard , EnumScoreboardPlugin scoreboard_plugin , boolean autostart_enable , int autostart_required ,
+			String scoreboard , EnumScoreboardPlugin scoreboard_plugin , boolean autostart_enable ,
+			int autostart_required_players , int autostart_required_teams ,
 			int autostart_countdown_display , Duration autostart_countdown_duration ) {
 		this.battlefield_name             = battlefield_name;
 		this.world_name                   = world_name;
@@ -101,7 +107,8 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		this.scoreboard                   = scoreboard;
 		this.scoreboard_plugin            = scoreboard_plugin;
 		this.autostart_enable             = autostart_enable;
-		this.autostart_required           = autostart_required;
+		this.autostart_required_players   = autostart_required_players;
+		this.autostart_required_teams     = autostart_required_teams;
 		this.autostart_countdown_display  = autostart_countdown_display;
 		this.autostart_countdown_duration = new ConfigurableDuration ( autostart_countdown_duration );
 	}
@@ -116,7 +123,8 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		this.scoreboard                   = copy.scoreboard;
 		this.scoreboard_plugin            = copy.scoreboard_plugin;
 		this.autostart_enable             = copy.autostart_enable;
-		this.autostart_required           = copy.autostart_required;
+		this.autostart_required_players   = copy.autostart_required_players;
+		this.autostart_required_teams     = copy.autostart_required_teams;
 		this.autostart_countdown_display  = copy.autostart_countdown_display;
 		this.autostart_countdown_duration = copy.autostart_countdown_duration;
 	}
@@ -292,13 +300,23 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	}
 	
 	/**
-	 * Gets the required number of players/teams
+	 * Gets the required number of players
 	 * to start the arena.
 	 *
-	 * @return required number of players/teams to start.
+	 * @return required number of players to start.
 	 */
-	public int getAutostartRequired ( ) {
-		return autostart_required;
+	public int getAutostartRequiredPlayers ( ) {
+		return autostart_required_players;
+	}
+	
+	/**
+	 * Gets the required number of teams
+	 * to start the arena.
+	 *
+	 * @return required number of teams to start.
+	 */
+	public int getAutostartRequiredTeams ( ) {
+		return autostart_required_teams;
 	}
 	
 	/**

@@ -5,6 +5,7 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaTeamRegistry;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.sound.UniversalSound;
@@ -12,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * @author AdrianSR / 20/10/2021 / 12:00 p. m.
@@ -86,7 +88,8 @@ public class AutoStarter implements Listener {
 	}
 	
 	protected final BattleRoyaleArena arena;
-	protected final int               required;
+	protected final int               required_players;
+	protected final int               required_teams;
 	protected final int               countdown_display;
 	protected final Duration          countdown_duration;
 	protected       boolean           finished;
@@ -98,7 +101,8 @@ public class AutoStarter implements Listener {
 		this.arena = arena;
 		
 		// configuration
-		this.required           = arena.getConfiguration ( ).getAutostartRequired ( );
+		this.required_players   = arena.getConfiguration ( ).getAutostartRequiredPlayers ( );
+		this.required_teams     = arena.getConfiguration ( ).getAutostartRequiredTeams ( );
 		this.countdown_display  = arena.getConfiguration ( ).getAutostartCountdownDisplay ( );
 		this.countdown_duration = arena.getConfiguration ( ).getAutostartCountdownDuration ( );
 	}
@@ -156,34 +160,45 @@ public class AutoStarter implements Listener {
 			BattleRoyaleMode mode = arena.getMode ( );
 			
 			if ( mode.isSolo ( ) ) {
-				return arena.getCount ( false ) >= required;
+				// teams are the same as players in a solo-mode.
+				return arena.getCount ( false ) >= required_players;
 			} else {
+				// checking required teams
 				BattleRoyaleArenaTeamRegistry team_registry = arena.getTeamRegistry ( );
-				int count = ( int ) team_registry.stream ( ).filter (
+				int team_count = ( int ) team_registry.stream ( ).filter (
 						team -> !team.isEmpty ( ) ).count ( );
 				
-				if ( count >= required ) {
-					// there are enough teams registered
-					// to start the arena.
-					return true;
-				} else {
+				if ( team_count < required_teams ) {
 					// there are no enough teams registered
 					// to start the arena; we will check
 					// if there are enough players to create
 					// new teams and fill them (in case the auto-fill is enabled).
 					if ( mode.isAutoFillEnabled ( ) ) {
-						int needed = required - count;
+						int needed = required_teams - team_count;
 						int player_count = ( int ) arena.getPlayers ( false ).stream ( )
 								.filter ( player -> !player.hasTeam ( ) ).count ( );
 						
-						return player_count >= ( mode.getMaxPlayersPerTeam ( ) * needed );
+						if ( player_count < ( mode.getMaxPlayersPerTeam ( ) * needed ) ) {
+							return false;
+						}
 					} else {
 						return false;
 					}
 				}
+				
+				// checking required players
+				Stream < Player > player_stream = arena.getPlayers ( false ).stream ( );
+				
+				if ( !mode.isAutoFillEnabled ( ) ) {
+					// only players on a team will be considered if auto-fill is disabled,
+					// as they will not be part of the game unless they join a team.
+					player_stream = player_stream.filter ( Player :: hasTeam );
+				}
+				
+				return player_stream.count ( ) >= required_players;
 			}
-		} else {
-			return false;
 		}
+		
+		return false;
 	}
 }

@@ -39,7 +39,7 @@ public enum EnumDirectory {
 	/**
 	 * Directory that stores the arenas.
 	 */
-	ARENA_DIRECTORY ( "arena" , true ),
+	ARENA_DIRECTORY ( "arena" , false ),
 	
 	/**
 	 * Directory that stores the scoreboard configurations.

@@ -72,8 +72,26 @@ public abstract class BattleRoyaleMode implements Validable {
 	 */
 	public abstract int getMaxPlayersPerTeam ( );
 	
+//	/**
+	//	 * Gets whether the team creation is enabled.
+	//	 * <br>
+	//	 * If the team creation is disabled, players will not able
+	//	 * to create teams; instead, they will have to select from
+	//	 * the existing teams.
+	//	 * <br>
+	//	 * These existing teams will be automatically created by
+	//	 * the plugin based on the team limit ({@link #getMaxTeams()}).
+	//	 *
+	//	 * @return whether the team creation is enabled.
+	//	 */
+	//	public abstract boolean isTeamCreationEnabled ( );
+	
 	/**
 	 * Gets whether the team selection is enabled.
+	 * <br>
+	 * If the team selection is disabled, players will not able
+	 * to select a team; instead, they will be automatically set
+	 * in a team by the plugin.
 	 * <br>
 	 * {@link #getMaxTeams()} and {@link #isAutoFillEnabled()}
 	 * will have no effect if this option is disabled.

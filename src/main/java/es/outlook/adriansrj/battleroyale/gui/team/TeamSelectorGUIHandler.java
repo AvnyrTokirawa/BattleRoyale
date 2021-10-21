@@ -5,9 +5,9 @@ import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.enums.EnumTeamGUIsLanguage;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.game.player.Team;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.menu.Item;
 import es.outlook.adriansrj.core.menu.ItemMenu;
@@ -282,9 +282,14 @@ public final class TeamSelectorGUIHandler extends PluginHandler {
 		BattleRoyaleArena arena     = br_player.getArena ( );
 		
 		if ( arena == null ) {
-			throw new UnsupportedOperationException ( "player must be in an arena in order to join a team" );
+			throw new UnsupportedOperationException (
+					"player must be in an arena in order to join a team" );
 		} else if ( arena.getState ( ) == EnumArenaState.RUNNING ) {
-			throw new UnsupportedOperationException ( "player cannot join a team if the arena is already running" );
+			throw new UnsupportedOperationException (
+					"player cannot join a team if the arena is already running" );
+		} else if ( !arena.getMode ( ).isTeamSelectionEnabled ( ) ) {
+			throw new UnsupportedOperationException (
+					"team selection is disabled in the current arena" );
 		}
 	}
 	

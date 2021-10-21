@@ -91,8 +91,6 @@ rsrc/main/java/es/outlook/adriansrj/battleroyale/compatibility/qualityarmory/Qua
 hsrc/main/java/es/outlook/adriansrj/battleroyale/placeholder/processor/papi/PapiPlaceholderExpansion.java,6\e\6e8c1fdf1d76af7d74c358a8d89950f38f039b1b
 ò
 hsrc/main/java/es/outlook/adriansrj/battleroyale/placeholder/processor/papi/PapiPlaceholderProcessor.java,6\f\6ff0af735381ba37c53dcff00226f3869379faef
-á
-Wsrc/main/java/es/outlook/adriansrj/battleroyale/arena/BattleRoyaleArenaBusRegistry.java,1\1\11f87382f0529f6a5912fa1f2ead1837ec70aaa8
 s
 Csrc/main/java/es/outlook/adriansrj/battleroyale/bus/BusHandler.java,b\c\bc30017c2946011fb8cd184a92b0d6e9dc74361e
 è
@@ -103,8 +101,6 @@ psrc/main/java/es/outlook/adriansrj/battleroyale/placeholder/processor/internal/
 Lsrc/main/java/es/outlook/adriansrj/battleroyale/gui/team/TeamGUIHandler.java,c\1\c171d31f50f1c7bed0f907635929b49a52691f66
 
 Osrc/main/java/es/outlook/adriansrj/battleroyale/enums/EnumTeamGUIsLanguage.java,6\a\6ac3da43cac5ba10457a261633c4e04357860e9c
-Ñ
-Tsrc/main/java/es/outlook/adriansrj/battleroyale/gui/team/TeamSelectorGUIHandler.java,8\c\8cf71a6773a0f351a97133664ffde8fdaeff2f64
 É
 Ssrc/main/java/es/outlook/adriansrj/battleroyale/world/chunk/v13/ChunkSection13.java,b\8\b866a91f6b9a4de1de33641b83f8c43e85a2ac79
 É
@@ -127,8 +123,6 @@ lsrc/main/java/es/outlook/adriansrj/battleroyale/configuration/vehicle/BattleRoy
 ksrc/main/java/es/outlook/adriansrj/battleroyale/configuration/arena/BattleRoyaleArenaSignConfigHandler.java,8\b\8b2f498340164e2d1facfa4b28f46f44b74b68aa
 û
 nsrc/main/java/es/outlook/adriansrj/battleroyale/configuration/arena/BattleRoyaleArenaSignContainerHandler.java,f\9\f93521fc8d4295e24656ba46e079e0cab997c03f
-x
-Hsrc/main/java/es/outlook/adriansrj/battleroyale/enums/EnumDirectory.java,8\9\895cd00b8eed7ab2fec901500ad3b552807e934a
 á
 Wsrc/main/java/es/outlook/adriansrj/battleroyale/configuration/bus/BusConfigHandler.java,c\2\c20cfa4f035a248808919991a3280f7009c00075
 ì
@@ -147,8 +141,6 @@ Hsrc/main/java/es/outlook/adriansrj/battleroyale/parachute/Parachute.java,9\f\9
 Usrc/main/java/es/outlook/adriansrj/battleroyale/parachute/custom/ParachuteCustom.java,b\2\b2907b3cf9c838097d3d18b725763e3aa2f548ee
 î
 dsrc/main/java/es/outlook/adriansrj/battleroyale/configuration/parachute/ParachutesConfigHandler.java,a\2\a2b667f738052774da690330de2d07bd861dc2cc
-å
-\src/main/java/es/outlook/adriansrj/battleroyale/game/mode/simple/SimpleBattleRoyaleMode.java,7\9\7972efef83e997cc888562a8a2c48d49a4539311
 á
 Wsrc/main/java/es/outlook/adriansrj/battleroyale/configuration/ConfigurationHandler.java,e\9\e9a89440dcdd5fcc7106b64e5b5bf92b1b49de95
 Ñ

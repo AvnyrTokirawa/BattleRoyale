@@ -217,11 +217,15 @@ public enum EnumLanguage implements ConfigurationEntry {
 	
 	// -------- auto starter
 	
-	AUTO_STARTER_STATE_WAITING_SOLO ( "auto-start.state.waiting.solo" ,
-									  "auto-starter waiting state text format (one-player teams)" ,
-									  "Players: " + ChatColor.GOLD + "%s" ),
+	AUTO_STARTER_STATE_WAITING_BATTLEFIELD ( "auto-start.state.waiting.loading-battlefield" ,
+											 "auto-starter waiting state text format (when the battlefield is being prepared)" ,
+											 ChatColor.GOLD + "Preparing Battlefield..." ),
 	
-	AUTO_STARTER_STATE_WAITING_TEAM ( "auto-start.state.waiting.team" ,
+	AUTO_STARTER_STATE_WAITING_PLAYER ( "auto-start.state.waiting.required-players" ,
+										"auto-starter waiting state text format (one-player teams)" ,
+										"Players: " + ChatColor.GOLD + "%s" ),
+	
+	AUTO_STARTER_STATE_WAITING_TEAM ( "auto-start.state.waiting.required-teams" ,
 									  "auto-starter waiting state text format (teams with more than one player)" ,
 									  "Teams: " + ChatColor.GOLD + "%s" ),
 	
@@ -230,12 +234,12 @@ public enum EnumLanguage implements ConfigurationEntry {
 								  "Starting in: " + ChatColor.GREEN + "%s" ),
 	
 	AUTO_STARTER_COUNTDOWN_TITLE ( "auto-start.countdown.title" ,
-											"auto-starter countdown title" ,
-											ChatColor.GOLD + "%d" ),
+								   "auto-starter countdown title" ,
+								   ChatColor.GOLD + "%d" ),
 	
 	AUTO_STARTER_COUNTDOWN_SUBTITLE ( "auto-start.countdown.subtitle" ,
-											   "auto-starter countdown subtitle" ,
-											   "" ),
+									  "auto-starter countdown subtitle" ,
+									  "" ),
 	
 	;
 	
