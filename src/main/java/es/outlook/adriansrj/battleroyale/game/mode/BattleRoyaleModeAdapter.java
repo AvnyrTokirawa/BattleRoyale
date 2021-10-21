@@ -16,6 +16,11 @@ public abstract class BattleRoyaleModeAdapter extends BattleRoyaleMode {
 	}
 	
 	@Override
+	public boolean isTeamCreationEnabled ( ) {
+		return true;
+	}
+	
+	@Override
 	public boolean isTeamSelectionEnabled ( ) {
 		return true;
 	}

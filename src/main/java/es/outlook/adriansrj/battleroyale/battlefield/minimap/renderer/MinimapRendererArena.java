@@ -35,13 +35,17 @@ public class MinimapRendererArena extends MinimapRendererBase {
 		drawPlayer ( player.getLocation ( ) , canvas , MapCursor.Type.WHITE_POINTER , display_bounds );
 		
 		// drawing teammates
-		Player.getPlayer ( player ).getTeam ( ).getPlayers ( ).stream ( )
-				.filter ( teammate -> !Objects.equals ( teammate.getUniqueId ( ) , player.getUniqueId ( ) ) )
-				.filter ( Player :: isPlaying )
-				.filter ( teammate -> !teammate.isSpectator ( ) )
-				.map ( Player :: getBukkitPlayerOptional ).filter ( Optional :: isPresent ).map ( Optional :: get )
-				.forEach ( teammate -> drawPlayer (
-						teammate.getLocation ( ) , canvas , MapCursor.Type.GREEN_POINTER , display_bounds ) );
+		Player br_player = Player.getPlayer ( player );
+		
+		if ( br_player.hasTeam ( ) ) {
+			br_player.getTeam ( ).getPlayers ( ).stream ( )
+					.filter ( teammate -> !Objects.equals ( teammate.getUniqueId ( ) , player.getUniqueId ( ) ) )
+					.filter ( Player :: isPlaying )
+					.filter ( teammate -> !teammate.isSpectator ( ) )
+					.map ( Player :: getBukkitPlayerOptional ).filter ( Optional :: isPresent ).map ( Optional :: get )
+					.forEach ( teammate -> drawPlayer (
+							teammate.getLocation ( ) , canvas , MapCursor.Type.GREEN_POINTER , display_bounds ) );
+		}
 		
 		/* drawing border */
 		// current border bounds

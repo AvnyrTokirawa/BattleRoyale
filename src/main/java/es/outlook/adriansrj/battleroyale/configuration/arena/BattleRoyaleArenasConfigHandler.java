@@ -82,13 +82,16 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 					.maximumPlayerPerTeam ( 1 )
 					.maximumTeams ( 0 ) // no team limit
 					.reviving ( false )
-					.teamSelection ( false ) // team selection must be disabled
+					// team creation/selection must be disabled
+					.teamCreation ( false )
+					.teamSelection ( false )
 					.build ( ) );
 			
 			saveDefaultMode ( "Duos" , new SimpleBattleRoyaleMode.Builder ( )
 					.maximumPlayerPerTeam ( 2 )
 					.maximumTeams ( 0 ) // no team limit
 					.reviving ( true ) // reviving
+					.teamCreation ( true )
 					.teamSelection ( true )
 					.autofill ( true )
 					.build ( ) );
@@ -97,6 +100,7 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 					.maximumPlayerPerTeam ( 4 )
 					.maximumTeams ( 0 ) // no team limit
 					.reviving ( true ) // reviving
+					.teamCreation ( true )
 					.teamSelection ( true )
 					.autofill ( true )
 					.build ( ) );
@@ -108,7 +112,9 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 					// reviving not enabled, but respawn instead
 					.reviving ( false )
 					.respawn ( true )
-					.teamSelection ( false )
+					// team creation must be disabled.
+					.teamCreation ( false )
+					.teamSelection ( true )
 					.autofill ( true )
 					.redeploy ( true )
 					.build ( ) );

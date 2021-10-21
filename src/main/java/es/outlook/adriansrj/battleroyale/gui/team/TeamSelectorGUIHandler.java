@@ -118,7 +118,7 @@ public final class TeamSelectorGUIHandler extends PluginHandler {
 		// create button
 		// player must not be on a team
 		// to create a new one
-		if ( br_player.getTeam ( ) == null &&
+		if ( br_player.getTeam ( ) == null && mode.isTeamCreationEnabled ( ) &&
 				( mode.getMaxTeams ( ) <= 0 || arena.getTeamRegistry ( ).getCount ( ) < mode.getMaxTeams ( ) ) ) {
 			ActionItem create_button = new ActionItem (
 					EnumTeamGUIsLanguage.BUTTON_CREATE_TEAM.getAsString ( ) ,

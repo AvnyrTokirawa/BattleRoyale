@@ -23,6 +23,7 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 	public static final Integer DEFAULT_MAX_PLAYERS           = 100;
 	public static final Integer DEFAULT_MAX_TEAMS             = 0;
 	public static final Integer DEFAULT_MAX_PLAYERS_PER_TEAM  = 1;
+	public static final Boolean DEFAULT_TEAM_CREATION         = true;
 	public static final Boolean DEFAULT_TEAM_SELECTION        = true;
 	public static final Boolean DEFAULT_AUTO_FILL             = true;
 	public static final Double  DEFAULT_HEALTH_AFTER_REVIVING = 6.0;
@@ -42,6 +43,7 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 		protected int                  maximum_kills        = DEFAULT_MAX_KILLS;
 		protected int                  maximum_teams        = DEFAULT_MAX_TEAMS;
 		protected int                  maximum_players_team = DEFAULT_MAX_PLAYERS_PER_TEAM;
+		protected boolean              team_creation        = DEFAULT_TEAM_CREATION;
 		protected boolean              team_selection       = DEFAULT_TEAM_SELECTION;
 		protected boolean              autofill             = DEFAULT_AUTO_FILL;
 		protected boolean              reviving;
@@ -73,6 +75,11 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 		
 		public Builder maximumPlayerPerTeam ( int maximum_players_team ) {
 			this.maximum_players_team = maximum_players_team;
+			return this;
+		}
+		
+		public Builder teamCreation ( boolean team_creation ) {
+			this.team_creation = team_creation;
 			return this;
 		}
 		
@@ -151,6 +158,9 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 			"\nset to 0 to disable this option." )
 	protected int maximum_players_team = DEFAULT_MAX_PLAYERS_PER_TEAM;
 	
+	@ConfigurableEntry ( key = "team.creation", comment = "if disabled, players will not be able to create teams" )
+	protected boolean team_creation = DEFAULT_TEAM_CREATION;
+	
 	@ConfigurableEntry ( key = "team.selection", comment = "if disabled, players will not be able to select a team" )
 	protected boolean team_selection = DEFAULT_TEAM_SELECTION;
 	
@@ -180,7 +190,7 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 	protected boolean redeploy;
 	
 	public SimpleBattleRoyaleMode ( double initial_health , double maximum_health , int maximum_kills , int maximum_teams ,
-			int maximum_players_team , boolean autofill , boolean team_selection , boolean reviving ,
+			int maximum_players_team , boolean autofill , boolean team_creation , boolean team_selection , boolean reviving ,
 			ConfigurableDuration reviving_time , double reviving_health , boolean respawn ,
 			ConfigurableDuration respawn_time , boolean redeploy ) {
 		this.initial_health       = initial_health;
@@ -188,6 +198,7 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 		this.maximum_kills        = maximum_kills;
 		this.maximum_teams        = maximum_teams;
 		this.maximum_players_team = maximum_players_team;
+		this.team_creation        = team_creation;
 		this.team_selection       = team_selection;
 		this.autofill             = autofill;
 		this.reviving             = reviving;
@@ -202,7 +213,8 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 			int maximum_players_team , boolean autofill , boolean reviving ,
 			ConfigurableDuration reviving_time , double reviving_health , boolean respawn ,
 			ConfigurableDuration respawn_time , boolean redeploy ) {
-		this ( initial_health , maximum_health , maximum_kills , maximum_teams , maximum_players_team , true , autofill ,
+		this ( initial_health , maximum_health , maximum_kills , maximum_teams , maximum_players_team , autofill ,
+			   true , true ,
 			   reviving , reviving_time , reviving_health , respawn , respawn_time , redeploy );
 	}
 	
@@ -248,6 +260,11 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 	@Override
 	public int getMaxPlayersPerTeam ( ) {
 		return maximum_players_team;
+	}
+	
+	@Override
+	public boolean isTeamCreationEnabled ( ) {
+		return team_creation;
 	}
 	
 	@Override
@@ -303,6 +320,7 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 	
 	@Override
 	public boolean isValid ( ) {
-		return maximum_players_team > 0 && maximum_health > 0.0D && initial_health > 0.0D;
+		return maximum_players_team > 0 && maximum_health > 0.0D && initial_health > 0.0D
+				&& ( team_creation || ( isSolo ( ) || maximum_teams > 0 ) );
 	}
 }

@@ -208,12 +208,18 @@ public final class BattleRoyaleArenaBusRegistry implements Iterable < BusInstanc
 	}
 	
 	public void start ( ) {
+		System.out.println ( ">>>> Bus registry: start: 0" );
+		
 		if ( dragon_bus != null ) {
+			System.out.println ( ">>>> Bus registry: start: 1" );
 			dragon_bus.start ( arena , spawn );
 		} else {
+			System.out.println ( ">>>> Bus registry: start: 2" );
 			// starting individual buses
 			arena.getPlayers ( false ).stream ( ).filter ( Player :: hasTeam ).filter (
 					Player :: isOnline ).forEach ( player -> {
+				System.out.println ( ">>>> Bus registry: start: 3: " + player );
+				
 				BusInstance < ? > bus = player.getBus ( );
 				
 				if ( bus.isStarted ( ) ) {

@@ -2,9 +2,9 @@ package es.outlook.adriansrj.battleroyale.gui.team;
 
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.enums.EnumTeamGUIsLanguage;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.game.player.Team;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.menu.Item;
 import es.outlook.adriansrj.core.menu.ItemMenu;
@@ -125,13 +125,6 @@ public final class TeamGUIHandler extends PluginHandler {
 				
 				if ( team != null ) {
 					br_player.leaveTeam ( );
-					
-					// the team will be empty once this
-					// player leaves it, so lets remove it
-					// as it is unnecessarily consuming slots.
-					if ( team.isEmpty ( ) ) {
-						team.getArena ( ).getTeamRegistry ( ).unregisterTeam ( team );
-					}
 				}
 				
 				// redirecting to the selector

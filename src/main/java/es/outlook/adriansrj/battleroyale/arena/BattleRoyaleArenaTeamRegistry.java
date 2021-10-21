@@ -26,6 +26,21 @@ public final class BattleRoyaleArenaTeamRegistry implements Iterable < Team > {
 	
 	BattleRoyaleArenaTeamRegistry ( BattleRoyaleArena arena ) {
 		this.arena = arena;
+		
+		// team creation is disabled,
+		// we must populate the teams.
+		int limit = arena.getMode ( ).getMaxTeams ( );
+		
+		if ( !arena.getMode ( ).isTeamCreationEnabled ( ) ) {
+			if ( limit > 0 ) {
+				for ( int i = 0 ; i < limit ; i++ ) {
+					createAndRegisterTeam ( );
+				}
+			} else {
+				throw new IllegalStateException (
+						"team limit must be higher than 0 if team creation is disabled" );
+			}
+		}
 	}
 	
 	/**

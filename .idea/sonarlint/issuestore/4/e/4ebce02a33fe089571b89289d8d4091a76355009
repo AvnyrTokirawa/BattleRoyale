@@ -1,0 +1,119 @@
+
+o
+java:S3008’"XRename this field "SERVER_THREAD" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(äî–—
+M
+java:S11350"2Complete the task associated to this TODO comment.(Ó¡Â¡úÿÿÿÿ
+M
+java:S11351"2Complete the task associated to this TODO comment.(É€åœøÿÿÿÿ
+G
+java:S11352"2Complete the task associated to this TODO comment.(‚ğÒZ
+M
+java:S11354"2Complete the task associated to this TODO comment.(«÷Ø¸üÿÿÿÿ
+M
+java:S11356"2Complete the task associated to this TODO comment.(ğÓçõøÿÿÿÿ
+M
+java:S11358"2Complete the task associated to this TODO comment.(´ŸÜÜüÿÿÿÿ
+H
+java:S1135:"2Complete the task associated to this TODO comment.(Â›ö’
+H
+java:S1135;"2Complete the task associated to this TODO comment.(ÓñàÍ
+M
+java:S1135>"2Complete the task associated to this TODO comment.(¬ñóıùÿÿÿÿ
+H
+java:S1135?"2Complete the task associated to this TODO comment.(ƒ Æ¶
+H
+java:S1135@"2Complete the task associated to this TODO comment.(ñŞİ„
+H
+java:S1135A"2Complete the task associated to this TODO comment.(ÓñàÍ
+M
+java:S1135D"2Complete the task associated to this TODO comment.(‰Éª¥øÿÿÿÿ
+H
+java:S1135E"2Complete the task associated to this TODO comment.(ÓñàÍ
+H
+java:S1135H"2Complete the task associated to this TODO comment.(‘€³¢
+H
+java:S1135I"2Complete the task associated to this TODO comment.(©äñË
+H
+java:S1135K"2Complete the task associated to this TODO comment.(ÓñàÍ
+H
+java:S1135N"2Complete the task associated to this TODO comment.(®´ÔĞ
+M
+java:S1135^"2Complete the task associated to this TODO comment.(á½î„ıÿÿÿÿ
+M
+java:S1135_"2Complete the task associated to this TODO comment.(© Îııÿÿÿÿ
+H
+java:S1135`"2Complete the task associated to this TODO comment.(ÓñàÍ
+M
+java:S1135c"2Complete the task associated to this TODO comment.(­€Ñùüÿÿÿÿ
+H
+java:S1135e"2Complete the task associated to this TODO comment.(ÓñàÍ
+M
+java:S1135h"2Complete the task associated to this TODO comment.(ñë“úÿÿÿÿ
+M
+java:S1135i"2Complete the task associated to this TODO comment.(·¶ş¼ÿÿÿÿÿ
+H
+java:S1135j"2Complete the task associated to this TODO comment.(ÓñàÍ
+M
+java:S1135m"2Complete the task associated to this TODO comment.(÷ïÇùÿÿÿÿ
+H
+java:S1135n"2Complete the task associated to this TODO comment.(ÖÌò®
+H
+java:S1135o"2Complete the task associated to this TODO comment.(ÓñàÍ
+H
+java:S1135r"2Complete the task associated to this TODO comment.(Çš³¡
+H
+java:S1135s"2Complete the task associated to this TODO comment.(ÓñàÍ
+H
+java:S1135v"2Complete the task associated to this TODO comment.(Ã°ˆÑ
+H
+java:S1135w"2Complete the task associated to this TODO comment.(ÓñàÍ
+M
+java:S1135z"2Complete the task associated to this TODO comment.(ÅÜŒ–ûÿÿÿÿ
+H
+java:S1135|"2Complete the task associated to this TODO comment.(ÓñàÍ
+M
+java:S1135"2Complete the task associated to this TODO comment.(ƒÈÄªùÿÿÿÿ
+N
+java:S1135€"2Complete the task associated to this TODO comment.(‰•µüÿÿÿÿ
+I
+java:S1135"2Complete the task associated to this TODO comment.(ÓñàÍ
+C
+java:S1602–",Remove useless curly braces around statement(±ÙÅ¤
+M
+java:S2696–"6Make the enclosing method "static" or remove this set.(±ÙÅ¤
+O	java:S106Ö"9Replace this use of System.out or System.err by a logger.(ÊïŞ¡
+T	java:S106Ü"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ
+T	java:S106İ"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ
+T	java:S106Ş"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ
+T	java:S106ß"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ
+T	java:S106à"9Replace this use of System.out or System.err by a logger.(‚ĞÍÌûÿÿÿÿ
+T	java:S106ã"9Replace this use of System.out or System.err by a logger.(¹ÂØ¥ÿÿÿÿÿ
+T	java:S106‹"9Replace this use of System.out or System.err by a logger.(÷Ğ¤ÿÿÿÿÿ
+A
+java:S1181¨"%Catch Exception instead of Throwable.(À˜§üÿÿÿÿ
+D
+java:S1185º"(Remove this method to simply inherit it.(Á¤áùÿÿÿÿ
+H
+java:S1135»"2Complete the task associated to this TODO comment.(ÿê™)
+2
+java:S3626ì"Remove this redundant jump.(ûÁİ…
+O	java:S106Ø"9Replace this use of System.out or System.err by a logger.(îŒê”
+L
+java:S1751á"5Remove this "break" statement or make it conditional.(›ûä·
+T	java:S106î"9Replace this use of System.out or System.err by a logger.(Œó‰üÿÿÿÿ
+C
+java:S1602ü",Remove useless curly braces around statement(ÏÎíÓ
+C
+java:S1602€",Remove useless curly braces around statement(ÏÎíÓ
+C
+java:S1602„",Remove useless curly braces around statement(ÏÎíÓ
+C
+java:S1602‹",Remove useless curly braces around statement(ÏÎíÓ
+|
+java:S1217‘"`Call the method Thread.start() to execute the content of the run() method in a dedicated thread.(²ååÌıÿÿÿÿ
+T	java:S106—"9Replace this use of System.out or System.err by a logger.(¾¬ºØıÿÿÿÿ
+T	java:S106˜"9Replace this use of System.out or System.err by a logger.(˜¡“¤úÿÿÿÿ
+T	java:S106š"9Replace this use of System.out or System.err by a logger.(¬ŠĞøÿÿÿÿ
+T	java:S106œ"9Replace this use of System.out or System.err by a logger.(Ö¬ÈÉúÿÿÿÿ
+T	java:S106"9Replace this use of System.out or System.err by a logger.(˜¡“¤úÿÿÿÿ
+T	java:S106 "9Replace this use of System.out or System.err by a logger.(ƒñÛüÿÿÿÿ

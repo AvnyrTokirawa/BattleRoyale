@@ -82,64 +82,75 @@ public class AirSupply {
 			// we are using the eye location to check if the air supply has landed as it represents
 			// the location of the head of the armor stand, which holds the helmet, that is
 			// the visible part of the armor stand for players.
-			if ( chest_holder.getEyeLocation ( ).getBlock ( ).getType ( ).isSolid ( ) ) {
-				// stopping and placing loot chest
-				airsupply.stop ( );
-				airsupply.destroyShape ( );
-				airsupply.placeLootChest ( );
-				
-				// landing sound
-				land.getWorld ( ).playSound ( land.getLocation ( ) , Sound.valueOf (
-						Version.getServerVersion ( ).isOlder ( Version.v1_13_R1 )
-								? "BLOCK_CLOTH_FALL"
-								: "BLOCK_SNOW_FALL" ) , 4F , 1F );
-				
-				land.getWorld ( ).playSound ( land.getLocation ( ) , Sound.BLOCK_LADDER_PLACE , 4F , 1F );
-			} else {
-				Location location = chest_holder.getLocation ( ).subtract ( 0D , FALLING_SPEED , 0D );
-				
-				// updating chest holder location.
-				// a teleport packet for the chest holder seems to be unnecessary,
-				// but if it starts causing  problems, then we will have to send teleport packets.
-				EntityReflection.setPositionDirty ( chest_holder , location.toVector ( ) );
-				
-				// updating parachute location
-				if ( airsupply.parachute != null ) {
-					for ( int i = 0 ; i < airsupply.parachute.length ; i++ ) {
-						BlockFace face = i < DirectionUtil.FACES_90.length ? DirectionUtil.FACES_90[ i ]
-								: DirectionUtil.FACES_90[ i % DirectionUtil.FACES_90.length ].getOppositeFace ( );
-						
-						Chicken part = airsupply.parachute[ i ];
-						double  x    = location.getX ( ) + ( face.getModX ( ) * 1.9D );
-						double  y    = location.getY ( ) + 5.0D;
-						double  z    = location.getZ ( ) + ( face.getModZ ( ) * 1.9D );
-						float   yaw  = DirectionUtil.getYaw ( face );
-						
-						// we will update the server-side location of the
-						// part as we will use it later.
-						EntityReflection.setPositionDirty ( part , new Vector ( x , y , z ) );
-						EntityReflection.setYawDirty ( part , yaw );
-					}
-				}
-				
-				// packets
-				airsupply.arena.getPlayers ( ).stream ( ).map ( PlayerWrapper :: getBukkitPlayer ).filter (
-						Objects :: nonNull ).forEach ( player -> {
-					// parachute teleport packet
+			Location location = chest_holder.getEyeLocation ( );
+			int      chunk_x  = location.getBlockX ( ) >> 4;
+			int      chunk_z  = location.getBlockZ ( ) >> 4;
+			
+			if ( chest_holder.getWorld ( ).isChunkLoaded ( chunk_x , chunk_z ) ) {
+				if ( chest_holder.getEyeLocation ( ).getBlock ( ).getType ( ).isSolid ( ) ) {
+					// stopping and placing loot chest
+					airsupply.stop ( );
+					airsupply.destroyShape ( );
+					airsupply.placeLootChest ( );
+					
+					// landing sound
+					land.getWorld ( ).playSound ( land.getLocation ( ) , Sound.valueOf (
+							Version.getServerVersion ( ).isOlder ( Version.v1_13_R1 )
+									? "BLOCK_CLOTH_FALL"
+									: "BLOCK_SNOW_FALL" ) , 4F , 1F );
+					
+					land.getWorld ( ).playSound ( land.getLocation ( ) , Sound.BLOCK_LADDER_PLACE , 4F , 1F );
+				} else {
+					location = chest_holder.getLocation ( ).subtract ( 0D , FALLING_SPEED , 0D );
+					
+					// updating chest holder location.
+					// a teleport packet for the chest holder seems to be unnecessary,
+					// but if it starts causing  problems, then we will have to send teleport packets.
+					EntityReflection.setPositionDirty ( chest_holder , location.toVector ( ) );
+					
+					// updating parachute location
 					if ( airsupply.parachute != null ) {
-						for ( Chicken part : airsupply.parachute ) {
-							Vector part_location = Objects.requireNonNull ( EntityReflection.getPositionDirty ( part ) );
+						for ( int i = 0 ; i < airsupply.parachute.length ; i++ ) {
+							BlockFace face = i < DirectionUtil.FACES_90.length ? DirectionUtil.FACES_90[ i ]
+									: DirectionUtil.FACES_90[ i % DirectionUtil.FACES_90.length ].getOppositeFace ( );
 							
-							PacketSenderService.getInstance ( ).sendEntityTeleportPacket (
-									player , EntityReflection.getEntityID ( part ) , false ,
-									part_location.getX ( ) , part_location.getY ( ) , part_location.getZ ( ) ,
-									EntityReflection.getYawDirty ( part ) , 0.0F );
+							Chicken part = airsupply.parachute[ i ];
+							double  x    = location.getX ( ) + ( face.getModX ( ) * 1.9D );
+							double  y    = location.getY ( ) + 5.0D;
+							double  z    = location.getZ ( ) + ( face.getModZ ( ) * 1.9D );
+							float   yaw  = DirectionUtil.getYaw ( face );
 							
-							// ensuring is leashed
-							PacketSenderService.getInstance ( ).sendEntityAttachPacket ( player , part , chest_holder );
+							// we will update the server-side location of the
+							// part as we will use it later.
+							EntityReflection.setPositionDirty ( part , new Vector ( x , y , z ) );
+							EntityReflection.setYawDirty ( part , yaw );
 						}
 					}
-				} );
+					
+					// packets
+					airsupply.arena.getPlayers ( ).stream ( ).map ( PlayerWrapper :: getBukkitPlayer ).filter (
+							Objects :: nonNull ).forEach ( player -> {
+						// parachute teleport packet
+						if ( airsupply.parachute != null ) {
+							for ( Chicken part : airsupply.parachute ) {
+								Vector part_location = Objects.requireNonNull ( EntityReflection.getPositionDirty ( part ) );
+								
+								PacketSenderService.getInstance ( ).sendEntityTeleportPacket (
+										player , EntityReflection.getEntityID ( part ) , false ,
+										part_location.getX ( ) , part_location.getY ( ) , part_location.getZ ( ) ,
+										EntityReflection.getYawDirty ( part ) , 0.0F );
+								
+								// ensuring is leashed
+								PacketSenderService.getInstance ( ).sendEntityAttachPacket ( player , part , chest_holder );
+							}
+						}
+					} );
+				}
+			} else {
+				// loading chunk synchronously
+				Bukkit.getScheduler ( ).runTask (
+						BattleRoyale.getInstance ( ) , ( ) ->
+								chest_holder.getWorld ( ).loadChunk ( chunk_x , chunk_z ) );
 			}
 		}
 	}

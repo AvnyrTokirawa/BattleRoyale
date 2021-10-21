@@ -59,6 +59,7 @@ public final class TeamHandler extends PluginHandler {
 				Team previous_team = player.team;
 				
 				player.team = team;
+				
 				if ( !player.team.players.contains ( player ) ) {
 					player.team.players.add ( player );
 				}
@@ -97,7 +98,8 @@ public final class TeamHandler extends PluginHandler {
 			team.players.remove ( player );
 			
 			// empty teams will automatically be removed
-			if ( team.players.isEmpty ( ) ) {
+			// if the team creation is enabled.
+			if ( team.arena.getMode ( ).isTeamCreationEnabled ( ) && team.players.isEmpty ( ) ) {
 				team.getArena ( ).getTeamRegistry ( ).unregisterTeam ( team );
 			}
 			

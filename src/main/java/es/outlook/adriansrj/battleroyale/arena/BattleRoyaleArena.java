@@ -258,6 +258,9 @@ public class BattleRoyaleArena {
 	}
 	
 	public void introduce ( org.bukkit.entity.Player player , boolean spectator ) {
+		Validate.isTrue ( getState ( ) == EnumArenaState.RUNNING ,
+						  "must be running to introduce a player" );
+		
 		if ( Bukkit.isPrimaryThread ( ) ) {
 			Player br_player     = Player.getPlayer ( player );
 			Team   next_not_full = team_registry.getNextNotFull ( );
@@ -267,12 +270,23 @@ public class BattleRoyaleArena {
 				spectator = true;
 			}
 			
+			System.out.println ( "spectator: " + spectator );
+			
 			if ( spectator ) {
 				br_player.setSpectator ( true );
 			} else {
+				System.out.println ( "br_player.hasTeam ( ): " + br_player.hasTeam ( ) );
+				System.out.println ( "next_not_full: " + next_not_full );
+				
 				if ( !br_player.hasTeam ( ) ) {
-					br_player.setTeam ( next_not_full != null ? next_not_full
-												: team_registry.createAndRegisterTeam ( ) );
+					Team team = next_not_full != null ? next_not_full
+							: team_registry.createAndRegisterTeam ( );
+					
+					System.out.println ( "team: " + team );
+					
+					br_player.setTeam ( team );
+					
+					System.out.println ( ">>>> player team: " + br_player.getTeam ( ) );
 				}
 				
 				player.setGameMode ( GameMode.SURVIVAL );
@@ -390,17 +404,15 @@ public class BattleRoyaleArena {
 				// world border
 				border.start ( );
 				
-				// auto-fill
-				if ( mode.isAutoFillEnabled ( ) && !team_registry.isFull ( ) ) {
-					// TODO: put players without team on a team
-				}
+//				// filling teams
+				//				getPlayers ( false ).stream ( ).filter (
+				//						player -> !player.hasTeam ( ) ).forEach ( player -> {
+				//
+				//				} );
 				
 				// introducing players
-				for ( Team team : team_registry ) {
-					for ( Player player : team.getPlayers ( ) ) {
-						introduce ( player , false );
-					}
-				}
+				getPlayers ( false ).forEach (
+						player -> introduce ( player , false ) );
 				
 				// starting bus
 				if ( bus_registry != null ) {
