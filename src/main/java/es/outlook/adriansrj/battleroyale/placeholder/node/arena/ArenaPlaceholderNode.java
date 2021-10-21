@@ -83,11 +83,9 @@ public class ArenaPlaceholderNode extends PlaceholderNode {
 				}
 				return null;
 			} else if ( params.toLowerCase ( ).startsWith ( "autostart" ) ) { // br_arena_autostart
-				System.out.println ( "params: " + params );
 				params = extractIdentifier ( params );
 				AutoStarter starter = arena.getAutoStarter ( );
 				
-				System.out.println ( "starter: " + starter );
 				if ( starter != null ) {
 					if ( params.toLowerCase ( ).startsWith ( "required" ) ) {  // br_arena_autostart_required
 						return String.valueOf ( arena.getConfiguration ( ).getAutostartRequired ( ) );
@@ -117,7 +115,9 @@ public class ArenaPlaceholderNode extends PlaceholderNode {
 							}
 							
 							return String.format (
-									EnumLanguage.AUTO_STARTER_STATE_WAITING.getAsString ( ) ,
+									arena.getMode ( ).isSolo ( ) ?
+											EnumLanguage.AUTO_STARTER_STATE_WAITING_SOLO.getAsString ( ) :
+											EnumLanguage.AUTO_STARTER_STATE_WAITING_TEAM.getAsString ( ) ,
 									count + "/" + required );
 						}
 					}

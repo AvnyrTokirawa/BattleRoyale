@@ -10,6 +10,7 @@ import es.outlook.adriansrj.battleroyale.battlefield.bus.BusSpawn;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.renderer.MinimapRendererArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLootContainer;
+import es.outlook.adriansrj.battleroyale.event.arena.ArenaPreparedEvent;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.exception.WorldRegionLimitReached;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfiguration;
@@ -89,8 +90,6 @@ public class BattleRoyaleArena {
 		this.mode          = Validate.notNull ( configuration.getMode ( ) , "mode cannot be null" );
 		this.region        = new BattleRoyaleArenaRegion ( this );
 		this.border        = new BattleRoyaleArenaBorder ( this );
-		
-		System.out.println ( name + " | configuration.isAutostartEnabled ( ): " + configuration.isAutostartEnabled ( ) );
 		
 		if ( configuration.isAutostartEnabled ( ) ) {
 			this.auto_starter = new AutoStarter ( this );
@@ -259,93 +258,101 @@ public class BattleRoyaleArena {
 	}
 	
 	public void introduce ( org.bukkit.entity.Player player , boolean spectator ) {
-		Player br_player     = Player.getPlayer ( player );
-		Team   next_not_full = team_registry.getNextNotFull ( );
-		
-		if ( !mode.introduce ( br_player ) || ( !br_player.hasTeam ( )
-				&& ( !mode.isAutoFillEnabled ( ) || ( team_registry.isFull ( ) && next_not_full == null ) ) ) ) {
-			spectator = true;
-		}
-		
-		if ( spectator ) {
-			br_player.setSpectator ( true );
-		} else {
-			if ( !br_player.hasTeam ( ) ) {
-				br_player.setTeam ( next_not_full != null ? next_not_full
-											: team_registry.createAndRegisterTeam ( ) );
+		if ( Bukkit.isPrimaryThread ( ) ) {
+			Player br_player     = Player.getPlayer ( player );
+			Team   next_not_full = team_registry.getNextNotFull ( );
+			
+			if ( !mode.introduce ( br_player ) || ( !br_player.hasTeam ( )
+					&& ( !mode.isAutoFillEnabled ( ) || ( team_registry.isFull ( ) && next_not_full == null ) ) ) ) {
+				spectator = true;
 			}
 			
-			player.setGameMode ( GameMode.SURVIVAL );
-			player.setTotalExperience ( 0 );
-			player.setLevel ( 0 );
-			player.setExp ( 0F );
-			player.setFoodLevel ( 20 );
-			player.setSaturation ( 20.0F );
-			player.setHealth ( Math.max ( mode.getInitialHealth ( ) , 0.5D ) );
-			EntityUtil.setMaxHealth ( player , Math.max ( mode.getMaxHealth ( ) , 0.5D ) );
-			player.getActivePotionEffects ( ).clear ( );
-			
-			player.getInventory ( ).clear ( );
-			player.getInventory ( ).setArmorContents ( null );
-			
-			// minimap
-			player.getInventory ( ).addItem ( ItemStackUtil.createViewItemStack (
-					MiniMapUtil.createView ( new MinimapRendererArena ( this ) , world ) ) );
-			
-			// initial loot
-			LootConfiguration loot_configuration = battlefield.getConfiguration ( ).getLootConfiguration ( );
-			
-			if ( loot_configuration != null ) {
-				LootConfigurationContainer initial = loot_configuration.getContainer ( EnumLootContainer.INITIAL );
-				
-				if ( initial != null && initial.isValid ( ) ) {
-					initial.fill ( player.getInventory ( ) );
+			if ( spectator ) {
+				br_player.setSpectator ( true );
+			} else {
+				if ( !br_player.hasTeam ( ) ) {
+					br_player.setTeam ( next_not_full != null ? next_not_full
+												: team_registry.createAndRegisterTeam ( ) );
 				}
-			}
-			
-			player.updateInventory ( );
-			
-			// if no bus spawns were set, the bus registry will
-			// be null; in that case we have to send players to
-			// a random player spawn if any set.
-			if ( bus_registry == null ) {
-				Set < ConfigurableVector > player_spawns = battlefield.getConfiguration ( ).getPlayerSpawns ( );
-				ConfigurableVector         spawn         = null;
 				
-				if ( player_spawns.size ( ) > 0 && player_spawns.stream ( )
-						.anyMatch ( ConfigurableVector :: isValid ) ) {
-					while ( spawn == null ) {
-						spawn = RandomUtil.getRandomElement ( player_spawns );
-						spawn = spawn != null && spawn.isValid ( ) ? spawn : null;
+				player.setGameMode ( GameMode.SURVIVAL );
+				player.setTotalExperience ( 0 );
+				player.setLevel ( 0 );
+				player.setExp ( 0F );
+				player.setFoodLevel ( 20 );
+				player.setSaturation ( 20.0F );
+				player.setHealth ( Math.max ( mode.getInitialHealth ( ) , 0.5D ) );
+				EntityUtil.setMaxHealth ( player , Math.max ( mode.getMaxHealth ( ) , 0.5D ) );
+				player.getActivePotionEffects ( ).clear ( );
+				
+				player.getInventory ( ).clear ( );
+				player.getInventory ( ).setArmorContents ( null );
+				
+				// minimap
+				player.getInventory ( ).addItem ( ItemStackUtil.createViewItemStack (
+						MiniMapUtil.createView ( new MinimapRendererArena ( this ) , world ) ) );
+				
+				// initial loot
+				LootConfiguration loot_configuration = battlefield.getConfiguration ( ).getLootConfiguration ( );
+				
+				if ( loot_configuration != null ) {
+					LootConfigurationContainer initial = loot_configuration.getContainer ( EnumLootContainer.INITIAL );
+					
+					if ( initial != null && initial.isValid ( ) ) {
+						initial.fill ( player.getInventory ( ) );
 					}
 				}
 				
-				if ( spawn != null ) {
-					player.teleport ( region.bounds.project ( spawn ).toLocation ( world ) );
-				} else {
-					ConsoleUtil.sendPluginMessage (
-							ChatColor.RED , "Couldn't find a valid spawn for the player '"
-									+ player.getName ( ) + "'" , BattleRoyale.getInstance ( ) );
+				player.updateInventory ( );
+				
+				// if no bus spawns were set, the bus registry will
+				// be null; in that case we have to send players to
+				// a random player spawn if any set.
+				if ( bus_registry == null ) {
+					Set < ConfigurableVector > player_spawns = battlefield.getConfiguration ( ).getPlayerSpawns ( );
+					ConfigurableVector         spawn         = null;
+					
+					if ( player_spawns.size ( ) > 0 && player_spawns.stream ( )
+							.anyMatch ( ConfigurableVector :: isValid ) ) {
+						while ( spawn == null ) {
+							spawn = RandomUtil.getRandomElement ( player_spawns );
+							spawn = spawn != null && spawn.isValid ( ) ? spawn : null;
+						}
+					}
+					
+					if ( spawn != null ) {
+						player.teleport ( region.bounds.project ( spawn ).toLocation ( world ) );
+					} else {
+						ConsoleUtil.sendPluginMessage (
+								ChatColor.RED , "Couldn't find a valid spawn for the player '"
+										+ player.getName ( ) + "'" , BattleRoyale.getInstance ( ) );
+					}
 				}
 			}
+			
+			// world border
+			border.getPlayers ( ).add ( br_player );
+			border.refresh ( );
+			
+			// scoreboard
+			if ( br_player.getBRScoreboard ( ) != null ) {
+				br_player.getBRScoreboard ( ).setVisible ( !spectator );
+			}
+			
+			// compass
+			if ( br_player.getCompass ( ) != null ) {
+				br_player.getCompass ( ).setVisible ( !spectator );
+			}
+			
+			// parachute
+			br_player.setCanOpenParachute ( true );
+		} else {
+			final org.bukkit.entity.Player final_player    = player;
+			final boolean                  final_spectator = spectator;
+			
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , ( ) -> introduce ( final_player , final_spectator ) );
 		}
-		
-		// world border
-		border.getPlayers ( ).add ( br_player );
-		border.refresh ( );
-		
-		// scoreboard
-		if ( br_player.getBRScoreboard ( ) != null ) {
-			br_player.getBRScoreboard ( ).setVisible ( !spectator );
-		}
-		
-		// compass
-		if ( br_player.getCompass ( ) != null ) {
-			br_player.getCompass ( ).setVisible ( !spectator );
-		}
-		
-		// parachute
-		br_player.setCanOpenParachute ( true );
 	}
 	
 	/**
@@ -364,38 +371,47 @@ public class BattleRoyaleArena {
 	}
 	
 	public synchronized void start ( ) {
-		switch ( state ) {
-			case WAITING:
-				break;
-			
-			case RUNNING:
-				throw new IllegalStateException ( "arena already started" );
-			case RESTARTING:
-				throw new IllegalStateException ( "arena is restarting" );
-			case STOPPED:
-				throw new IllegalStateException ( "arena requires the world to be restarted" );
-		}
-		
-		if ( prepared ) {
-			this.setState ( EnumArenaState.RUNNING );
-			
-			// world border
-			border.start ( );
-			
-			// TODO: put players without team on a team
-			// introducing players
-			for ( Team team : team_registry ) {
-				for ( Player player : team.getPlayers ( ) ) {
-					introduce ( player , false );
-				}
+		if ( Bukkit.isPrimaryThread ( ) ) {
+			switch ( state ) {
+				case WAITING:
+					break;
+				
+				case RUNNING:
+					throw new IllegalStateException ( "arena already started" );
+				case RESTARTING:
+					throw new IllegalStateException ( "arena is restarting" );
+				case STOPPED:
+					throw new IllegalStateException ( "arena requires the world to be restarted" );
 			}
 			
-			// starting bus
-			if ( bus_registry != null ) {
-				bus_registry.start ( );
+			if ( prepared ) {
+				this.setState ( EnumArenaState.RUNNING );
+				
+				// world border
+				border.start ( );
+				
+				// auto-fill
+				if ( mode.isAutoFillEnabled ( ) && !team_registry.isFull ( ) ) {
+					// TODO: put players without team on a team
+				}
+				
+				// introducing players
+				for ( Team team : team_registry ) {
+					for ( Player player : team.getPlayers ( ) ) {
+						introduce ( player , false );
+					}
+				}
+				
+				// starting bus
+				if ( bus_registry != null ) {
+					bus_registry.start ( );
+				}
+			} else {
+				throw new IllegalStateException ( "call prepare() first" );
 			}
 		} else {
-			throw new IllegalStateException ( "call prepare() first" );
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , this :: start );
 		}
 	}
 	
@@ -448,25 +464,30 @@ public class BattleRoyaleArena {
 	}
 	
 	public synchronized void stop ( ) {
-		if ( state == EnumArenaState.STOPPED ) {
-			throw new IllegalStateException ( "arena already stopped" );
+		if ( Bukkit.isPrimaryThread ( ) ) {
+			if ( state == EnumArenaState.STOPPED ) {
+				throw new IllegalStateException ( "arena already stopped" );
+			}
+			
+			this.restartModules ( );
+			this.setState ( EnumArenaState.STOPPED );
+			
+			// this ensures all the players in the arena
+			// will actually be moved.
+			BattleRoyaleLobby lobby = BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( );
+			
+			Player.getPlayers ( ).stream ( )
+					.filter ( player -> Objects.equals ( player.getArena ( ) , this ) )
+					.forEach ( lobby :: introduce );
+			
+			this.region.disposeCurrentRegion ( player -> {
+				lobby.introduce ( player );
+				return true;
+			} );
+		} else {
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , this :: stop );
 		}
-		
-		this.restartModules ( );
-		this.setState ( EnumArenaState.STOPPED );
-		
-		// this ensures all the players in the arena
-		// will actually be moved.
-		BattleRoyaleLobby lobby = BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( );
-		
-		Player.getPlayers ( ).stream ( )
-				.filter ( player -> Objects.equals ( player.getArena ( ) , this ) )
-				.forEach ( lobby :: introduce );
-		
-		this.region.disposeCurrentRegion ( player -> {
-			lobby.introduce ( player );
-			return true;
-		} );
 	}
 	
 	public void prepare ( Runnable callback ) {
@@ -516,6 +537,7 @@ public class BattleRoyaleArena {
 	 */
 	protected synchronized void setState ( EnumArenaState state ) {
 		Validate.notNull ( state , "state cannot be null" );
+		Validate.isTrue ( Bukkit.isPrimaryThread ( ) , "must run in server thread" );
 		
 		final EnumArenaState old_state = this.state;
 		this.state      = state;
@@ -534,13 +556,19 @@ public class BattleRoyaleArena {
 				if ( callback != null ) {
 					callback.run ( );
 				}
+				
+				// firing event
+				new ArenaPreparedEvent ( this ).callSafe ( );
 			} );
 		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> prepare0 ( callback ) );
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , ( ) -> prepare0 ( callback ) );
 		}
 	}
 	
 	protected synchronized void restartModules ( ) {
+		Validate.isTrue ( Bukkit.isPrimaryThread ( ) , "must run in server thread" );
+		
 		this.border.restart ( );
 		this.auto_starter.restart ( );
 		this.air_supplies.restart ( );

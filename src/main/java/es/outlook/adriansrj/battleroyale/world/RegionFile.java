@@ -6,8 +6,6 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
-import static java.lang.String.format;
-
 /**
  * TODO: Description
  * </p>
@@ -17,12 +15,15 @@ import static java.lang.String.format;
 public class RegionFile implements AutoCloseable {
 	
 	private void debug ( String in ) {
-//		System.out.print ( in );
+		//		System.out.print ( in );
 	}
 	
 	private static final int VERSION_GZIP    = 1;
 	private static final int VERSION_DEFLATE = 2;
 	
+	/**
+	 * Sector size in bytes.
+	 */
 	private static final int SECTOR_BYTES = 4096;
 	private static final int SECTOR_INTS  = SECTOR_BYTES / 4;
 	
@@ -79,11 +80,11 @@ public class RegionFile implements AutoCloseable {
 		if ( !readOnly ) {
 			if ( file.length ( ) < SECTOR_BYTES ) {
 				/* we need to write the chunk offset table */
-				for ( int i = 0; i < SECTOR_INTS; ++i ) {
+				for ( int i = 0 ; i < SECTOR_INTS ; ++i ) {
 					file.writeInt ( 0 );
 				}
 				// write another sector for the timestamp info
-				for ( int i = 0; i < SECTOR_INTS; ++i ) {
+				for ( int i = 0 ; i < SECTOR_INTS ; ++i ) {
 					file.writeInt ( 0 );
 				}
 				
@@ -92,7 +93,7 @@ public class RegionFile implements AutoCloseable {
 			
 			if ( ( file.length ( ) & 0xfff ) != 0 ) {
 				/* the file size is not a multiple of 4KB, grow it */
-				for ( int i = 0; i < ( file.length ( ) & 0xfff ); ++i ) {
+				for ( int i = 0 ; i < ( file.length ( ) & 0xfff ) ; ++i ) {
 					file.write ( ( byte ) 0 );
 				}
 			}
@@ -102,18 +103,18 @@ public class RegionFile implements AutoCloseable {
 		int nSectors = ( int ) file.length ( ) / SECTOR_BYTES;
 		sectorFree = new ArrayList <> ( nSectors );
 		
-		for ( int i = 0; i < nSectors; ++i ) {
+		for ( int i = 0 ; i < nSectors ; ++i ) {
 			sectorFree.add ( true );
 		}
 		
 		file.seek ( 0 );
 		if ( sectorFree.size ( ) > 0 ) {
 			sectorFree.set ( 0 , false ); // chunk offset table
-			for ( int i = 0; i < SECTOR_INTS; ++i ) {
+			for ( int i = 0 ; i < SECTOR_INTS ; ++i ) {
 				int offset = file.readInt ( );
 				offsets[ i ] = offset;
 				if ( offset != 0 && ( offset >> 8 ) + ( offset & 0xFF ) <= sectorFree.size ( ) ) {
-					for ( int sectorNum = 0; sectorNum < ( offset & 0xFF ); ++sectorNum ) {
+					for ( int sectorNum = 0 ; sectorNum < ( offset & 0xFF ) ; ++sectorNum ) {
 						sectorFree.set ( ( offset >> 8 ) + sectorNum , false );
 					}
 				}
@@ -121,7 +122,7 @@ public class RegionFile implements AutoCloseable {
 		}
 		if ( sectorFree.size ( ) > 1 ) {
 			sectorFree.set ( 1 , false ); // for the last modified info
-			for ( int i = 0; i < SECTOR_INTS; ++i ) {
+			for ( int i = 0 ; i < SECTOR_INTS ; ++i ) {
 				int lastModValue = file.readInt ( );
 				chunkTimestamps[ i ] = lastModValue;
 			}
@@ -163,6 +164,7 @@ public class RegionFile implements AutoCloseable {
 		}
 		
 		int offset = getOffset ( x , z );
+		
 		if ( offset == 0 ) {
 			// debugln("READ", x, z, "miss");
 			return null;
@@ -174,7 +176,7 @@ public class RegionFile implements AutoCloseable {
 		if ( sectorNumber + numSectors > sectorFree.size ( ) ) {
 			debugln ( "READ" , x , z , "invalid sector" );
 			throw new IllegalArgumentException (
-					format ( "READ %d,%d: invalid sector in region %d,%d" , x , z , this.x , this.z ) );
+					String.format ( "READ %d,%d: invalid sector in region %d,%d" , x , z , this.x , this.z ) );
 		}
 		
 		file.seek ( sectorNumber * SECTOR_BYTES );
@@ -183,8 +185,8 @@ public class RegionFile implements AutoCloseable {
 		if ( length > SECTOR_BYTES * numSectors ) {
 			debugln ( "READ" , x , z , "invalid length: " + length + " > 4096 * " + numSectors );
 			throw new IllegalArgumentException (
-					format ( "READ %d,%d: invalid length: %d > 4096 * %d in region %d,%d" , x , z , length ,
-							 numSectors , this.x , this.z ) );
+					String.format ( "READ %d,%d: invalid length: %d > 4096 * %d in region %d,%d" , x , z , length ,
+									numSectors , this.x , this.z ) );
 		}
 		
 		byte version = file.readByte ( );
@@ -280,7 +282,7 @@ public class RegionFile implements AutoCloseable {
 			/* we need to allocate new sectors */
 			
 			/* mark the sectors previously used for this chunk as free */
-			for ( int i = 0; i < sectorsAllocated; ++i ) {
+			for ( int i = 0 ; i < sectorsAllocated ; ++i ) {
 				sectorFree.set ( sectorNumber + i , true );
 			}
 			
@@ -288,7 +290,7 @@ public class RegionFile implements AutoCloseable {
 			int runStart  = sectorFree.indexOf ( true );
 			int runLength = 0;
 			if ( runStart != -1 ) {
-				for ( int i = runStart; i < sectorFree.size ( ); ++i ) {
+				for ( int i = runStart ; i < sectorFree.size ( ) ; ++i ) {
 					if ( runLength != 0 ) {
 						if ( sectorFree.get ( i ) ) {
 							runLength++;
@@ -310,7 +312,7 @@ public class RegionFile implements AutoCloseable {
 				debug ( "SAVE" , x , z , length , "reuse" );
 				sectorNumber = runStart;
 				setOffset ( x , z , ( sectorNumber << 8 ) | sectorsNeeded );
-				for ( int i = 0; i < sectorsNeeded; ++i ) {
+				for ( int i = 0 ; i < sectorsNeeded ; ++i ) {
 					sectorFree.set ( sectorNumber + i , false );
 				}
 				write ( sectorNumber , data , length );
@@ -322,7 +324,7 @@ public class RegionFile implements AutoCloseable {
 				debug ( "SAVE" , x , z , length , "grow" );
 				file.seek ( file.length ( ) );
 				sectorNumber = sectorFree.size ( );
-				for ( int i = 0; i < sectorsNeeded; ++i ) {
+				for ( int i = 0 ; i < sectorsNeeded ; ++i ) {
 					file.write ( emptySector );
 					sectorFree.add ( false );
 				}

@@ -34,15 +34,17 @@ import java.util.Objects;
  */
 public class BattleRoyaleArenaConfiguration implements Configurable {
 	
-	protected static final String                  BATTLEFIELD_KEY                = "battlefield";
-	protected static final String                  WORLD_KEY                      = "world";
-	protected static final String                  MODE_KEY                       = "mode";
-	protected static final String                  SCOREBOARD_KEY                 = "scoreboard.name";
-	protected static final String                  SCOREBOARD_PLUGIN_KEY          = "scoreboard.plugin";
-	protected static final String                  ARENA_AUTO_START_ENABLE_KEY    = "auto-start.enable";
-	protected static final String                  ARENA_AUTO_START_REQUIRED_KEY  = "auto-start.required";
-	protected static final String                  ARENA_AUTO_START_COUNTDOWN_KEY = "auto-start.countdown";
-	protected static final BattleRoyaleModeManager MODE_MANAGER                   = new BattleRoyaleModeManager ( );
+	protected static final String BATTLEFIELD_KEY                         = "battlefield";
+	protected static final String WORLD_KEY                               = "world";
+	protected static final String MODE_KEY                                = "mode";
+	protected static final String SCOREBOARD_KEY                          = "scoreboard.name";
+	protected static final String SCOREBOARD_PLUGIN_KEY                   = "scoreboard.plugin";
+	protected static final String ARENA_AUTO_START_ENABLE_KEY             = "auto-start.enable";
+	protected static final String ARENA_AUTO_START_REQUIRED_KEY           = "auto-start.required";
+	protected static final String ARENA_AUTO_START_COUNTDOWN_DISPLAY_KEY  = "auto-start.countdown.display";
+	protected static final String ARENA_AUTO_START_COUNTDOWN_DURATION_KEY = "auto-start.countdown.duration";
+	
+	protected static final BattleRoyaleModeManager MODE_MANAGER = new BattleRoyaleModeManager ( );
 	
 	public static BattleRoyaleArenaConfiguration of ( ConfigurationSection section ) {
 		return new BattleRoyaleArenaConfiguration ( ).load ( section );
@@ -52,57 +54,71 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		return of ( YamlConfigurationComments.loadConfiguration ( file ) );
 	}
 	
+	// battlefield
 	@ConfigurableEntry ( key = BATTLEFIELD_KEY, comment = "battlefield on which this arena will take place." )
 	protected String      battlefield_name;
 	protected Battlefield battlefield;
 	
+	// world
 	@ConfigurableEntry ( key = WORLD_KEY, comment = "the actual world on which the battlefield will be inserted." )
 	protected String world_name;
 	protected World  world;
 	
+	// mode
 	@ConfigurableEntry ( key = MODE_KEY, comment = "file name of the mode to be played in this arena" )
 	protected String           mode_filename;
 	protected BattleRoyaleMode mode;
 	
+	// scoreboard
 	@ConfigurableEntry ( key = SCOREBOARD_KEY, comment = "file name of the scoreboard to be displayed in this arena." )
 	protected String               scoreboard;
 	protected EnumScoreboardPlugin scoreboard_plugin;
 	
+	// auto-start
 	@ConfigurableEntry ( key = ARENA_AUTO_START_ENABLE_KEY, comment =
 			"if enabled, the arena will start automatically when the\n" +
 					"minimum number of players/teams is reached." )
-	protected boolean              autostart_enable;
-	@ConfigurableEntry ( key = ARENA_AUTO_START_REQUIRED_KEY, comment = "the required number of players/teams to start arena." )
-	protected int                  autostart_required;
-	@ConfigurableEntry ( key = ARENA_AUTO_START_COUNTDOWN_KEY,
-						 comment = "the duration of the countdown when automatically starting." )
-	protected ConfigurableDuration autostart_countdown;
+	protected boolean autostart_enable;
+	
+	@ConfigurableEntry ( key = ARENA_AUTO_START_REQUIRED_KEY, comment =
+			"the required number of players/teams to start arena." )
+	protected int autostart_required;
+	
+	@ConfigurableEntry ( key = ARENA_AUTO_START_COUNTDOWN_DISPLAY_KEY, comment =
+			"the count from which titles start to show." )
+	protected int autostart_countdown_display;
+	
+	@ConfigurableEntry ( key = ARENA_AUTO_START_COUNTDOWN_DURATION_KEY, comment =
+			"the duration of the countdown when automatically starting." )
+	protected ConfigurableDuration autostart_countdown_duration;
 	
 	public BattleRoyaleArenaConfiguration ( String battlefield_name , String world_name , String mode_filename ,
 			String scoreboard , EnumScoreboardPlugin scoreboard_plugin , boolean autostart_enable , int autostart_required ,
-			Duration autostart_countdown ) {
-		this.battlefield_name    = battlefield_name;
-		this.world_name          = world_name;
-		this.mode_filename       = mode_filename;
-		this.scoreboard          = scoreboard;
-		this.scoreboard_plugin   = scoreboard_plugin;
-		this.autostart_enable    = autostart_enable;
-		this.autostart_required  = autostart_required;
-		this.autostart_countdown = new ConfigurableDuration ( autostart_countdown );
+			int autostart_countdown_display , Duration autostart_countdown_duration ) {
+		this.battlefield_name             = battlefield_name;
+		this.world_name                   = world_name;
+		this.mode_filename                = mode_filename;
+		this.scoreboard                   = scoreboard;
+		this.scoreboard_plugin            = scoreboard_plugin;
+		this.autostart_enable             = autostart_enable;
+		this.autostart_required           = autostart_required;
+		this.autostart_countdown_display  = autostart_countdown_display;
+		this.autostart_countdown_duration = new ConfigurableDuration ( autostart_countdown_duration );
 	}
 	
 	public BattleRoyaleArenaConfiguration ( BattleRoyaleArenaConfiguration copy ) {
-		this.battlefield_name    = copy.battlefield_name;
-		this.battlefield         = copy.battlefield;
-		this.world_name          = copy.world_name;
-		this.world               = copy.world;
-		this.mode_filename       = copy.mode_filename;
-		this.mode                = copy.mode;
-		this.scoreboard          = copy.scoreboard;
-		this.scoreboard_plugin   = copy.scoreboard_plugin;
-		this.autostart_enable    = copy.autostart_enable;
-		this.autostart_required  = copy.autostart_required;
-		this.autostart_countdown = copy.autostart_countdown;
+		this.battlefield_name             = copy.battlefield_name;
+		this.battlefield                  = copy.battlefield;
+		this.world_name                   = copy.world_name;
+		this.world                        = copy.world;
+		this.mode_filename                = copy.mode_filename;
+		this.mode                         = copy.mode;
+		this.scoreboard                   = copy.scoreboard;
+		this.scoreboard_plugin            = copy.scoreboard_plugin;
+		this.autostart_enable             = copy.autostart_enable;
+		this.autostart_required           = copy.autostart_required;
+		this.autostart_countdown_display  = copy.autostart_countdown_display;
+		this.autostart_countdown_duration = copy.autostart_countdown_duration;
 	}
 	
 	public BattleRoyaleArenaConfiguration ( ) {
@@ -285,8 +301,20 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		return autostart_required;
 	}
 	
-	public ConfigurableDuration getAutostartCountdown ( ) {
-		return new ConfigurableDuration ( autostart_countdown );
+	/**
+	 * Gets the count from which titles start to show.
+	 * <br>
+	 * In other words, this value is actually an offset
+	 * for the countdown titles.
+	 *
+	 * @return the count from which titles start to show.
+	 */
+	public int getAutostartCountdownDisplay ( ) {
+		return autostart_countdown_display;
+	}
+	
+	public ConfigurableDuration getAutostartCountdownDuration ( ) {
+		return new ConfigurableDuration ( autostart_countdown_duration );
 	}
 	
 	@Override

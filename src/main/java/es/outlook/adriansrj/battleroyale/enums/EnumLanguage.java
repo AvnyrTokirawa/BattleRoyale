@@ -217,13 +217,25 @@ public enum EnumLanguage implements ConfigurationEntry {
 	
 	// -------- auto starter
 	
-	AUTO_STARTER_STATE_WAITING ( "border.state.waiting" ,
-								 "auto-starter waiting state text format" ,
-								 "Required: " + ChatColor.GOLD + "%s" ),
+	AUTO_STARTER_STATE_WAITING_SOLO ( "auto-start.state.waiting.solo" ,
+									  "auto-starter waiting state text format (one-player teams)" ,
+									  "Players: " + ChatColor.GOLD + "%s" ),
 	
-	AUTO_STARTER_STATE_STARTING ( "border.state.starting" ,
+	AUTO_STARTER_STATE_WAITING_TEAM ( "auto-start.state.waiting.team" ,
+									  "auto-starter waiting state text format (teams with more than one player)" ,
+									  "Teams: " + ChatColor.GOLD + "%s" ),
+	
+	AUTO_STARTER_STATE_STARTING ( "auto-start.state.starting" ,
 								  "auto-starter starting state text format" ,
 								  "Starting in: " + ChatColor.GREEN + "%s" ),
+	
+	AUTO_STARTER_COUNTDOWN_TITLE ( "auto-start.countdown.title" ,
+											"auto-starter countdown title" ,
+											ChatColor.GOLD + "%d" ),
+	
+	AUTO_STARTER_COUNTDOWN_SUBTITLE ( "auto-start.countdown.subtitle" ,
+											   "auto-starter countdown subtitle" ,
+											   "" ),
 	
 	;
 	

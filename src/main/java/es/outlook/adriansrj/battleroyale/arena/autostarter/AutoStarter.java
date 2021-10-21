@@ -3,17 +3,17 @@ package es.outlook.adriansrj.battleroyale.arena.autostarter;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaTeamRegistry;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
+import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.util.Duration;
+import es.outlook.adriansrj.core.util.sound.UniversalSound;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- *
- *
  * @author AdrianSR / 20/10/2021 / 12:00 p. m.
  */
 public class AutoStarter implements Listener {
@@ -52,7 +52,23 @@ public class AutoStarter implements Listener {
 					long second = TimeUnit.MILLISECONDS.toSeconds ( full_time - time );
 					
 					if ( last_second != second ) {
-					
+						if ( second > 0L && second <= starter.countdown_display ) {
+							starter.arena.getPlayers ( false ).forEach ( player -> {
+								// titles
+								player.sendTitle (
+										String.format ( EnumLanguage.AUTO_STARTER_COUNTDOWN_TITLE.getAsString ( ) , second ) ,
+										String.format ( EnumLanguage.AUTO_STARTER_COUNTDOWN_SUBTITLE.getAsString ( ) ,
+														second ) );
+								
+								// sound
+								player.playSound ( player.getLocation ( ) , ( second > 1
+										? UniversalSound.ORB_PICKUP
+										: UniversalSound.LEVEL_UP )
+										.asBukkit ( ) , 2.0F , 0.0F );
+							} );
+						}
+						
+						last_second = second;
 					}
 				} else {
 					// set finished
@@ -64,12 +80,14 @@ public class AutoStarter implements Listener {
 				}
 			} else {
 				starter.stop ( );
+				starter.finished = false;
 			}
 		}
 	}
 	
 	protected final BattleRoyaleArena arena;
 	protected final int               required;
+	protected final int               countdown_display;
 	protected final Duration          countdown_duration;
 	protected       boolean           finished;
 	
@@ -81,7 +99,8 @@ public class AutoStarter implements Listener {
 		
 		// configuration
 		this.required           = arena.getConfiguration ( ).getAutostartRequired ( );
-		this.countdown_duration = arena.getConfiguration ( ).getAutostartCountdown ( );
+		this.countdown_display  = arena.getConfiguration ( ).getAutostartCountdownDisplay ( );
+		this.countdown_duration = arena.getConfiguration ( ).getAutostartCountdownDuration ( );
 	}
 	
 	public BattleRoyaleArena getArena ( ) {
@@ -92,7 +111,7 @@ public class AutoStarter implements Listener {
 		if ( start_task == null || start_task.isCancelled ( ) ) {
 			this.start_task = new StartTask ( this );
 			this.start_task.runTaskTimerAsynchronously (
-					BattleRoyale.getInstance ( ) , 15L , 15L );
+					BattleRoyale.getInstance ( ) , 10L , 10L );
 			return true;
 		} else {
 			return false;

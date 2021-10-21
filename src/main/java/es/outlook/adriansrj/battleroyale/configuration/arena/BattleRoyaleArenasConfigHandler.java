@@ -41,6 +41,7 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 				null ,
 				true ,
 				15 ,
+				5 ,
 				Duration.ofSeconds ( 15 )
 		);
 	}

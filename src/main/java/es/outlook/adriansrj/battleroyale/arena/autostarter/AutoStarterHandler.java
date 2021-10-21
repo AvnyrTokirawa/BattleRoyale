@@ -2,8 +2,11 @@ package es.outlook.adriansrj.battleroyale.arena.autostarter;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
+import es.outlook.adriansrj.battleroyale.event.arena.ArenaPreparedEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaLeaveEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaSetEvent;
+import es.outlook.adriansrj.battleroyale.event.player.PlayerChangeTeamEvent;
+import es.outlook.adriansrj.battleroyale.event.player.PlayerJoinTeamEvent;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import org.bukkit.event.EventHandler;
@@ -32,7 +35,7 @@ public final class AutoStarterHandler extends PluginHandler {
 	private void check ( BattleRoyaleArena arena ) {
 		AutoStarter starter = arena.getAutoStarter ( );
 		
-		if ( arena.getState ( ) == EnumArenaState.WAITING && starter != null ) {
+		if ( starter != null && arena.getState ( ) == EnumArenaState.WAITING ) {
 			// stopping and restarting
 			if ( starter.isStarted ( ) && !starter.isFinished ( )
 					&& !starter.canStart ( ) ) {
@@ -44,6 +47,21 @@ public final class AutoStarterHandler extends PluginHandler {
 				starter.start ( );
 			}
 		}
+	}
+	
+	@EventHandler ( priority = EventPriority.MONITOR )
+	public void onPrepare ( ArenaPreparedEvent event ) {
+		check ( event.getArena ( ) );
+	}
+	
+	@EventHandler ( priority = EventPriority.MONITOR )
+	public void onJoinTeam ( PlayerJoinTeamEvent event ) {
+		check ( event.getTeam ( ).getArena ( ) );
+	}
+	
+	@EventHandler ( priority = EventPriority.MONITOR )
+	public void onChangeTeam ( PlayerChangeTeamEvent event ) {
+		check ( event.getTeam ( ).getArena ( ) );
 	}
 	
 	@EventHandler ( priority = EventPriority.MONITOR )
