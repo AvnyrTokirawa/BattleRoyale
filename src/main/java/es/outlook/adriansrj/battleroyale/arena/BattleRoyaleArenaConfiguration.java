@@ -34,16 +34,18 @@ import java.util.Objects;
  */
 public class BattleRoyaleArenaConfiguration implements Configurable {
 	
-	protected static final String BATTLEFIELD_KEY                         = "battlefield";
-	protected static final String WORLD_KEY                               = "world";
-	protected static final String MODE_KEY                                = "mode";
-	protected static final String SCOREBOARD_KEY                          = "scoreboard.name";
-	protected static final String SCOREBOARD_PLUGIN_KEY                   = "scoreboard.plugin";
-	protected static final String ARENA_AUTO_START_ENABLE_KEY             = "auto-start.enable";
-	protected static final String ARENA_AUTO_START_REQUIRED_PLAYERS_KEY   = "auto-start.required.players";
-	protected static final String ARENA_AUTO_START_REQUIRED_TEAMS_KEY     = "auto-start.required.teams";
-	protected static final String ARENA_AUTO_START_COUNTDOWN_DISPLAY_KEY  = "auto-start.countdown.display";
-	protected static final String ARENA_AUTO_START_COUNTDOWN_DURATION_KEY = "auto-start.countdown.duration";
+	protected static final String BATTLEFIELD_KEY                   = "battlefield";
+	protected static final String WORLD_KEY                         = "world";
+	protected static final String MODE_KEY                          = "mode";
+	protected static final String SCOREBOARD_KEY                    = "scoreboard.name";
+	protected static final String SCOREBOARD_PLUGIN_KEY             = "scoreboard.plugin";
+	protected static final String AUTO_START_ENABLE_KEY             = "auto-start.enable";
+	protected static final String AUTO_START_REQUIRED_PLAYERS_KEY   = "auto-start.required.players";
+	protected static final String AUTO_START_REQUIRED_TEAMS_KEY     = "auto-start.required.teams";
+	protected static final String AUTO_START_COUNTDOWN_DISPLAY_KEY  = "auto-start.countdown.display";
+	protected static final String AUTO_START_COUNTDOWN_DURATION_KEY = "auto-start.countdown.duration";
+	protected static final String RESTART_COUNTDOWN_DISPLAY_KEY     = "restart.countdown.display";
+	protected static final String RESTART_COUNTDOWN_DURATION_KEY    = "restart.countdown.duration";
 	
 	protected static final BattleRoyaleModeManager MODE_MANAGER = new BattleRoyaleModeManager ( );
 	
@@ -76,31 +78,37 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	protected EnumScoreboardPlugin scoreboard_plugin;
 	
 	// auto-start
-	@ConfigurableEntry ( key = ARENA_AUTO_START_ENABLE_KEY, comment =
+	@ConfigurableEntry ( key = AUTO_START_ENABLE_KEY, comment =
 			"if enabled, the arena will start automatically when the\n" +
 					"minimum number of players/teams is reached." )
 	protected boolean autostart_enable;
 	
-	@ConfigurableEntry ( key = ARENA_AUTO_START_REQUIRED_PLAYERS_KEY, comment =
+	@ConfigurableEntry ( key = AUTO_START_REQUIRED_PLAYERS_KEY, comment =
 			"the required number of players to start arena." )
 	protected int autostart_required_players;
 	
-	@ConfigurableEntry ( key = ARENA_AUTO_START_REQUIRED_TEAMS_KEY, comment =
+	@ConfigurableEntry ( key = AUTO_START_REQUIRED_TEAMS_KEY, comment =
 			"the required number of teams to start arena." )
 	protected int autostart_required_teams;
 	
-	@ConfigurableEntry ( key = ARENA_AUTO_START_COUNTDOWN_DISPLAY_KEY, comment =
+	@ConfigurableEntry ( key = AUTO_START_COUNTDOWN_DISPLAY_KEY, comment =
 			"the count from which titles start to show." )
 	protected int autostart_countdown_display;
 	
-	@ConfigurableEntry ( key = ARENA_AUTO_START_COUNTDOWN_DURATION_KEY, comment =
+	@ConfigurableEntry ( key = AUTO_START_COUNTDOWN_DURATION_KEY, comment =
 			"the duration of the countdown when automatically starting." )
 	protected ConfigurableDuration autostart_countdown_duration;
+	
+	// restart
+	@ConfigurableEntry ( key = RESTART_COUNTDOWN_DURATION_KEY, comment =
+			"the duration of the countdown when restarting this arena." )
+	protected ConfigurableDuration restart_countdown_duration;
 	
 	public BattleRoyaleArenaConfiguration ( String battlefield_name , String world_name , String mode_filename ,
 			String scoreboard , EnumScoreboardPlugin scoreboard_plugin , boolean autostart_enable ,
 			int autostart_required_players , int autostart_required_teams ,
-			int autostart_countdown_display , Duration autostart_countdown_duration ) {
+			int autostart_countdown_display , Duration autostart_countdown_duration ,
+			Duration restart_countdown_duration ) {
 		this.battlefield_name             = battlefield_name;
 		this.world_name                   = world_name;
 		this.mode_filename                = mode_filename;
@@ -111,6 +119,7 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		this.autostart_required_teams     = autostart_required_teams;
 		this.autostart_countdown_display  = autostart_countdown_display;
 		this.autostart_countdown_duration = new ConfigurableDuration ( autostart_countdown_duration );
+		this.restart_countdown_duration   = new ConfigurableDuration ( restart_countdown_duration );
 	}
 	
 	public BattleRoyaleArenaConfiguration ( BattleRoyaleArenaConfiguration copy ) {
@@ -127,6 +136,7 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		this.autostart_required_teams     = copy.autostart_required_teams;
 		this.autostart_countdown_display  = copy.autostart_countdown_display;
 		this.autostart_countdown_duration = copy.autostart_countdown_duration;
+		this.restart_countdown_duration   = copy.restart_countdown_duration;
 	}
 	
 	public BattleRoyaleArenaConfiguration ( ) {
@@ -332,7 +342,17 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	}
 	
 	public ConfigurableDuration getAutostartCountdownDuration ( ) {
-		return new ConfigurableDuration ( autostart_countdown_duration );
+		return autostart_countdown_duration != null
+				? new ConfigurableDuration ( autostart_countdown_duration )
+				: new ConfigurableDuration ( Duration.ZERO );
+	}
+	
+	// -------- restart configuration
+	
+	public ConfigurableDuration getRestartCountdownDuration ( ) {
+		return restart_countdown_duration != null
+				? new ConfigurableDuration ( restart_countdown_duration )
+				: new ConfigurableDuration ( Duration.ZERO );
 	}
 	
 	@Override

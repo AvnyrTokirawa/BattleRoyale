@@ -103,60 +103,6 @@ public final class BattleRoyaleArenaBusRegistry implements Iterable < BusInstanc
 		return handle.size ( );
 	}
 	
-	//	/**
-	//	 * Creates and registers a new {@link BusInstance} for the specified player.
-	//	 * <br>
-	//	 * Note that the <b>dragon bus</b> will be returned if enabled, instead
-	//	 * of a new bus.
-	//	 *
-	//	 * @param owner the owner.
-	//	 * @return the created bus, or the <b>dragon bus</b> if enabled.
-	//	 */
-	//	BusInstance < ? > createAndRegisterBus ( Player owner ) {
-	//		if ( dragon_bus == null ) {
-	//			// finishing current
-	//			BusInstance < ? > current = handle.get ( owner.getUniqueId ( ) );
-	//
-	//			if ( current != null && !current.isFinished ( ) ) {
-	//				current.finish ( );
-	//			}
-	//
-	//			// then creating
-	//			// TODO: create bus. of course this depends on the type of bus the player is using
-	//		} else {
-	//			return dragon_bus;
-	//		}
-	//		return null;
-	//	}
-	
-	//	/**
-	//	 * Creates and registers a new {@link BusInstance} for the player
-	//	 * identified by the provided {@link UUID}.
-	//	 * <br>
-	//	 * Note that the <b>dragon bus</b> will be returned if enabled, instead
-	//	 * of a new bus.
-	//	 *
-	//	 * @param owner_uid the owner uuid.
-	//	 * @return the created bus, or the <b>dragon bus</b> if enabled.
-	//	 */
-	//	BusInstance < ? > createAndRegisterBus ( UUID owner_uid ) {
-	//		if ( dragon_bus == null ) {
-	//			// finishing current
-	//			BusInstance < ? > current = handle.get ( owner_uid );
-	//
-	//			if ( current != null && !current.isFinished ( ) ) {
-	//				current.finish ( );
-	//			}
-	//
-	//			// then creating
-	//
-	//			// TODO: create bus. of course this depends on the type of bus the player is using
-	//		} else {
-	//			return dragon_bus;
-	//		}
-	//		return null;
-	//	}
-	
 	/**
 	 * Gets the bus that carries the player identified by the provided {@link UUID}.
 	 * <br>
@@ -208,18 +154,12 @@ public final class BattleRoyaleArenaBusRegistry implements Iterable < BusInstanc
 	}
 	
 	public void start ( ) {
-		System.out.println ( ">>>> Bus registry: start: 0" );
-		
 		if ( dragon_bus != null ) {
-			System.out.println ( ">>>> Bus registry: start: 1" );
 			dragon_bus.start ( arena , spawn );
 		} else {
-			System.out.println ( ">>>> Bus registry: start: 2" );
 			// starting individual buses
 			arena.getPlayers ( false ).stream ( ).filter ( Player :: hasTeam ).filter (
 					Player :: isOnline ).forEach ( player -> {
-				System.out.println ( ">>>> Bus registry: start: 3: " + player );
-				
 				BusInstance < ? > bus = player.getBus ( );
 				
 				if ( bus.isStarted ( ) ) {

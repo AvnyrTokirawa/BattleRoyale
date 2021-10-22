@@ -9,7 +9,6 @@ import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.sound.UniversalSound;
-import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.concurrent.TimeUnit;
@@ -18,7 +17,7 @@ import java.util.stream.Stream;
 /**
  * @author AdrianSR / 20/10/2021 / 12:00 p. m.
  */
-public class AutoStarter implements Listener {
+public class AutoStarter {
 	
 	/**
 	 * @author AdrianSR / 20/10/2021 / 12:07 p. m.

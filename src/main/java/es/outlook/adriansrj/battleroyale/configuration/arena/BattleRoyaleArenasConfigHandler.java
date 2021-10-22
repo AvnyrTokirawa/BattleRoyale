@@ -40,9 +40,12 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 				Constants.DEFAULT_YAML_FILE_NAME ,
 				null ,
 				true ,
+				// auto-start
 				15 ,
 				2 ,
 				5 ,
+				Duration.ofSeconds ( 15 ) ,
+				// restart
 				Duration.ofSeconds ( 15 )
 		);
 	}

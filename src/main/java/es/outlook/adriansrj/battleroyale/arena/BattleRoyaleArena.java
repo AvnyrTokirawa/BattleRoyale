@@ -5,6 +5,7 @@ import es.outlook.adriansrj.battleroyale.arena.autostarter.AutoStarter;
 import es.outlook.adriansrj.battleroyale.arena.bombing.BombingZoneGenerator;
 import es.outlook.adriansrj.battleroyale.arena.border.BattleRoyaleArenaBorder;
 import es.outlook.adriansrj.battleroyale.arena.drop.ItemDropManager;
+import es.outlook.adriansrj.battleroyale.arena.restarter.Restarter;
 import es.outlook.adriansrj.battleroyale.battlefield.Battlefield;
 import es.outlook.adriansrj.battleroyale.battlefield.bus.BusSpawn;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.renderer.MinimapRendererArena;
@@ -63,6 +64,7 @@ public class BattleRoyaleArena {
 	protected final BattleRoyaleArenaRegion        region;
 	protected final BattleRoyaleArenaBorder        border;
 	protected final AutoStarter                    auto_starter;
+	protected final Restarter                      restarter;
 	protected final AirSupplyGenerator             air_supplies;
 	protected final BombingZoneGenerator           bombing_zones;
 	protected final ItemDropManager                drop_manager;
@@ -97,6 +99,7 @@ public class BattleRoyaleArena {
 			this.auto_starter = null;
 		}
 		
+		this.restarter     = new Restarter ( this );
 		this.air_supplies  = new AirSupplyGenerator ( this );
 		this.bombing_zones = new BombingZoneGenerator ( this );
 		this.drop_manager  = new ItemDropManager ( this );
@@ -164,6 +167,17 @@ public class BattleRoyaleArena {
 	 */
 	public AutoStarter getAutoStarter ( ) {
 		return auto_starter;
+	}
+	
+	/**
+	 * Gets the restarter responsible for
+	 * scheduling task to restart this arena
+	 * with a defined delay.
+	 *
+	 * @return the restarter useful to restart this arena.
+	 */
+	public Restarter getRestarter ( ) {
+		return restarter;
 	}
 	
 	public AirSupplyGenerator getAirSupplyGenerator ( ) {
@@ -261,34 +275,19 @@ public class BattleRoyaleArena {
 		Validate.isTrue ( getState ( ) == EnumArenaState.RUNNING ,
 						  "must be running to introduce a player" );
 		
+		// player must be in a team
+		// to be introduced.
+		Player br_player = Player.getPlayer ( player );
+		
+		if ( !br_player.hasTeam ( ) ) {
+			throw new UnsupportedOperationException ( "player must be in a team" );
+		}
+		
+		// then introducing
 		if ( Bukkit.isPrimaryThread ( ) ) {
-			Player br_player     = Player.getPlayer ( player );
-			Team   next_not_full = team_registry.getNextNotFull ( );
-			
-			if ( !mode.introduce ( br_player ) || ( !br_player.hasTeam ( )
-					&& ( !mode.isAutoFillEnabled ( ) || ( team_registry.isFull ( ) && next_not_full == null ) ) ) ) {
-				spectator = true;
-			}
-			
-			System.out.println ( "spectator: " + spectator );
-			
-			if ( spectator ) {
+			if ( spectator || !mode.introduce ( br_player ) ) {
 				br_player.setSpectator ( true );
 			} else {
-				System.out.println ( "br_player.hasTeam ( ): " + br_player.hasTeam ( ) );
-				System.out.println ( "next_not_full: " + next_not_full );
-				
-				if ( !br_player.hasTeam ( ) ) {
-					Team team = next_not_full != null ? next_not_full
-							: team_registry.createAndRegisterTeam ( );
-					
-					System.out.println ( "team: " + team );
-					
-					br_player.setTeam ( team );
-					
-					System.out.println ( ">>>> player team: " + br_player.getTeam ( ) );
-				}
-				
 				player.setGameMode ( GameMode.SURVIVAL );
 				player.setTotalExperience ( 0 );
 				player.setLevel ( 0 );
@@ -361,11 +360,8 @@ public class BattleRoyaleArena {
 			// parachute
 			br_player.setCanOpenParachute ( true );
 		} else {
-			final org.bukkit.entity.Player final_player    = player;
-			final boolean                  final_spectator = spectator;
-			
 			Bukkit.getScheduler ( ).runTask (
-					BattleRoyale.getInstance ( ) , ( ) -> introduce ( final_player , final_spectator ) );
+					BattleRoyale.getInstance ( ) , ( ) -> introduce ( player , spectator ) );
 		}
 	}
 	
@@ -374,7 +370,7 @@ public class BattleRoyaleArena {
 	 * <b>Note that the player must be online to be introduced.</b>
 	 *
 	 * @param br_player
-	 * @param spectator TODO
+	 * @param spectator
 	 */
 	public void introduce ( Player br_player , boolean spectator ) {
 		Validate.notNull ( br_player , "player cannot be null" );
@@ -399,19 +395,34 @@ public class BattleRoyaleArena {
 			}
 			
 			if ( prepared ) {
+				// filling teams
+				this.getPlayers ( false ).stream ( ).filter (
+						player -> !player.hasTeam ( ) ).forEach ( player -> {
+					Team team = null;
+					
+					if ( mode.isSolo ( ) ) {
+						team = team_registry.createAndRegisterTeam ( );
+					} else if ( mode.isAutoFillEnabled ( ) ) {
+						team = team_registry.getNextNotFull ( );
+						
+						if ( team == null && !team_registry.isFull ( ) ) {
+							team = team_registry.createAndRegisterTeam ( );
+						}
+					}
+					
+					if ( team != null ) {
+						player.setTeam ( team );
+					}
+				} );
+				
+				// updating state
 				this.setState ( EnumArenaState.RUNNING );
 				
 				// world border
 				border.start ( );
 				
-//				// filling teams
-				//				getPlayers ( false ).stream ( ).filter (
-				//						player -> !player.hasTeam ( ) ).forEach ( player -> {
-				//
-				//				} );
-				
 				// introducing players
-				getPlayers ( false ).forEach (
+				this.getPlayers ( false ).stream ( ).filter ( Player :: hasTeam ).forEach (
 						player -> introduce ( player , false ) );
 				
 				// starting bus
@@ -471,7 +482,16 @@ public class BattleRoyaleArena {
 			this.setState ( EnumArenaState.RESTARTING );
 			this.prepare0 ( ( ) -> this.setState ( EnumArenaState.WAITING /* ready to start */ ) );
 		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , this :: restart );
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , ( Runnable ) this :: restart );
+		}
+	}
+	
+	public synchronized void restart ( boolean instantly ) {
+		if ( instantly ) {
+			restart ( );
+		} else {
+			restarter.start ( configuration.getRestartCountdownDuration ( ) );
 		}
 	}
 	

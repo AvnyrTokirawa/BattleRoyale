@@ -217,7 +217,8 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 					br_killer.getBukkitPlayerOptional ( ).ifPresent (
 							killer -> sendPositionTitle ( killer , 0 ) );
 					
-					// TODO: game over. restart arena
+					// restarting
+					restart ( arena );
 				}
 			} else {
 				// dying player is the only one that was alive
@@ -225,7 +226,8 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 						ChatColor.RED , "The winner could not be determined " +
 								"as the only player who was alive has died" , BattleRoyale.getInstance ( ) );
 				
-				// TODO: restart arena
+				// restarting
+				restart ( arena );
 			}
 		}
 	}
@@ -317,5 +319,9 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		// will send respawn packet in the next tick
 		SchedulerUtil.scheduleSyncDelayedTask ( ( ) -> player.getBukkitPlayerOptional ( ).ifPresent (
 				PacketSenderService.getInstance ( ) :: sendRespawnPacket ) );
+	}
+	
+	private void restart ( BattleRoyaleArena arena ) {
+		// TODO: restart arena
 	}
 }

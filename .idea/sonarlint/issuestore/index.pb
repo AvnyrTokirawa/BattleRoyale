@@ -243,8 +243,6 @@ Isrc/main/java/es/outlook/adriansrj/battleroyale/util/math/ZoneBounds.java,6\d\
 Xsrc/main/java/es/outlook/adriansrj/battleroyale/arena/listener/DeathMessageListener.java,f\8\f83538e1f30a75b4ad7eb62c07506637305e1d1f
 í
 bsrc/main/java/es/outlook/adriansrj/battleroyale/placeholder/node/player/PlayerPlaceholderNode.java,2\6\266878052d66837aa9f8b1855bc48fac90f062f9
-Å
-Qsrc/main/java/es/outlook/adriansrj/battleroyale/arena/listener/DeathListener.java,2\f\2f1ac10a52a2fddb2e06ec9184e7a7b2fddbe992
 Ç
 Rsrc/main/java/es/outlook/adriansrj/battleroyale/arena/listener/DamageListener.java,c\4\c452691c0a58b3bfb6414ed62eb12d80ee2d074d
 ú
@@ -349,12 +347,8 @@ Vsrc/main/java/es/outlook/adriansrj/battleroyale/event/arena/ArenaStateChangeEve
 Ssrc/main/java/es/outlook/adriansrj/battleroyale/event/arena/ArenaPreparedEvent.java,a\2\a233db7aaae2767558b6388c757678694aaad191
 x
 Hsrc/main/java/es/outlook/adriansrj/battleroyale/enums/EnumDirectory.java,8\9\895cd00b8eed7ab2fec901500ad3b552807e934a
-â
-Ysrc/main/java/es/outlook/adriansrj/battleroyale/arena/BattleRoyaleArenaConfiguration.java,3\c\3c1daaa8aa9dca2ab52bfd52b6df5d00d6a4c77e
 ê
 `src/main/java/es/outlook/adriansrj/battleroyale/placeholder/node/arena/ArenaPlaceholderNode.java,a\6\a666cd61765842cfa5092409498b11b834e9259c
-Ç
-Rsrc/main/java/es/outlook/adriansrj/battleroyale/arena/autostarter/AutoStarter.java,e\5\e5d5b8017bd0b3c9bddabf5894e0925ddbee354f
 â
 Ysrc/main/java/es/outlook/adriansrj/battleroyale/arena/autostarter/AutoStarterHandler.java,1\d\1d3baecdc8c0de02e37d2f55f046d0df04c9c930
 v
@@ -367,8 +361,6 @@ Usrc/main/java/es/outlook/adriansrj/battleroyale/game/mode/BattleRoyaleModeLoade
 Vsrc/main/java/es/outlook/adriansrj/battleroyale/game/mode/BattleRoyaleModeManager.java,0\6\068f1a08b460a5e65412578cdba54f67141e785e
 ã
 [src/main/java/es/outlook/adriansrj/battleroyale/game/mode/BattleRoyaleModePresentation.java,7\c\7c03274950ca9efef2e55f184583bca086e4cc26
-
-Osrc/main/java/es/outlook/adriansrj/battleroyale/game/mode/BattleRoyaleMode.java,7\e\7e977fe273cee719b3a4e17d3f9f839fa6558014
 Ñ
 Tsrc/main/java/es/outlook/adriansrj/battleroyale/gui/team/TeamSelectorGUIHandler.java,8\c\8cf71a6773a0f351a97133664ffde8fdaeff2f64
 å
