@@ -6,6 +6,7 @@ import es.outlook.adriansrj.battleroyale.data.DataStorageHandler;
 import es.outlook.adriansrj.battleroyale.enums.EnumMainConfiguration;
 import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.enums.EnumStat;
+import es.outlook.adriansrj.battleroyale.event.player.PlayerStatSetEvent;
 import es.outlook.adriansrj.battleroyale.util.NamespacedKey;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 
@@ -80,16 +81,24 @@ public final class PlayerDataStorage {
 		Validate.notNull ( stat_type , "stat type cannot be null" );
 		Validate.isTrue ( value >= 0 , "value must be >= 0" );
 		
-		this.stat_values.put ( stat_type , value );
-		this.dirty = true;
+		final int current_value = getStat ( stat_type );
 		
-		// then uploading
-		if ( upload && EnumMainConfiguration.ENABLE_DATABASE.getAsBoolean ( ) ) {
-			try {
-				DataStorageHandler.getInstance ( ).getDataStorage ( )
-						.setStatValue ( this , stat_type , value );
-			} catch ( Exception e ) {
-				e.printStackTrace ( );
+		if ( value != current_value ) {
+			this.stat_values.put ( stat_type , value );
+			this.dirty = true;
+			
+			// firing event
+			new PlayerStatSetEvent (
+					uuid , stat_type , current_value , value ).callSafe ( );
+			
+			// then uploading
+			if ( upload && EnumMainConfiguration.ENABLE_DATABASE.getAsBoolean ( ) ) {
+				try {
+					DataStorageHandler.getInstance ( ).getDataStorage ( )
+							.setStatValue ( this , stat_type , value );
+				} catch ( Exception e ) {
+					e.printStackTrace ( );
+				}
 			}
 		}
 	}

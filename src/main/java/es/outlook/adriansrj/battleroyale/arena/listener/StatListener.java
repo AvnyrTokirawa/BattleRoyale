@@ -1,5 +1,7 @@
 package es.outlook.adriansrj.battleroyale.arena.listener;
 
+import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
+import es.outlook.adriansrj.battleroyale.enums.EnumArenaStat;
 import es.outlook.adriansrj.battleroyale.enums.EnumStat;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerDeathEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerKnockedOutEvent;
@@ -9,8 +11,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
 /**
- * Class responsible for keeping track of the stats
- * of the players on the battlefield.
+ * Class responsible for keeping track of the stats of
+ * the arenas and the players on the battlefield.
  *
  * @author AdrianSR / 20/09/2021 / 04:16 p. m.
  */
@@ -32,6 +34,7 @@ public final class StatListener extends BattleRoyaleArenaListener {
 		}
 		
 		incrementStat ( player , EnumStat.TIMES_KNOCKED );
+		incrementArenaStat ( player.getArena ( ) , EnumArenaStat.KNOCKS );
 	}
 	
 	// event handler responsible for
@@ -46,10 +49,15 @@ public final class StatListener extends BattleRoyaleArenaListener {
 		}
 		
 		incrementStat ( player , EnumStat.DEATHS );
+		incrementArenaStat ( player.getArena ( ) , EnumArenaStat.KILLS );
 	}
 	
 	private void incrementStat ( Player player , EnumStat stat ) {
 		player.getDataStorage ( ).incrementStat ( stat , 1 , true );
 		player.getDataStorage ( ).incrementTempStat ( stat , 1 );
+	}
+	
+	private void incrementArenaStat ( BattleRoyaleArena arena , EnumArenaStat stat ) {
+		arena.getStats ( ).increment ( stat , 1 );
 	}
 }

@@ -6,6 +6,7 @@ import es.outlook.adriansrj.battleroyale.arena.autostarter.AutoStarterHandler;
 import es.outlook.adriansrj.battleroyale.arena.bombing.BombingZoneGeneratorHandler;
 import es.outlook.adriansrj.battleroyale.arena.border.BattleRoyaleArenaBorderHandler;
 import es.outlook.adriansrj.battleroyale.arena.drop.ItemDropHandler;
+import es.outlook.adriansrj.battleroyale.arena.restarter.RestarterHandler;
 import es.outlook.adriansrj.battleroyale.arena.sign.BattleRoyaleArenaSignHandler;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldRegistry;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.MinimapHandler;
@@ -127,6 +128,7 @@ public enum EnumPluginHandler {
 	ARENA_SIGN_CONTAINER_HANDLER ( BattleRoyaleArenaSignContainerHandler.class ),
 	ARENA_BORDER_HANDLER ( BattleRoyaleArenaBorderHandler.class ),
 	ARENA_AUTO_STARTER_HANDLER ( AutoStarterHandler.class ),
+	ARENA_RESTARTER_HANDLER ( RestarterHandler.class ),
 	ARENA_AIR_SUPPLY_HANDLER ( AirSupplyGeneratorHandler.class ),
 	ARENA_BOMBING_ZONE_HANDLER ( BombingZoneGeneratorHandler.class ),
 	ARENA_ITEM_DROP_HANDLER ( ItemDropHandler.class ),

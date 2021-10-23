@@ -209,7 +209,7 @@ public class BattleRoyaleArenaRegion {
 	 * @param callback callback to run when shape process is finished.
 	 */
 	protected synchronized void shape ( Runnable callback ) {
-		Validate.isTrue ( Bukkit.isPrimaryThread ( ) , "must run on server thread" );
+		//		Validate.isTrue ( Bukkit.isPrimaryThread ( ) , "must run on server thread" );
 		Validate.notNull ( base_location , "region never assign" );
 		
 		EXECUTOR_SERVICE.execute ( ( ) -> {

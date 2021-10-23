@@ -29,6 +29,7 @@ import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.util.mode.BattleRoyaleModeUtil;
+import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.configurable.vector.ConfigurableVector;
 import es.outlook.adriansrj.core.util.console.ConsoleUtil;
 import es.outlook.adriansrj.core.util.entity.EntityUtil;
@@ -69,8 +70,10 @@ public class BattleRoyaleArena {
 	protected final BombingZoneGenerator           bombing_zones;
 	protected final ItemDropManager                drop_manager;
 	
+	/** stats */
+	protected final BattleRoyaleArenaStats       stats;
 	/** bus registry */
-	protected final BattleRoyaleArenaBusRegistry  bus_registry;
+	protected final BattleRoyaleArenaBusRegistry bus_registry;
 	/** team registry */
 	protected final BattleRoyaleArenaTeamRegistry team_registry;
 	
@@ -103,6 +106,7 @@ public class BattleRoyaleArena {
 		this.air_supplies  = new AirSupplyGenerator ( this );
 		this.bombing_zones = new BombingZoneGenerator ( this );
 		this.drop_manager  = new ItemDropManager ( this );
+		this.stats         = new BattleRoyaleArenaStats ( this );
 		this.team_registry = new BattleRoyaleArenaTeamRegistry ( this );
 		this.prepared      = false;
 		
@@ -192,6 +196,10 @@ public class BattleRoyaleArena {
 		return drop_manager;
 	}
 	
+	public BattleRoyaleArenaStats getStats ( ) {
+		return stats;
+	}
+	
 	/**
 	 * Gets the bus registry of this arena.
 	 * <br>
@@ -254,6 +262,10 @@ public class BattleRoyaleArena {
 	
 	public int getCount ( ) {
 		return getCount ( getState ( ) == EnumArenaState.RUNNING );
+	}
+	
+	public boolean isEmpty ( ) {
+		return getCount ( ) == 0;
 	}
 	
 	/**
@@ -480,7 +492,9 @@ public class BattleRoyaleArena {
 			
 			this.restartModules ( );
 			this.setState ( EnumArenaState.RESTARTING );
-			this.prepare0 ( ( ) -> this.setState ( EnumArenaState.WAITING /* ready to start */ ) );
+			this.prepare0 ( ( ) -> Bukkit.getScheduler ( ).runTask (
+					// ready to start
+					BattleRoyale.getInstance ( ) , ( ) -> this.setState ( EnumArenaState.WAITING ) ) );
 		} else {
 			Bukkit.getScheduler ( ).runTask (
 					BattleRoyale.getInstance ( ) , ( Runnable ) this :: restart );
@@ -491,8 +505,13 @@ public class BattleRoyaleArena {
 		if ( instantly ) {
 			restart ( );
 		} else {
-			restarter.start ( configuration.getRestartCountdownDuration ( ) );
+			restarter.start ( );
 		}
+	}
+	
+	public synchronized void restart ( Duration countdown_duration ) {
+		restarter.start ( Objects.requireNonNull ( countdown_duration ,
+												   "countdown_duration cannot be null" ) );
 	}
 	
 	public synchronized void stop ( ) {
@@ -603,6 +622,7 @@ public class BattleRoyaleArena {
 		
 		this.border.restart ( );
 		this.auto_starter.restart ( );
+		this.restarter.restart ( );
 		this.air_supplies.restart ( );
 		this.team_registry.clear ( );
 		

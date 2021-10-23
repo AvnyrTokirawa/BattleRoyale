@@ -44,7 +44,6 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	protected static final String AUTO_START_REQUIRED_TEAMS_KEY     = "auto-start.required.teams";
 	protected static final String AUTO_START_COUNTDOWN_DISPLAY_KEY  = "auto-start.countdown.display";
 	protected static final String AUTO_START_COUNTDOWN_DURATION_KEY = "auto-start.countdown.duration";
-	protected static final String RESTART_COUNTDOWN_DISPLAY_KEY     = "restart.countdown.display";
 	protected static final String RESTART_COUNTDOWN_DURATION_KEY    = "restart.countdown.duration";
 	
 	protected static final BattleRoyaleModeManager MODE_MANAGER = new BattleRoyaleModeManager ( );

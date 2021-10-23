@@ -133,21 +133,21 @@ public enum EnumLanguage implements ConfigurationEntry {
 								 "respawn countdown subtitle" ,
 								 ChatColor.GOLD + "Respawning in %s" ),
 	
-	POSITION_WINNER_TITLE ( "position.winner.title" ,
-							"winner position title" ,
-							ChatColor.GREEN + "#1 WINNER" ),
+	RANK_WINNER_TITLE ( "rank.winner.title" ,
+						"winner rank title" ,
+						ChatColor.GREEN + "#1 WINNER" ),
 	
-	POSITION_WINNER_SUBTITLE ( "position.winner.subtitle" ,
-							   "winner position subtitle" ,
-							   ChatColor.GOLD + "Battle Royale" ),
+	RANK_WINNER_SUBTITLE ( "rank.winner.subtitle" ,
+						   "winner rank subtitle" ,
+						   ChatColor.GOLD + "Battle Royale" ),
 	
-	POSITION_GAME_OVER_TITLE ( "position.game-over.title" ,
-							   "game-over position title" ,
-							   ChatColor.DARK_RED + "#%d GAME OVER" ),
+	RANK_GAME_OVER_TITLE ( "rank.game-over.title" ,
+						   "game-over rank title" ,
+						   ChatColor.DARK_RED + "#%d GAME OVER" ),
 	
-	POSITION_GAME_OVER_SUBTITLE ( "position.game-over.subtitle" ,
-								  "game-over position subtitle" ,
-								  ChatColor.GOLD + "Battle Royale" ),
+	RANK_GAME_OVER_SUBTITLE ( "rank.game-over.subtitle" ,
+							  "game-over rank subtitle" ,
+							  ChatColor.GOLD + "Battle Royale" ),
 	
 	// -------- killed phrases
 	
@@ -240,6 +240,12 @@ public enum EnumLanguage implements ConfigurationEntry {
 	AUTO_STARTER_COUNTDOWN_SUBTITLE ( "auto-start.countdown.subtitle" ,
 									  "auto-starter countdown subtitle" ,
 									  "" ),
+	
+	// -------- restarter
+	
+	RESTARTER_COUNTDOWN_ACTIONBAR ( "restart.countdown.actionbar" ,
+								   "restarter countdown actionbar" ,
+								   ChatColor.DARK_RED + "Restarting in " + ChatColor.BOLD + "%s" ),
 	
 	;
 	

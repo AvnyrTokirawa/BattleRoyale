@@ -493,7 +493,7 @@ public final class BattleRoyale extends PluginAdapter implements Listener {
 		} else if ( event.getMessage ( ).trim ( ).equals ( "restart" ) ) {
 			System.out.println ( ">>>> restarting...." );
 			
-			Player.getPlayer ( event.getPlayer ( ) ).getArena ( ).restart ( );
+			Player.getPlayer ( event.getPlayer ( ) ).getArena ( ).restart ( false );
 		} else if ( event.getMessage ( ).equals ( "set" ) ) {
 			org.bukkit.entity.Player player = event.getPlayer ( );
 			

@@ -18,6 +18,7 @@ import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardSimple;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.core.player.PlayerWrapper;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
 import java.util.*;
@@ -93,11 +94,17 @@ public final class Player extends PlayerWrapper {
 	/** flag player who knocked out this player. */
 	private Player knocker;
 	
+	/** rank */
+	private int rank;
+	
 	Player ( String name , UUID id , org.bukkit.entity.Player last_handle ) {
 		super ( id , name );
 		
 		this.last_handle  = last_handle;
 		this.data_storage = new PlayerDataStorage ( id , name );
+		
+		// unset rank
+		this.rank = -1;
 		
 		// default scoreboard
 		this.scoreboard = new ScoreboardSimple ( this );
@@ -202,6 +209,10 @@ public final class Player extends PlayerWrapper {
 		return knocker;
 	}
 	
+	public int getRank ( ) {
+		return rank;
+	}
+	
 	public boolean isInArena ( ) {
 		return arena != null;
 	}
@@ -241,10 +252,10 @@ public final class Player extends PlayerWrapper {
 		Validate.isTrue ( arena.getState ( ) != EnumArenaState.STOPPED ,
 						  "arena cannot be stopped" );
 		
-		if ( !Objects.equals ( this.arena , arena ) ) {
+		final BattleRoyaleArena current = this.arena;
+		
+		if ( !Objects.equals ( current , arena ) ) {
 			// leaving current
-			BattleRoyaleArena current = this.arena;
-			
 			if ( current != null ) {
 				if ( current.getState ( ) == EnumArenaState.RUNNING ) {
 					throw new UnsupportedOperationException (
@@ -266,13 +277,14 @@ public final class Player extends PlayerWrapper {
 	}
 	
 	public synchronized boolean leaveArena ( ) {
-		if ( arena != null ) {
+		final BattleRoyaleArena current = this.arena;
+		
+		if ( current != null ) {
 			// resetting values
 			resetValues ( );
 			// must leave team too
 			leaveTeam ( );
 			
-			BattleRoyaleArena current = this.arena;
 			this.arena = null;
 			
 			// firing event
@@ -345,8 +357,9 @@ public final class Player extends PlayerWrapper {
 			throw new IllegalArgumentException ( "this player and the owner of the compass must match" );
 		}
 		
-		if ( !Objects.equals ( this.compass , compass ) ) {
-			CompassBar previous = this.compass;
+		final CompassBar previous = this.compass;
+		
+		if ( !Objects.equals ( previous , compass ) ) {
 			this.compass = compass;
 			
 			if ( previous != null && dispose_previous ) {
@@ -383,8 +396,11 @@ public final class Player extends PlayerWrapper {
 		this.parachute_flag = flag;
 	}
 	
+	public void setRank ( int rank ) {
+		this.rank = rank;
+	}
+	
 	private synchronized void dirtyCheck ( ) {
-		// TODO:
 		if ( data_storage.dirty ) {
 			// updating bus
 			Bus bus_configuration = data_storage.getSetting ( Bus.class , EnumPlayerSetting.BUS );
@@ -439,6 +455,7 @@ public final class Player extends PlayerWrapper {
 	}
 	
 	private synchronized void resetValues ( ) {
+		this.rank           = -1;
 		this.knocked        = false;
 		this.knocker        = null;
 		this.parachute_flag = false;
@@ -455,5 +472,11 @@ public final class Player extends PlayerWrapper {
 		if ( parachute != null && parachute.isOpen ( ) ) {
 			parachute.close ( );
 		}
+		
+		// scoreboard
+		this.scoreboard = null;
+		
+		setScoreboard ( Objects.requireNonNull (
+				Bukkit.getScoreboardManager ( ) ).getMainScoreboard ( ) );
 	}
 }

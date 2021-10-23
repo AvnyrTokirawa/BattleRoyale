@@ -15,6 +15,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
+ * Class responsible for starting a certain arena
+ * in a provided period of time.
+ *
  * @author AdrianSR / 20/10/2021 / 12:00 p. m.
  */
 public class AutoStarter {
@@ -25,18 +28,26 @@ public class AutoStarter {
 	protected static class StartTask extends BukkitRunnable {
 		
 		protected final AutoStarter starter;
+		protected final Duration    countdown_duration;
+		protected final int         countdown_display;
 		protected       long        timestamp;
 		protected       long        last_second;
 		
-		public StartTask ( AutoStarter starter ) {
-			this.starter     = starter;
-			this.timestamp   = -1;
-			this.last_second = -1;
+		public StartTask ( AutoStarter starter , Duration countdown_duration ) {
+			this.starter            = starter;
+			this.countdown_duration = countdown_duration;
+			this.countdown_display  = starter.arena.getConfiguration ( ).getAutostartCountdownDisplay ( );
+			this.timestamp          = -1;
+			this.last_second        = -1;
+		}
+		
+		public Duration getCountdownDuration ( ) {
+			return countdown_duration;
 		}
 		
 		public Duration getTimeLeft ( ) {
 			return Duration.ofMilliseconds ( Math.max (
-					starter.countdown_duration.toMillis ( ) - ( System.currentTimeMillis ( ) - timestamp ) , 0L ) );
+					countdown_duration.toMillis ( ) - ( System.currentTimeMillis ( ) - timestamp ) , 0L ) );
 		}
 		
 		@Override
@@ -47,13 +58,13 @@ public class AutoStarter {
 			
 			if ( starter.canStart ( ) ) {
 				long time      = System.currentTimeMillis ( ) - timestamp;
-				long full_time = starter.countdown_duration.toMillis ( );
+				long full_time = countdown_duration.toMillis ( );
 				
 				if ( time < full_time ) {
 					long second = TimeUnit.MILLISECONDS.toSeconds ( full_time - time );
 					
 					if ( last_second != second ) {
-						if ( second > 0L && second <= starter.countdown_display ) {
+						if ( second > 0L && second <= countdown_display ) {
 							starter.arena.getPlayers ( false ).forEach ( player -> {
 								// titles
 								player.sendTitle (
@@ -89,36 +100,37 @@ public class AutoStarter {
 	protected final BattleRoyaleArena arena;
 	protected final int               required_players;
 	protected final int               required_teams;
-	protected final int               countdown_display;
-	protected final Duration          countdown_duration;
 	protected       boolean           finished;
 	
-	// start task
+	// current start task
 	protected StartTask start_task;
 	
 	public AutoStarter ( BattleRoyaleArena arena ) {
 		this.arena = arena;
 		
 		// configuration
-		this.required_players   = arena.getConfiguration ( ).getAutostartRequiredPlayers ( );
-		this.required_teams     = arena.getConfiguration ( ).getAutostartRequiredTeams ( );
-		this.countdown_display  = arena.getConfiguration ( ).getAutostartCountdownDisplay ( );
-		this.countdown_duration = arena.getConfiguration ( ).getAutostartCountdownDuration ( );
+		this.required_players = arena.getConfiguration ( ).getAutostartRequiredPlayers ( );
+		this.required_teams   = arena.getConfiguration ( ).getAutostartRequiredTeams ( );
 	}
 	
 	public BattleRoyaleArena getArena ( ) {
 		return arena;
 	}
 	
-	public boolean start ( ) {
+	public boolean start ( Duration countdown_duration ) {
 		if ( start_task == null || start_task.isCancelled ( ) ) {
-			this.start_task = new StartTask ( this );
+			this.start_task = new StartTask ( this , countdown_duration != null ? countdown_duration
+					: arena.getConfiguration ( ).getAutostartCountdownDuration ( ) );
 			this.start_task.runTaskTimerAsynchronously (
 					BattleRoyale.getInstance ( ) , 10L , 10L );
 			return true;
 		} else {
 			return false;
 		}
+	}
+	
+	public boolean start ( ) {
+		return start ( null );
 	}
 	
 	public boolean stop ( ) {

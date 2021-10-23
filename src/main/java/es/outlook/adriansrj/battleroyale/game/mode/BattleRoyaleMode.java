@@ -46,6 +46,8 @@ public abstract class BattleRoyaleMode implements Validable {
 	/**
 	 * Gets the maximum kills for this modality, which means that the game will
 	 * end when it reaches this number of kills.
+	 * <br>
+	 * <b>The winner is the player with the highest number of kills.</b>
 	 * <p>
 	 * @return maximum kills.
 	 */
