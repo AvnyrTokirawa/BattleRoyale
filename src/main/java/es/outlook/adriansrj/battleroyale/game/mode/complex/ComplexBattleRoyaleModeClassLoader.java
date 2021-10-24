@@ -1,6 +1,7 @@
 package es.outlook.adriansrj.battleroyale.game.mode.complex;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -9,13 +10,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TODO: Description
+ * A {@link URLClassLoader} implementation intended to
+ * load the classes of a complex battle royale mode.
  * <p>
  * @author AdrianSR / Sunday 16 May, 2021 / 05:03 PM
  */
 class ComplexBattleRoyaleModeClassLoader extends URLClassLoader {
 	
-	private final Map < String, Class < ? > > classes = new HashMap < String, Class < ? > > ( );
+	private final Map < String, Class < ? > > classes = new HashMap <> ( );
 	
 	private final ComplexBattleRoyaleModeLoader      loader;
 	private final ComplexBattleRoyaleModeDescription description;
@@ -28,7 +30,7 @@ class ComplexBattleRoyaleModeClassLoader extends URLClassLoader {
 		this.description = description;
 	}
 	
-	ComplexBattleRoyaleMode load ( ) throws IllegalArgumentException {
+	ComplexBattleRoyaleMode load ( ) throws IllegalArgumentException , InvocationTargetException {
 		Class < ? > uncast_main_class = null;
 		
 		try {
@@ -47,10 +49,10 @@ class ComplexBattleRoyaleModeClassLoader extends URLClassLoader {
 		}
 		
 		try {
-			return main_class.newInstance ( );
+			return main_class.getConstructor ( ).newInstance ( );
 		} catch ( InstantiationException ex ) {
 			throw new IllegalArgumentException ( "abnormal type" , ex );
-		} catch ( IllegalAccessException ex_b ) {
+		} catch ( IllegalAccessException | NoSuchMethodException ex_b ) {
 			throw new IllegalArgumentException ( "a public constructor with no parameters couldn't be found!" , ex_b );
 		}
 	}

@@ -23,8 +23,6 @@ import java.util.UUID;
  */
 public final class ParachuteSettingsMainGUIHandler extends PluginHandler {
 	
-	// TODO: make configurable
-	
 	public static ParachuteSettingsMainGUIHandler getInstance ( ) {
 		return getPluginHandler ( ParachuteSettingsMainGUIHandler.class );
 	}

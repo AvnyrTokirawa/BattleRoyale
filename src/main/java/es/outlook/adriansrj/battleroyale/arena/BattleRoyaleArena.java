@@ -9,8 +9,10 @@ import es.outlook.adriansrj.battleroyale.arena.restarter.Restarter;
 import es.outlook.adriansrj.battleroyale.battlefield.Battlefield;
 import es.outlook.adriansrj.battleroyale.battlefield.bus.BusSpawn;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.renderer.MinimapRendererArena;
+import es.outlook.adriansrj.battleroyale.compass.CompassBar;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLootContainer;
+import es.outlook.adriansrj.battleroyale.event.arena.ArenaEndEvent;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaPreparedEvent;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.exception.WorldRegionLimitReached;
@@ -23,6 +25,7 @@ import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
+import es.outlook.adriansrj.battleroyale.scoreboard.Scoreboard;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.MiniMapUtil;
 import es.outlook.adriansrj.battleroyale.util.Validate;
@@ -71,9 +74,9 @@ public class BattleRoyaleArena {
 	protected final ItemDropManager                drop_manager;
 	
 	/** stats */
-	protected final BattleRoyaleArenaStats       stats;
+	protected final BattleRoyaleArenaStats        stats;
 	/** bus registry */
-	protected final BattleRoyaleArenaBusRegistry bus_registry;
+	protected final BattleRoyaleArenaBusRegistry  bus_registry;
 	/** team registry */
 	protected final BattleRoyaleArenaTeamRegistry team_registry;
 	
@@ -82,6 +85,8 @@ public class BattleRoyaleArena {
 	protected volatile long           state_time;
 	/** whether the battlefield is prepared */
 	protected volatile boolean        prepared;
+	/** whether this arena is over */
+	protected volatile boolean        over;
 	
 	protected BattleRoyaleArena ( String name , BattleRoyaleArenaConfiguration configuration ) throws IllegalStateException {
 		Validate.isValid ( Validate.notNull ( configuration , "configuration cannot be null" ) ,
@@ -240,6 +245,15 @@ public class BattleRoyaleArena {
 	}
 	
 	/**
+	 * Gets whether this arena is over.
+	 *
+	 * @return whether this arena is over.
+	 */
+	public synchronized boolean isOver ( ) {
+		return over;
+	}
+	
+	/**
 	 * Gets all the players in this arena.
 	 *
 	 * @param world whether to include only players in the world of this arena.
@@ -308,7 +322,7 @@ public class BattleRoyaleArena {
 				player.setSaturation ( 20.0F );
 				player.setHealth ( Math.max ( mode.getInitialHealth ( ) , 0.5D ) );
 				EntityUtil.setMaxHealth ( player , Math.max ( mode.getMaxHealth ( ) , 0.5D ) );
-				player.getActivePotionEffects ( ).clear ( );
+				EntityUtil.clearPotionEffects ( player );
 				
 				player.getInventory ( ).clear ( );
 				player.getInventory ( ).setArmorContents ( null );
@@ -359,14 +373,18 @@ public class BattleRoyaleArena {
 			border.getPlayers ( ).add ( br_player );
 			border.refresh ( );
 			
-			// scoreboard
-			if ( br_player.getBRScoreboard ( ) != null ) {
-				br_player.getBRScoreboard ( ).setVisible ( !spectator );
+			// making sure scoreboard is visible
+			Scoreboard scoreboard = br_player.getBRScoreboard ( );
+			
+			if ( scoreboard != null ) {
+				scoreboard.setVisible ( !spectator );
 			}
 			
-			// compass
-			if ( br_player.getCompass ( ) != null ) {
-				br_player.getCompass ( ).setVisible ( !spectator );
+			// making sure compass is visible
+			CompassBar compass = br_player.getCompass ( );
+			
+			if ( compass != null ) {
+				compass.setVisible ( !spectator );
 			}
 			
 			// parachute
@@ -450,6 +468,40 @@ public class BattleRoyaleArena {
 		}
 	}
 	
+	public synchronized void end ( Player winning_player , Team winning_team ) {
+		Validate.isTrue ( getState ( ) == EnumArenaState.RUNNING ,
+						  "must be running to end the arena" );
+		Validate.isTrue ( !over , "arena is already over" );
+		
+		if ( Bukkit.isPrimaryThread ( ) ) {
+			this.over = true;
+			
+			// firing event
+			ArenaEndEvent event;
+			
+			if ( winning_player != null ) {
+				event = new ArenaEndEvent ( this , winning_player );
+			} else if ( winning_team != null ) {
+				event = new ArenaEndEvent ( this , winning_team );
+			} else {
+				event = new ArenaEndEvent ( this );
+			}
+			
+			event.callSafe ( );
+		} else {
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , ( ) -> end ( winning_player , winning_team ) );
+		}
+	}
+	
+	public synchronized void end ( Player winner ) {
+		end ( winner , null );
+	}
+	
+	public synchronized void end ( Team winner ) {
+		end ( null , winner );
+	}
+	
 	public synchronized void restart ( ) {
 		if ( Bukkit.isPrimaryThread ( ) ) {
 			switch ( state ) {
@@ -495,6 +547,7 @@ public class BattleRoyaleArena {
 			this.prepare0 ( ( ) -> Bukkit.getScheduler ( ).runTask (
 					// ready to start
 					BattleRoyale.getInstance ( ) , ( ) -> this.setState ( EnumArenaState.WAITING ) ) );
+			this.over = false;
 		} else {
 			Bukkit.getScheduler ( ).runTask (
 					BattleRoyale.getInstance ( ) , ( Runnable ) this :: restart );
@@ -522,6 +575,7 @@ public class BattleRoyaleArena {
 			
 			this.restartModules ( );
 			this.setState ( EnumArenaState.STOPPED );
+			this.over = false;
 			
 			// this ensures all the players in the arena
 			// will actually be moved.

@@ -1,8 +1,7 @@
 package es.outlook.adriansrj.battleroyale.enums;
 
 /**
- * TODO: Description
- * </p>
+ * Enumerates the different world generators.
  *
  * @author AdrianSR / 25/08/2021 / Time: 09:49 a. m.
  */

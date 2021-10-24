@@ -13,6 +13,7 @@ import es.outlook.adriansrj.battleroyale.gui.team.TeamSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
+import es.outlook.adriansrj.battleroyale.world.chunk.EmptyChunkGenerator;
 import es.outlook.adriansrj.core.dependency.MavenDependency;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.player.PlayerWrapper;
@@ -37,6 +38,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Battle royale plugin main class.
@@ -143,130 +145,13 @@ public final class BattleRoyale extends PluginAdapter implements Listener {
 		};
 	}
 	
-	static Thread SERVER_THREAD;
-	
 	@Override
 	protected boolean setUp ( ) {
-		Bukkit.getScheduler ( ).runTask ( this , ( ) -> { SERVER_THREAD = Thread.currentThread ( ); } );
-		
-		ConsoleUtil.sendPluginMessage ( ChatColor.GREEN ,
-										"BattleRoyale enabled!" , this );
+		ConsoleUtil.sendPluginMessage (
+				ChatColor.GREEN , "BattleRoyale enabled!" , this );
 		
 		// cleaning temp folder
 		deleteTempFolder ( );
-		
-		//		final Map < UUID, BossBar > map = new HashMap <> ( );
-		
-		//		Bukkit.getScheduler ( ).runTaskTimerAsynchronously ( this , new Runnable ( ) {
-		//			@Override
-		//			public void run ( ) {
-		//				for ( org.bukkit.entity.Player player : Bukkit.getOnlinePlayers ( ) ) {
-		//					BossBar bar = map.get ( player.getUniqueId ( ) );
-		//
-		//					if ( bar == null ) {
-		//						map.put ( player.getUniqueId ( ) , bar =
-		//								Bukkit.createBossBar ( "hola" , BarColor.RED , BarStyle.SOLID ) );
-		//						bar.addPlayer ( player );
-		//					}
-		//
-		//					int           bar_length = 110;
-		//					StringBuilder base       = new StringBuilder ( );
-		//
-		//					// between 0 and 359
-		//					for ( int d = 0 ; d < 360 ; d++ ) {
-		//						CompassCardinalPoint point = CompassCardinalPoint.ofValue ( d );
-		//
-		//						if ( point == null ) {
-		//							base.append ( '.' ); // 100% customizable
-		//						} else {
-		//							if ( point.is90 ( ) ) {
-		//								base.append ( point.getAbbreviationCharacter ( ) ); // 100% customizable
-		//							} else {
-		//								base.append ( point.getDefaultAbbreviation ( ) ); // 100% customizable
-		//							}
-		//						}
-		//					}
-		//
-		//					StringBuilder builder     = new StringBuilder ( );
-		//					int           begin_index = base.length ( );
-		//
-		//					builder.append ( base );
-		//					builder.append ( base );
-		//					builder.append ( base );
-		//
-		//					String full        = builder.toString ( );
-		//					int    angle       = ( int ) DirectionUtil.normalize ( player.getLocation ( ).getYaw ( ) );
-		//					int    base_length = base.length ( );
-		//
-		//					float factor_a = ( ( float ) angle ) / 360.0F;
-		//					int   index    = ( begin_index - ( bar_length / 2 ) ) + ( int ) ( base_length * factor_a );
-		//
-		//					bar.setTitle ( ChatColor.GOLD + StringUtil.limit ( full.substring ( index ) , bar_length
-		//					) );
-		//				}
-		//			}
-		//		} , 0 , 0 );
-		
-		PacketChannelHandler.addPacketListener (
-				"PacketPlayOutOpenSignEditor" , PacketListener.Priority.LOWEST , new PacketAdapter ( ) {
-					@Override
-					public void onSending ( PacketEvent event ) {
-						System.out.println ( "onSending: " + event.getPacket ( ) );
-						
-						Thread[] f = new Thread[ Thread.currentThread ( ).getThreadGroup ( ).activeCount ( ) ];
-						Thread.currentThread ( ).getThreadGroup ( ).enumerate ( f );
-						
-						for ( Thread thread : f ) {
-							System.out.println ( );
-							System.out.println ( );
-							System.out.println ( );
-							System.out.println ( );
-							System.out.println ( "* " + thread.getName ( ) );
-							
-							for ( StackTraceElement e : thread.getStackTrace ( ) ) {
-								System.out.println ( "   - " + e );
-							}
-						}
-						
-						//						System.out.println ( ">>>> channel thread stack trace: " );
-						//						System.out.println ( );
-						//						for ( StackTraceElement element : Thread.currentThread ( )
-						//						.getStackTrace ( ) ) {
-						//							System.out.println ( "- " + element );
-						//							System.out.println ( );
-						//						}
-						//
-						//						System.out.println ( );
-						//
-						//						System.out.println ( ">>>> server thread stack trace: " );
-						//						System.out.println ( );
-						//						for ( StackTraceElement element : SERVER_THREAD.getStackTrace ( ) ) {
-						//							System.out.println ( "- " + element );
-						//							System.out.println ( );
-						//						}
-						//
-						//						System.out.println ( );
-						//
-						//						System.out.println ( "dumpStack::::: " );
-						//						Thread.dumpStack ( );
-						//
-						//						System.out.println ( );
-						//
-						//						System.out.println ( "getThreadGroup list::::: " );
-						//						Thread.currentThread ( ).getThreadGroup ( ).list ( );
-						//
-						//						System.out.println ( );
-						//
-						//						new Throwable ( ).printStackTrace ( );
-						
-						event.setCancelled ( true );
-					}
-					
-					@Override
-					public void onReceiving ( PacketEvent event ) {
-						System.out.println ( "onReceiving: " + event.getPacket ( ) );
-					}
-				} );
 		return true;
 	}
 	
@@ -282,7 +167,7 @@ public final class BattleRoyale extends PluginAdapter implements Listener {
 		return true;
 	}
 	
-	protected boolean initialize ( EnumPluginHandler handler ) {
+	private boolean initialize ( EnumPluginHandler handler ) {
 		try {
 			PluginHandler instance = handler.getHandlerClass ( )
 					.getConstructor ( BattleRoyale.class ).newInstance ( this );
@@ -293,7 +178,7 @@ public final class BattleRoyale extends PluginAdapter implements Listener {
 			}
 			
 			return true;
-		} catch ( Throwable ex ) {
+		} catch ( Exception ex ) {
 			ex.printStackTrace ( );
 			return false;
 		}
@@ -312,14 +197,16 @@ public final class BattleRoyale extends PluginAdapter implements Listener {
 	
 	@Override
 	public ChunkGenerator getDefaultWorldGenerator ( String world_name , String id ) {
-		// TODO: return a EmptyChunkGenerator if it is a world generated from the arena world generator
-		//		if ( Objects.equal ( Bukkit.getWorld ( world_name ).getWorldFolder ( ) ,
-		//							 EnumDirectory.BATTLE_MAP_SETUP_WORLD_DIRECTORY.getDirectory ( ) ) ) {
-		//			return new EmptyChunkGenerator ( );
-		//		} else {
-		//			return super.getDefaultWorldGenerator ( world_name , id );
-		//		}
-		return super.getDefaultWorldGenerator ( world_name , id );
+		// returns an EmptyChunkGenerator if the world was
+		// generated from the arena world generator.
+		World world = Bukkit.getWorld ( world_name );
+		
+		if ( world != null && Objects.equals ( world.getWorldFolder ( ).getParentFile ( ) ,
+											   EnumDirectory.BATTLEFIELD_TEMP_DIRECTORY.getDirectory ( ) ) ) {
+			return new EmptyChunkGenerator ( );
+		} else {
+			return super.getDefaultWorldGenerator ( world_name , id );
+		}
 	}
 	
 	@Override

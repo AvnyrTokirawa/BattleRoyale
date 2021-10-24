@@ -1,6 +1,7 @@
 package es.outlook.adriansrj.battleroyale.gui;
 
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.core.util.configurable.Configurable;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
@@ -78,14 +79,23 @@ public abstract class GUIIcon implements Configurable {
 		return description_format;
 	}
 	
-	public GUIIconInstance createInstance ( GUIInstance gui , Player player ) {
-		// TODO: set placeholders to both display name and description
-		return createInstance (
-				gui , player ,
-				// display name
-				StringUtil.defaultIfBlank ( display_name_format , StringUtil.EMPTY ) ,
-				// description
-				description_format );
+	public GUIIconInstance createInstance ( GUIInstance gui , Player br_player ) {
+		org.bukkit.entity.Player player              = br_player.getPlayer ( );
+		PlaceholderHandler       placeholder_handler = PlaceholderHandler.getInstance ( );
+		
+		// display name
+		String display_name = placeholder_handler.setPlaceholders (
+				player , StringUtil.defaultIfBlank ( display_name_format , StringUtil.EMPTY ) );
+		
+		// description
+		List < String > description = new ArrayList <> ( description_format );
+		
+		for ( int i = 0 ; i < description.size ( ) ; i++ ) {
+			description.set ( i , placeholder_handler.setPlaceholders (
+					player , StringUtil.defaultIfBlank ( description.get ( i ) , StringUtil.EMPTY ) ) );
+		}
+		
+		return createInstance ( gui , br_player , display_name , description );
 	}
 	
 	protected abstract GUIIconInstance createInstance ( GUIInstance gui , Player player ,

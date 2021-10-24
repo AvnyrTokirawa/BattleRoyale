@@ -11,8 +11,8 @@ import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
 /**
- * TODO: Description
- * <p>
+ * {@link ComplexBattleRoyaleMode} description.
+ *
  * @author AdrianSR / Sunday 16 May, 2021 / 05:05 PM
  */
 public final class ComplexBattleRoyaleModeDescription {

@@ -79,7 +79,7 @@ public class BattleRoyaleLobby implements Listener {
 		player.setSaturation ( 20.0F );
 		EntityUtil.setMaxHealth ( player , 20.0D );
 		player.setHealth ( 20.0D );
-		player.getActivePotionEffects ( ).clear ( );
+		EntityUtil.clearPotionEffects ( player );
 		player.getInventory ( ).clear ( );
 		player.getInventory ( ).setArmorContents ( null );
 		player.updateInventory ( );

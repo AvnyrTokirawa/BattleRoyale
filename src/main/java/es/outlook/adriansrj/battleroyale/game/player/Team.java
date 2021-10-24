@@ -22,9 +22,13 @@ public final class Team {
 	final UUID              id;
 	final BattleRoyaleArena arena;
 	
+	// rank
+	int rank;
+	
 	public Team ( BattleRoyaleArena arena ) {
 		this.id    = UUID.randomUUID ( );
 		this.arena = arena;
+		this.rank  = -1;
 	}
 	
 	public Collection < Player > getPlayers ( ) {
@@ -43,8 +47,28 @@ public final class Team {
 		return getCount ( ) >= arena.getMode ( ).getMaxPlayersPerTeam ( );
 	}
 	
+	public boolean isAlive ( ) {
+		return getPlayers ( ).stream ( ).anyMatch ( Player :: isPlaying );
+	}
+	
 	public BattleRoyaleArena getArena ( ) {
 		return arena;
+	}
+	
+	public int getRank ( ) {
+		return rank;
+	}
+	
+	public void setRank ( int rank ) {
+		if ( rank >= 0 ) {
+			this.rank = rank;
+		} else {
+			this.rank = -1; // unset
+		}
+		
+		// updating members rank
+		getPlayers ( ).forEach (
+				player -> player.setRank ( this.rank ) );
 	}
 	
 	/**

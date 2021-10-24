@@ -61,6 +61,7 @@ import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardConfigurationRegistry;
 import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardHandler;
 import es.outlook.adriansrj.battleroyale.util.PluginUtil;
+import es.outlook.adriansrj.battleroyale.util.stuff.PlayerStuffChestHandler;
 import es.outlook.adriansrj.battleroyale.vehicle.VehiclesConfigurationRegistry;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 
@@ -154,6 +155,8 @@ public enum EnumPluginHandler {
 	
 	QUALITY_ARMORY_COMPATIBILITY_HANDLER (
 			QualityArmoryCompatibilityHandler.class , PluginUtil :: isQualityArmoryEnabled ),
+	
+	PLAYER_STUFF_CHEST_HANDLER ( PlayerStuffChestHandler.class ) ,
 	
 	;
 	

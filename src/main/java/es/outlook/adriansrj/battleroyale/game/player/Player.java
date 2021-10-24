@@ -18,7 +18,6 @@ import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardSimple;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.core.player.PlayerWrapper;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
 import java.util.*;
@@ -108,7 +107,8 @@ public final class Player extends PlayerWrapper {
 		
 		// default scoreboard
 		this.scoreboard = new ScoreboardSimple ( this );
-		this.scoreboard.setVisible ( true );
+		// it will be visible whn the player joins an arena.
+		this.scoreboard.setVisible ( false );
 		
 		// default compass
 		this.compass = new CompassBarSimple ( this );
@@ -397,7 +397,11 @@ public final class Player extends PlayerWrapper {
 	}
 	
 	public void setRank ( int rank ) {
-		this.rank = rank;
+		if ( rank >= 0 ) {
+			this.rank = rank;
+		} else {
+			this.rank = -1; // unset
+		}
 	}
 	
 	private synchronized void dirtyCheck ( ) {
@@ -472,11 +476,5 @@ public final class Player extends PlayerWrapper {
 		if ( parachute != null && parachute.isOpen ( ) ) {
 			parachute.close ( );
 		}
-		
-		// scoreboard
-		this.scoreboard = null;
-		
-		setScoreboard ( Objects.requireNonNull (
-				Bukkit.getScoreboardManager ( ) ).getMainScoreboard ( ) );
 	}
 }

@@ -3,12 +3,13 @@ package es.outlook.adriansrj.battleroyale.enums;
 import es.outlook.adriansrj.core.util.server.Version;
 
 /**
- * TODO: Description
- * </p>
+ * Enumerates the different server data versions.
  *
  * @author AdrianSR / 25/08/2021 / Time: 10:21 a. m.
  */
 public enum EnumDataVersion {
+	
+	// it will probably be necessary to add versions like: v1_12_2
 	
 	v1_9 ( 169 , false , "1.9" ),
 	v1_10 ( 510 , false , "1.10" ),
@@ -19,8 +20,6 @@ public enum EnumDataVersion {
 	v1_15 ( 2225 , false , "1.15" ),
 	v1_16 ( 2566 , false , "1.16" ),
 	v1_17 ( 2724 , false , "1.17" ),
-	
-	// TODO: add versions like: v1_12_2
 	
 	;
 	

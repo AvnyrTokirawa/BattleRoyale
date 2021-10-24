@@ -5,6 +5,7 @@ import es.outlook.adriansrj.battleroyale.enums.EnumArenaStat;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.enums.EnumStat;
+import es.outlook.adriansrj.battleroyale.event.arena.ArenaEndEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerDeathEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerStatSetEvent;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
@@ -16,6 +17,7 @@ import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.util.mode.BattleRoyaleModeUtil;
+import es.outlook.adriansrj.battleroyale.util.stuff.PlayerStuffChestHandler;
 import es.outlook.adriansrj.battleroyale.util.time.TimeUtil;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.StringUtil;
@@ -60,6 +62,10 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 	//         the player will join the spectator mode for a couple seconds (configurable from mode configuration),
 	//         and after waiting the couple seconds, will be respawned in the air with
 	//         the parachute being open automatically
+	
+	// SOLO: the rank is determined when the player dies, or when is the last one alive. (player rank)
+	// TEAM: the rank is determined when all the players in the team dies, or when the team is the last one alive. (team rank)
+	// KILL-LIMIT: the rank is determined when the kill-limit is reached. (player rank)
 	
 	/**
 	 * Task that starts a countdown to respawn a player.
@@ -208,7 +214,6 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 	private final Set < UUID >                         respawn_queue      = new HashSet <> ( );
 	private final Map < UUID, Location >               death_location_map = new HashMap <> ( );
 	private final Map < UUID, RespawnTask >            task_map           = new HashMap <> ( );
-	private final Map < Player, Integer >              rank_map           = new HashMap <> ( );
 	// map responsible for storing the time the
 	// stat of a player is set.
 	private final Map < UUID, Map < EnumStat, Long > > stat_set_map       = new HashMap <> ( );
@@ -235,143 +240,32 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		org.bukkit.entity.Player player    = event.getEntity ( );
 		Player                   br_player = Player.getPlayer ( player );
 		BattleRoyaleArena        arena     = br_player.getArena ( );
-		boolean                  restart   = false;
 		
 		if ( arena != null && arena.getState ( ) == EnumArenaState.RUNNING
 				&& br_player.hasTeam ( ) && !br_player.isSpectator ( ) ) {
-			BattleRoyaleMode mode = arena.getMode ( );
-			int              rank = mode.isRespawnEnabled ( ) ? -1 : getRank ( br_player ); // -1 if respawn is enabled.
+			BattleRoyaleMode mode       = arena.getMode ( );
+			boolean          respawning = mode.isRespawnEnabled ( );
 			
+			// death location
+			setDeathLocation ( br_player , player.getLocation ( ) );
 			// this will respawn the player in spectator mode
 			respawn ( br_player );
 			
-			if ( arena.getMode ( ).isRespawnEnabled ( ) ) {
+			// keeping inventory and level;
+			// or spawning stuff chest.
+			if ( respawning ) {
 				event.setKeepInventory ( true );
 				event.setKeepLevel ( true );
 			} else {
-				// mapping rank
-				rank_map.put ( br_player , rank );
+				PlayerStuffChestHandler.getInstance ( ).spawnStuffChest (
+						event.getDrops ( ) , player.getLocation ( ).add ( 0.0D , 1.0D , 0.0D ) );
 				
-				// TODO: spawn player stuff chest: if the ground is too close, then spawn the chest normally,
-				//  otherwise the chest will be spawned as a falling block, that once landing will actually spawn the
-				//  chest with the stuff on the block on which it lands
+				// clearing drops
+				event.getDrops ( ).clear ( );
 			}
 			
-			// mapping death location
-			death_location_map.put ( player.getUniqueId ( ) , player.getLocation ( ) );
-			
-			// firing event
-			EntityDamageEvent last_damage = player.getLastDamageCause ( );
-			PlayerDeathEvent.Cause cause = last_damage != null
-					? PlayerDeathEvent.Cause.of ( last_damage.getCause ( ) ) : null;
-			Player br_killer = null;
-			
-			if ( last_damage instanceof EntityDamageByEntityEvent ) {
-				// the player was killed by another player
-				Entity uncast_killer = ( ( EntityDamageByEntityEvent ) last_damage ).getDamager ( );
-				
-				if ( uncast_killer instanceof org.bukkit.entity.Player ) {
-					br_killer = Player.getPlayer ( uncast_killer.getUniqueId ( ) );
-				} else if ( uncast_killer instanceof Projectile ) {
-					Projectile       projectile = ( Projectile ) uncast_killer;
-					ProjectileSource shooter    = projectile.getShooter ( );
-					
-					if ( shooter instanceof org.bukkit.entity.Player ) {
-						br_killer = Player.getPlayer ( ( org.bukkit.entity.Player ) shooter );
-					}
-				}
-			}
-			
-			// battle royale custom causes
-			if ( br_killer == null && cause == PlayerDeathEvent.Cause.CUSTOM ) {
-				// died bleeding out
-				if ( br_player.isKnocked ( ) ) {
-					cause     = PlayerDeathEvent.Cause.BLEEDING_OUT;
-					br_killer = br_player.getKnocker ( );
-				}
-				// died out of bounds
-				else if ( !arena.getBorder ( ).getCurrentBounds ( ).contains ( player.getLocation ( ) ) ) {
-					cause = PlayerDeathEvent.Cause.OUT_OF_BOUNDS;
-				}
-			}
-			
-			// finally firing
-			PlayerDeathEvent wrapper = new PlayerDeathEvent (
-					br_player , br_killer , cause , event.getDeathMessage ( ) , false );
-			
-			wrapper.setDeathMessage ( event.getDeathMessage ( ) );
-			wrapper.setKeepInventory ( event.getKeepInventory ( ) );
-			wrapper.setKeepLevel ( event.getKeepLevel ( ) );
-			
-			wrapper.call ( );
-			
-			// passing wrapper values
-			event.setDeathMessage ( wrapper.getDeathMessage ( ) );
-			event.setKeepInventory ( wrapper.isKeepInventory ( ) );
-			event.setKeepLevel ( wrapper.isKeepLevel ( ) );
-			
-			// rank.
-			if ( rank > 0 ) {
-				// in case the killer is the last one standing,
-				// means that is the end of the arena.
-				if ( rank == 1 && br_killer != null ) {
-					// mark for restarting
-					restart = true;
-					
-					// 0 for the last one standing
-					sendRankTitle ( br_killer , 0 );
-					
-					// killer won!
-					win ( br_killer );
-				}
-			} else {
-				// mark for restarting
-				restart = true;
-				
-				// dying player is the only one that was alive
-				ConsoleUtil.sendPluginMessage (
-						ChatColor.RED , "The winner could not be determined " +
-								"as the only player who was alive has died" , BattleRoyale.getInstance ( ) );
-			}
-			
-			// determined by kills
-			if ( BattleRoyaleModeUtil.isDeterminedByKills ( mode ) ) {
-				int kill_limit = mode.getMaxKills ( );
-				
-				if ( arena.getStats ( ).get ( EnumArenaStat.KILLS ) >= kill_limit ) {
-					restart = true;
-					
-					// finding out winner
-					Player winner = arena.getPlayers ( false ).stream ( )
-							.filter ( Player :: isPlaying ).min ( statComparator ( EnumStat.KILLS ) )
-							.orElse ( null );
-					
-					if ( winner != null ) {
-						win ( winner );
-						
-						// rank title for the winner (first)
-						sendRankTitle ( winner , 0 );
-						
-						// rank for the rest of the players
-						List < Player > rest = arena.getPlayers ( false ).stream ( )
-								.filter ( Player :: isPlaying ).filter ( other -> !Objects.equals ( other , winner ) )
-								.sorted ( statComparator ( EnumStat.KILLS ) ).collect ( Collectors.toList ( ) );
-						
-						for ( int i = 0 ; i < rest.size ( ) ; i++ ) {
-							sendRankTitle ( rest.get ( i ) , i + 1 );
-						}
-					} else {
-						ConsoleUtil.sendPluginMessage (
-								ChatColor.RED , "The winner could not be determined" ,
-								BattleRoyale.getInstance ( ) );
-					}
-				}
-			}
-			
-			// restarting
-			if ( restart && !arena.getMode ( ).isRespawnEnabled ( ) ) {
-				arena.restart ( false );
-			}
+			// processing
+			processRanking ( processDeathEvent ( event ) );
 		}
 	}
 	
@@ -403,20 +297,22 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 					player.setGameMode ( GameMode.SPECTATOR );
 					
 					// scheduling respawn task
-					RespawnTask task = new RespawnTask ( br_player );
-					task.runTaskTimer (
-							BattleRoyale.getInstance ( ) , 0L , 10L );
-					
-					task_map.put ( player.getUniqueId ( ) , task );
+					if ( !arena.isOver ( ) ) {
+						RespawnTask task = new RespawnTask ( br_player );
+						task.runTaskTimer (
+								BattleRoyale.getInstance ( ) , 0L , 10L );
+						
+						task_map.put ( player.getUniqueId ( ) , task );
+					}
 				} else {
 					// introducing into spectator mode
 					SchedulerUtil.scheduleSyncDelayedTask ( ( ) -> br_player.setSpectator ( true ) );
 					
 					// displaying position.
-					Integer position = rank_map.get ( br_player );
+					int rank = br_player.getRank ( );
 					
-					if ( position != null && position > 0 ) {
-						sendRankTitle ( br_player , position );
+					if ( rank != -1 ) {
+						sendRankTitle ( br_player , rank );
 					}
 				}
 			}
@@ -436,15 +332,290 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		}
 	}
 	
+	// -------------- utils
+	
+	private PlayerDeathEvent processDeathEvent ( org.bukkit.event.entity.PlayerDeathEvent event ) {
+		org.bukkit.entity.Player player      = event.getEntity ( );
+		Player                   br_player   = Player.getPlayer ( player );
+		Player                   br_killer   = null;
+		EntityDamageEvent        last_damage = player.getLastDamageCause ( );
+		BattleRoyaleArena        arena       = br_player.getArena ( );
+		
+		PlayerDeathEvent.Cause cause = last_damage != null
+				? PlayerDeathEvent.Cause.of ( last_damage.getCause ( ) ) : null;
+		
+		if ( last_damage instanceof EntityDamageByEntityEvent ) {
+			// the player was killed by another player
+			Entity uncast_killer = ( ( EntityDamageByEntityEvent ) last_damage ).getDamager ( );
+			
+			if ( uncast_killer instanceof org.bukkit.entity.Player ) {
+				br_killer = Player.getPlayer ( uncast_killer.getUniqueId ( ) );
+			} else if ( uncast_killer instanceof Projectile ) {
+				Projectile       projectile = ( Projectile ) uncast_killer;
+				ProjectileSource shooter    = projectile.getShooter ( );
+				
+				if ( shooter instanceof org.bukkit.entity.Player ) {
+					br_killer = Player.getPlayer ( ( org.bukkit.entity.Player ) shooter );
+				}
+			}
+		}
+		
+		// battle royale custom causes
+		if ( br_killer == null && cause == PlayerDeathEvent.Cause.CUSTOM ) {
+			// died bleeding out
+			if ( br_player.isKnocked ( ) ) {
+				cause     = PlayerDeathEvent.Cause.BLEEDING_OUT;
+				br_killer = br_player.getKnocker ( );
+			}
+			// died out of bounds
+			else if ( !arena.getBorder ( ).getCurrentBounds ( ).contains ( player.getLocation ( ) ) ) {
+				cause = PlayerDeathEvent.Cause.OUT_OF_BOUNDS;
+			}
+		}
+		
+		// finally firing
+		PlayerDeathEvent wrapper = new PlayerDeathEvent (
+				br_player , br_killer , cause , event.getDeathMessage ( ) , false );
+		
+		wrapper.setDeathMessage ( event.getDeathMessage ( ) );
+		wrapper.setKeepInventory ( event.getKeepInventory ( ) );
+		wrapper.setKeepLevel ( event.getKeepLevel ( ) );
+		
+		wrapper.call ( );
+		
+		// passing wrapper values
+		event.setDeathMessage ( wrapper.getDeathMessage ( ) );
+		event.setKeepInventory ( wrapper.isKeepInventory ( ) );
+		event.setKeepLevel ( wrapper.isKeepLevel ( ) );
+		
+		return wrapper;
+	}
+	
+	private void processRanking ( PlayerDeathEvent event ) {
+		Player            br_player        = event.getPlayer ( );
+		BattleRoyaleArena arena            = br_player.getArena ( );
+		BattleRoyaleMode  mode             = arena.getMode ( );
+		boolean           respawning       = mode.isRespawnEnabled ( );
+		boolean           determined_kills = BattleRoyaleModeUtil.isDeterminedByKills ( mode );
+		String            error_message    = null;
+		Player            winning_player   = null;
+		Team              winning_team     = null;
+		boolean           over             = false;
+		
+		if ( !determined_kills && !respawning ) {
+			// if it is solo, the rank will be
+			// instantly calculated; otherwise,
+			// the rank will be calculated once
+			// the last living member of the team dies.
+			int rank = -1;
+			
+			if ( mode.isSolo ( ) ) {
+				rank = calculateRank ( br_player );
+				
+				// player rank
+				br_player.setRank ( rank );
+			} else {
+				Team team = br_player.getTeam ( );
+				
+				if ( team.getPlayers ( ).stream ( ).noneMatch (
+						teammate -> teammate.isPlaying ( ) && !Objects.equals ( teammate , br_player ) ) ) {
+					rank = calculateRank ( team );
+					
+					// team rank
+					team.setRank ( rank );
+					// player rank (the same as the team rank)
+					br_player.setRank ( rank );
+				}
+			}
+			
+			// game ending
+			if ( rank != -1 ) {
+				if ( rank > 0 ) {
+					Player br_killer = event.getKiller ( );
+					
+					// in case rank is 1, this means there
+					// is only one player/team alive, which
+					// is actually the winner of the match.
+					if ( rank == 1 ) {
+						if ( mode.isSolo ( ) ) {
+							if ( br_killer != null ) {
+								winning_player = br_killer;
+							} else {
+								// was not killed by another player;
+								// we must find out who is the last
+								// player standing.
+								winning_player = arena.getPlayers ( ).stream ( )
+										.filter ( other -> !Objects.equals ( other , br_player ) )
+										.filter ( Player :: isPlaying )
+										.findFirst ( ).orElse ( null );
+							}
+							
+							if ( winning_player != null ) {
+								// best rank for the winner
+								winning_player.setRank ( 0 );
+								sendRankTitle ( winning_player , 0 );
+								
+								// incrementing stat
+								incrementWinStat ( winning_player );
+							} else {
+								error_message = "The winning player could not be determined";
+							}
+						} else {
+							if ( br_killer != null ) {
+								winning_team = br_killer.getTeam ( );
+							} else {
+								// was not killed by another player;
+								// we must find out which is the last
+								// team standing.
+								winning_team = arena.getTeamRegistry ( ).stream ( )
+										.filter ( other -> !Objects.equals ( other , br_player.getTeam ( ) ) )
+										.filter ( Team :: isAlive )
+										.findFirst ( ).orElse ( null );
+							}
+							
+							if ( winning_team != null ) {
+								// best rank for the winning team
+								// and its members
+								winning_team.setRank ( 0 );
+								winning_team.getPlayers ( ).forEach ( member -> {
+									member.setRank ( 0 );
+									sendRankTitle ( member , 0 );
+									
+									// incrementing stat
+									incrementWinStat ( member );
+								} );
+							} else {
+								error_message = "The winning team could not be determined";
+							}
+						}
+						
+						// marking as over
+						over = true;
+					}
+				} else {
+					if ( mode.isSolo ( ) ) {
+						error_message = "The winner could not be determined " +
+								"as the only player who was alive has died";
+					} else {
+						error_message = "The winning-team could not be determined " +
+								"as there is only one team in the arena";
+					}
+					
+					// marking as over
+					over = true;
+				}
+			}
+		} else if ( determined_kills ) {
+			// end determined by kills
+			int kill_limit = mode.getMaxKills ( );
+			
+			if ( arena.getStats ( ).get ( EnumArenaStat.KILLS ) >= kill_limit ) {
+				Player winner = arena.getPlayers ( false ).stream ( )
+						.filter ( Player :: isPlaying ).min ( statComparator ( EnumStat.KILLS ) )
+						.orElse ( null );
+				
+				if ( winner != null ) {
+					// best rank for the winner
+					winner.setRank ( 0 );
+					sendRankTitle ( winner , 0 );
+					
+					// incrementing stat
+					incrementWinStat ( winner );
+					
+					// ranking rest of players
+					List < Player > rest = arena.getPlayers ( false ).stream ( )
+							.filter ( player -> player.hasTeam ( ) && player.isOnline ( ) )
+							.filter ( other -> !Objects.equals ( other , winner ) )
+							.sorted ( statComparator ( EnumStat.KILLS ) ).collect ( Collectors.toList ( ) );
+					
+					for ( int i = 0 ; i < rest.size ( ) ; i++ ) {
+						Player other = rest.get ( i );
+						int    rank  = i + 1;
+						
+						other.setRank ( rank );
+						sendRankTitle ( other , rank );
+						
+						// incrementing stat
+						incrementWinStat ( other );
+					}
+				} else {
+					ConsoleUtil.sendPluginMessage (
+							ChatColor.RED , "The winner could not be determined" ,
+							BattleRoyale.getInstance ( ) );
+				}
+				
+				// marking as over
+				over = true;
+			}
+		}
+		
+		// then ending
+		if ( over && !arena.isOver ( ) ) {
+			arena.end ( winning_player , winning_team );
+		}
+		
+		// couldn't determine winner
+		if ( error_message != null ) {
+			ConsoleUtil.sendPluginMessage (
+					ChatColor.RED , error_message , BattleRoyale.getInstance ( ) );
+		}
+	}
+	
+	// this handler will cancel the respawn task
+	// when the arena ends, as it would override
+	// the rank titles; and as them are not necessary
+	// at this point, then we can cancel them.
+	@EventHandler ( priority = EventPriority.MONITOR )
+	public void onEnd ( ArenaEndEvent event ) {
+		task_map.values ( ).forEach ( RespawnTask :: cancel );
+		task_map.clear ( );
+	}
+	
+	// -------------- utils
+	
 	/**
-	 * Sets the provided player as the winner
-	 * of the arena.
+	 * Increments the {@link EnumStat#WINS} for the
+	 * provided player.
 	 *
-	 * @param player the player who wins.
+	 * @param player the player to benefit.
 	 */
-	private void win ( Player player ) {
+	private void incrementWinStat ( Player player ) {
 		player.getDataStorage ( ).incrementStat ( EnumStat.WINS , 1 , true );
 		player.getDataStorage ( ).incrementTempStat ( EnumStat.WINS , 1 );
+	}
+	
+	/**
+	 * Calculates the rank of the provided {@link Player}.
+	 * <br>
+	 * <b>This will obviously work only if the respawn is not
+	 * enabled, otherwise the result is unknown.</b>
+	 *
+	 * @param player the player to calculate.
+	 * @return the rank of the player.
+	 */
+	private int calculateRank ( Player player ) {
+		return player.getArena ( ).getTeamRegistry ( ).getHandle ( ).stream ( )
+				.map ( team -> team.getPlayers ( ).stream ( )
+						.filter ( alive -> !Objects.equals ( alive , player ) )
+						.filter ( Player :: isPlaying )
+						.count ( ) )
+				.reduce ( 0L , Long :: sum ).intValue ( );
+	}
+	
+	/**
+	 * Calculates the rank of the provided {@link Team}.
+	 * <br>
+	 * <b>This will obviously work only if the respawn is not
+	 * enabled, otherwise the result is unknown.</b>
+	 *
+	 * @param team the team to calculate.
+	 * @return the rank of the team.
+	 */
+	private int calculateRank ( Team team ) {
+		return ( int ) team.getArena ( ).getTeamRegistry ( ).getHandle ( ).stream ( )
+				.filter ( other -> !Objects.equals ( team , other ) )
+				.filter ( other -> !other.isEmpty ( ) && other.getPlayers ( ).stream ( ).anyMatch ( Player :: isPlaying ) )
+				.count ( );
 	}
 	
 	/**
@@ -493,29 +664,8 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		};
 	}
 	
-	/**
-	 * Calculates the rank of the provided {@link Player}.
-	 * <br>
-	 * <b>This will obviously work only if the respawn is not
-	 * enabled, otherwise the result is unknown.</b>
-	 *
-	 * @param player the player to get.
-	 * @return the rank of the player.
-	 */
-	private int getRank ( Player player ) {
-		return player.getArena ( ).getTeamRegistry ( ).getHandle ( ).stream ( )
-				.map ( team -> team.getPlayers ( ).stream ( )
-						.filter ( alive -> !Objects.equals ( alive , player ) )
-						.filter ( Player :: isPlaying )
-						.count ( ) )
-				.reduce ( 0L , Long :: sum ).intValue ( );
-	}
-	
-	private int getRank ( Team team ) {
-		return ( int ) team.getArena ( ).getTeamRegistry ( ).getHandle ( ).stream ( )
-				.filter ( other -> !Objects.equals ( team , other ) )
-				.filter ( other -> !other.isEmpty ( ) && other.getPlayers ( ).stream ( ).anyMatch ( Player :: isPlaying ) )
-				.count ( );
+	private void setDeathLocation ( Player player , Location location ) {
+		death_location_map.put ( player.getUniqueId ( ) , location );
 	}
 	
 	private void sendRankTitle ( Player player , int rank ) {

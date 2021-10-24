@@ -41,8 +41,6 @@ import java.util.*;
  */
 public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 	
-	// TODO: name, bounds and minimap are to be set in order to enable this setup option
-	
 	/**
 	 * @author AdrianSR / 07/09/2021 / 07:25 p. m.
 	 */

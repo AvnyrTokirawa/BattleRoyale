@@ -19,8 +19,6 @@ import java.util.UUID;
  */
 public final class ArenaSelectorGUIHandler extends PluginHandler {
 	
-	// TODO: it will probably be necessary to not show arenas that are being prepared
-	
 	static {
 		// registering icon types
 		for ( ArenaSelectorGUIIconType type : ArenaSelectorGUIIconType.values ( ) ) {

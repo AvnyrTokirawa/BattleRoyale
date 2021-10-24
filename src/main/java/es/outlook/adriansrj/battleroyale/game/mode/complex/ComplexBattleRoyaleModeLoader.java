@@ -8,6 +8,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +16,8 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * TODO: Description
- * <p>
+ * {@link ComplexBattleRoyaleMode} loader.
+ *
  * @author AdrianSR / Sunday 16 May, 2021 / 04:21 PM
  */
 public class ComplexBattleRoyaleModeLoader extends BattleRoyaleModeLoader {
@@ -53,7 +54,7 @@ public class ComplexBattleRoyaleModeLoader extends BattleRoyaleModeLoader {
 			} else {
 				throw new IllegalArgumentException ( "invalid description: " + file.getName ( ) );
 			}
-		} catch ( MalformedURLException ex ) {
+		} catch ( MalformedURLException | InvocationTargetException ex ) {
 			ex.printStackTrace ( );
 		}
 		return null;

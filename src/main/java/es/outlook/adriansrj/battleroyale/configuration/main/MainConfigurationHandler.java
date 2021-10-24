@@ -8,9 +8,6 @@ import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import java.io.File;
 
 /**
- * TODO: Description
- * </p>
- *
  * @author AdrianSR / 22/08/2021 / Time: 09:04 p. m.
  */
 public final class MainConfigurationHandler extends EnumConfigurationHandler < EnumMainConfiguration > {

@@ -86,6 +86,8 @@ public class Constants {
 	
 	// ---------- packet class names
 	
+	// TODO: packet names in 1.17+ might be different
+	
 	public static final String PACKET_IN_ARM_ANIMATION_NAME              = "PacketPlayInArmAnimation";
 	public static final String PACKET_IN_POSITION_NAME                   = "PacketPlayInPosition";
 	public static final String PACKET_IN_LOOK_NAME                       = "PacketPlayInPositionLook";

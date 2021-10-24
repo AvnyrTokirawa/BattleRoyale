@@ -1,6 +1,7 @@
 package es.outlook.adriansrj.battleroyale.enums;
 
 import es.outlook.adriansrj.battleroyale.configuration.ConfigurationEntry;
+import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
 import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
 import es.outlook.adriansrj.core.menu.size.ItemMenuSize;
 import es.outlook.adriansrj.core.util.StringUtil;
@@ -9,6 +10,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -313,9 +315,12 @@ public enum EnumSettingsGUIsConfiguration implements ConfigurationEntry {
 	
 	@Override
 	public String getAsString ( ) {
-		// TODO: full placeholders plugins support
-		return StringEscapeUtils.unescapeJava (
-				StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) ) );
+		return getAsString ( null );
+	}
+	
+	public String getAsString ( Player player ) {
+		return PlaceholderHandler.getInstance ( ).setPlaceholders ( player , StringEscapeUtils.unescapeJava (
+				StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) ) ) );
 	}
 	
 	@Override

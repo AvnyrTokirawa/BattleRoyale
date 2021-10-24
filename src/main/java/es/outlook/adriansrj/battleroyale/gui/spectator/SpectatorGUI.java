@@ -17,13 +17,12 @@ import org.bukkit.ChatColor;
 public final class SpectatorGUI extends PluginHandler {
 	
 	// TODO: make configurable
-	// TODO: button to toggle camera
 	
 	public static SpectatorGUI getInstance ( ) {
 		return getPluginHandler ( SpectatorGUI.class );
 	}
 	
-	protected final ItemMenu handle;
+	private final ItemMenu handle;
 	
 	/**
 	 * Constructs the plugin handler.

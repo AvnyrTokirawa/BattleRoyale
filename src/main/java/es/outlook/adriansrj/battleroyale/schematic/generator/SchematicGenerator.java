@@ -4,6 +4,8 @@ import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldShape;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldShapeData;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldShapePart;
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
+import es.outlook.adriansrj.battleroyale.schematic.generator.v12.SchematicGenerator_v12;
+import es.outlook.adriansrj.battleroyale.schematic.generator.v13.SchematicGenerator_v13;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.core.util.math.collision.BoundingBox;
 import org.bukkit.World;
@@ -26,9 +28,9 @@ public interface SchematicGenerator {
 	
 	public static SchematicGenerator newSchematicGenerator ( EnumDataVersion data_version ) {
 		if ( data_version.getId ( ) < EnumDataVersion.v1_13.getId ( ) ) {
-			return new es.outlook.adriansrj.battleroyale.schematic.generator.v12.SchematicGenerator ( data_version );
+			return new SchematicGenerator_v12 ( data_version );
 		} else {
-			return new es.outlook.adriansrj.battleroyale.schematic.generator.v13.SchematicGenerator ( data_version );
+			return new SchematicGenerator_v13 ( data_version );
 		}
 	}
 	

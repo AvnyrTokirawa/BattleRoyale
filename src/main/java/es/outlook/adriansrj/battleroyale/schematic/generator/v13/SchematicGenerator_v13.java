@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  *
  * @author AdrianSR / 29/08/2021 / 01:50 p. m.
  */
-public class SchematicGenerator implements es.outlook.adriansrj.battleroyale.schematic.generator.SchematicGenerator {
+public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale.schematic.generator.SchematicGenerator {
 	
 	/**
 	 * @author AdrianSR / 29/08/2021 / 02:36 p. m.
@@ -64,7 +64,7 @@ public class SchematicGenerator implements es.outlook.adriansrj.battleroyale.sch
 	
 	protected final EnumDataVersion data_version;
 	
-	public SchematicGenerator ( EnumDataVersion data_version ) {
+	public SchematicGenerator_v13 ( EnumDataVersion data_version ) {
 		Validate.isTrue ( data_version.getId ( ) >= EnumDataVersion.v1_13.getId ( ) ,
 						  "unsupported data version" );
 		

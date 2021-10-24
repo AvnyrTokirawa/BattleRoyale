@@ -18,7 +18,9 @@ public abstract class ScoreboardBase extends Scoreboard {
 		
 		// initializing handle
 		this.handle = new ScoreScoreboard ( StringUtil.EMPTY );
-		this.handle.addViewersByUniqueId ( player.getUniqueId ( ) );
+		
+		// visible by default
+		this.setVisible ( true );
 	}
 	
 	@Override

@@ -49,7 +49,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 /**
- * TODO: Description
+ * {@link Battlefield} setup session.
  *
  * @author AdrianSR / 23/08/2021 / Time: 10:59 a. m.
  */

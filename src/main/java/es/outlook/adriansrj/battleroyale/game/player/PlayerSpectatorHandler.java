@@ -32,11 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class PlayerSpectatorHandler extends PluginHandler implements PacketListener {
 	
-	// TODO: if the player left clicks, the spectator GUI will open
-	// TODO: toggleCamera will go to the next camera: the next camera will be the camera of a teammate
-	//  (if any alive), or the camera of any other player playing on the battlefield (when have no teammates alive, or
-	//  when is not in a team).
-	
 	static PlayerSpectatorHandler getInstance ( ) {
 		return getPluginHandler ( PlayerSpectatorHandler.class );
 	}
@@ -54,7 +49,6 @@ public final class PlayerSpectatorHandler extends PluginHandler implements Packe
 		super ( plugin );
 		register ( );
 		
-		// TODO: packet names in 1.17+ might be different
 		/* registering packet listeners */
 		// move packet listeners
 		PacketChannelHandler.addPacketListener (

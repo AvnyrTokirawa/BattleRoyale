@@ -65,8 +65,6 @@ class BattlefieldSetupGUISelectingSchematicInput extends BookItemMenu {
 					UniversalMaterial.CHEST.getItemStack ( ) );
 			
 			addAction ( action -> {
-				// TODO: make it, so the world generator is capable to return the progress of the generation
-				//  process
 				// part n°1 of the process.
 				org.bukkit.entity.Player player = action.getPlayer ( );
 				player.sendMessage ( ChatColor.GOLD + "Loading schematic, please wait..." );

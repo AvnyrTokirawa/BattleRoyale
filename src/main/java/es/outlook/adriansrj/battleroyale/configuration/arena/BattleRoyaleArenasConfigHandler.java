@@ -11,6 +11,7 @@ import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
+import es.outlook.adriansrj.battleroyale.util.mode.BattleRoyaleModeUtil;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.console.ConsoleUtil;
 import es.outlook.adriansrj.core.util.file.FilenameUtil;
@@ -162,15 +163,22 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 				continue;
 			}
 			
+			// in case respawn is enabled, but there is not a
+			// kill limit, the arena will not end, so let's
+			// print a warning message.
+			if ( mode.isRespawnEnabled ( )
+					&& !BattleRoyaleModeUtil.isDeterminedByKills ( mode ) ) {
+				ConsoleUtil.sendPluginMessage ( ChatColor.RED , "It seems that the arena '" + name
+						+ "' will never end: respawning is enabled, but there is not a kill limit." , plugin );
+			}
+			
 			// must load arenas asynchronously as the server could crash
 			// since the shapes of the arenas could probably be huge.
-			final String resulting_name = name.trim ( );
-			
-			ConsoleUtil.sendPluginMessage ( ChatColor.YELLOW , "Loading arena '" + resulting_name
+			ConsoleUtil.sendPluginMessage ( ChatColor.YELLOW , "Loading arena '" + name
 					+ "' ..." , plugin );
 			
 			EXECUTOR_SERVICE.execute ( ( ) -> BattleRoyaleArenaHandler.getInstance ( ).createArena (
-					resulting_name , configuration , arena -> {
+					name , configuration , arena -> {
 						ConsoleUtil.sendPluginMessage ( ChatColor.GREEN , "Arena '"
 								+ arena.getName ( ) + "' successfully loaded." , plugin );
 						

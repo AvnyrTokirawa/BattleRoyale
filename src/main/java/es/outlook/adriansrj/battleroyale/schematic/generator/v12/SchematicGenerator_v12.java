@@ -24,11 +24,11 @@ import java.util.Map;
  *
  * @author AdrianSR / 29/08/2021 / 01:50 p. m.
  */
-public class SchematicGenerator implements es.outlook.adriansrj.battleroyale.schematic.generator.SchematicGenerator {
+public class SchematicGenerator_v12 implements es.outlook.adriansrj.battleroyale.schematic.generator.SchematicGenerator {
 	
 	protected final EnumDataVersion data_version;
 	
-	public SchematicGenerator ( EnumDataVersion data_version ) {
+	public SchematicGenerator_v12 ( EnumDataVersion data_version ) {
 		this.data_version = data_version;
 	}
 	
