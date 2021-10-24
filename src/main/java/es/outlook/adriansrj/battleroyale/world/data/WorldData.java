@@ -5,8 +5,7 @@ import es.outlook.adriansrj.battleroyale.enums.EnumWorldGenerator;
 import es.outlook.adriansrj.battleroyale.util.nbt.NBTSerializable;
 
 /**
- * TODO: Description
- * </p>
+ * Minecraft world data.
  *
  * @author AdrianSR / 25/08/2021 / Time: 11:08 a. m.
  */

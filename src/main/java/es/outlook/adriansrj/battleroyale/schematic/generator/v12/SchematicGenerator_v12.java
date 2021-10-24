@@ -1,14 +1,13 @@
 package es.outlook.adriansrj.battleroyale.schematic.generator.v12;
 
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
+import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
-import es.outlook.adriansrj.battleroyale.util.math.Location2I;
+import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProvider;
+import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProviderWorldFolder;
 import es.outlook.adriansrj.battleroyale.world.chunk.v12.Chunk12;
 import es.outlook.adriansrj.battleroyale.world.chunk.v12.ChunkSection12;
-import es.outlook.adriansrj.battleroyale.world.region.Region;
-import es.outlook.adriansrj.battleroyale.world.region.v12.Region12;
 import es.outlook.adriansrj.core.util.math.collision.BoundingBox;
-import es.outlook.adriansrj.core.util.world.WorldUtil;
 import net.kyori.adventure.nbt.*;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
@@ -29,6 +28,9 @@ public class SchematicGenerator_v12 implements es.outlook.adriansrj.battleroyale
 	protected final EnumDataVersion data_version;
 	
 	public SchematicGenerator_v12 ( EnumDataVersion data_version ) {
+		Validate.isTrue ( data_version.getId ( ) <= EnumDataVersion.v1_12.getId ( ) ,
+						  "unsupported data version" );
+		
 		this.data_version = data_version;
 	}
 	
@@ -46,13 +48,10 @@ public class SchematicGenerator_v12 implements es.outlook.adriansrj.battleroyale
 		int    height = ( int ) Math.round ( bounds.getHeight ( ) );
 		int    depth  = ( int ) Math.round ( bounds.getDepth ( ) );
 		
-		byte[] blocks     = new byte[ width * height * depth ];
-		byte[] add_blocks = null;
-		byte[] block_data = new byte[ width * height * depth ];
-		
-		// TODO: use ChunkProvider instead of manually loading chunks
-		Map < Location2I, Region12 >   region_map = new HashMap <> ( );
-		Map < ChunkLocation, Chunk12 > chunk_map  = new HashMap <> ( );
+		byte[]        blocks         = new byte[ width * height * depth ];
+		byte[]        add_blocks     = null;
+		byte[]        block_data     = new byte[ width * height * depth ];
+		ChunkProvider chunk_provider = new ChunkProviderWorldFolder ( folder );
 		
 		for ( int y = 0 ; y < height ; y++ ) {
 			int yy = origin.getBlockY ( ) + y;
@@ -63,23 +62,7 @@ public class SchematicGenerator_v12 implements es.outlook.adriansrj.battleroyale
 					
 					// reading chunk
 					ChunkLocation chunk_location = new ChunkLocation ( xx >> 4 , zz >> 4 );
-					Chunk12       chunk          = chunk_map.get ( chunk_location );
-					
-					if ( chunk == null ) {
-						Location2I region_location = chunk_location.getRegionLocation ( );
-						Region12   region          = region_map.get ( region_location );
-						
-						if ( region == null ) {
-							region_map.put (
-									region_location , region = new Region12 ( region_location , new File (
-											new File ( folder , WorldUtil.REGION_FOLDER_NAME ) ,
-											String.format ( Region.REGION_FILE_NAME_FORMAT ,
-															region_location.getX ( ) ,
-															region_location.getZ ( ) ) ) ) );
-						}
-						
-						chunk_map.put ( chunk_location , chunk = region.getChunk ( chunk_location ) );
-					}
+					Chunk12       chunk          = ( Chunk12 ) chunk_provider.getChunk ( chunk_location );
 					
 					// extracting block
 					ChunkSection12 section = chunk != null ? chunk.getSectionFromYCoordinate ( yy ) : null;
@@ -106,11 +89,7 @@ public class SchematicGenerator_v12 implements es.outlook.adriansrj.battleroyale
 			}
 		}
 		
-		// disposing resources
-		chunk_map.clear ( );
-		region_map.clear ( );
-		
-		// re-enabling autosave
+		// re-enabling auto-save
 		world.setAutoSave ( autosave );
 		
 		// then generating

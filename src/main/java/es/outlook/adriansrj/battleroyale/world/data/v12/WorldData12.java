@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * TODO: Description
- * </p>
+ * < 1.12 {@link WorldData}.
  *
  * @author AdrianSR / 25/08/2021 / Time: 09:40 a. m.
  */

@@ -1,13 +1,0 @@
-
-h
-java:S3776"RRefactor this method to reduce its Cognitive Complexity from 26 to the 15 allowed.(­¾Ç¹
-[
-java:S3358«"DExtract this nested ternary operation into an independent statement.(†à–Â
-u
-java:S3012µ"YUse "Arrays.copyOf", "Arrays.asList", "Collections.addAll" or "System.arraycopy" instead.(ÿ¡×òùÿÿÿÿ
-u
-java:S3012À"YUse "Arrays.copyOf", "Arrays.asList", "Collections.addAll" or "System.arraycopy" instead.(¬¡¥ñûÿÿÿÿ
-u
-java:S3012Ë"YUse "Arrays.copyOf", "Arrays.asList", "Collections.addAll" or "System.arraycopy" instead.(šù‡þüÿÿÿÿ
-i
-java:S3776Ô"RRefactor this method to reduce its Cognitive Complexity from 73 to the 15 allowed.(“öÄ÷

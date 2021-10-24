@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  */
 public interface SchematicGenerator {
 	
-	public static SchematicGenerator newSchematicGenerator ( EnumDataVersion data_version ) {
+	static SchematicGenerator newSchematicGenerator ( EnumDataVersion data_version ) {
 		if ( data_version.getId ( ) < EnumDataVersion.v1_13.getId ( ) ) {
 			return new SchematicGenerator_v12 ( data_version );
 		} else {
@@ -34,7 +34,7 @@ public interface SchematicGenerator {
 		}
 	}
 	
-	public static SchematicGenerator newSchematicGenerator ( ) {
+	static SchematicGenerator newSchematicGenerator ( ) {
 		return newSchematicGenerator ( EnumDataVersion.getServerDataVersion ( ) );
 	}
 	

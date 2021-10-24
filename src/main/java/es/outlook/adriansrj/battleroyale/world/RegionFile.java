@@ -7,9 +7,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 /**
- * TODO: Description
- * </p>
- *
  * @author AdrianSR / 24/08/2021 / Time: 11:27 p. m.
  */
 public class RegionFile implements AutoCloseable {

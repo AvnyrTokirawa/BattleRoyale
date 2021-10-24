@@ -2,15 +2,13 @@ package es.outlook.adriansrj.battleroyale.schematic.generator.v13;
 
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
 import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
-import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.world.Material;
+import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProvider;
+import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProviderWorldFolder;
 import es.outlook.adriansrj.battleroyale.world.chunk.v13.Chunk13;
 import es.outlook.adriansrj.battleroyale.world.chunk.v13.ChunkSection13;
-import es.outlook.adriansrj.battleroyale.world.region.Region;
-import es.outlook.adriansrj.battleroyale.world.region.v13.Region13;
 import es.outlook.adriansrj.core.util.math.Vector3D;
 import es.outlook.adriansrj.core.util.math.collision.BoundingBox;
-import es.outlook.adriansrj.core.util.world.WorldUtil;
 import net.kyori.adventure.nbt.*;
 import org.apache.commons.lang.Validate;
 import org.bukkit.World;
@@ -79,16 +77,13 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 		world.setAutoSave ( false );
 		
 		// extracting required data
-		File            folder = world.getWorldFolder ( );
-		Vector          origin = bounds.getMinimum ( );
-		int             width  = ( int ) Math.round ( bounds.getWidth ( ) );
-		int             height = ( int ) Math.round ( bounds.getHeight ( ) );
-		int             depth  = ( int ) Math.round ( bounds.getDepth ( ) );
-		BlockData[][][] blocks = new BlockData[ width ][ height ][ depth ];
-		
-		// TODO: use ChunkProvider instead of manually loading chunks
-		Map < Location2I, Region13 >   region_map = new HashMap <> ( );
-		Map < ChunkLocation, Chunk13 > chunk_map  = new HashMap <> ( );
+		File            folder         = world.getWorldFolder ( );
+		Vector          origin         = bounds.getMinimum ( );
+		int             width          = ( int ) Math.round ( bounds.getWidth ( ) );
+		int             height         = ( int ) Math.round ( bounds.getHeight ( ) );
+		int             depth          = ( int ) Math.round ( bounds.getDepth ( ) );
+		BlockData[][][] blocks         = new BlockData[ width ][ height ][ depth ];
+		ChunkProvider   chunk_provider = new ChunkProviderWorldFolder ( folder );
 		
 		for ( int y = 0 ; y < height ; y++ ) {
 			int yy = origin.getBlockY ( ) + y;
@@ -99,23 +94,7 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 					
 					// reading chunk
 					ChunkLocation chunk_location = new ChunkLocation ( xx >> 4 , zz >> 4 );
-					Chunk13       chunk          = chunk_map.get ( chunk_location );
-					
-					if ( chunk == null ) {
-						Location2I region_location = chunk_location.getRegionLocation ( );
-						Region13   region          = region_map.get ( region_location );
-						
-						if ( region == null ) {
-							region_map.put (
-									region_location , region = new Region13 ( region_location , new File (
-											new File ( folder , WorldUtil.REGION_FOLDER_NAME ) ,
-											String.format ( Region.REGION_FILE_NAME_FORMAT ,
-															region_location.getX ( ) ,
-															region_location.getZ ( ) ) ) ) );
-						}
-						
-						chunk_map.put ( chunk_location , chunk = region.getChunk ( chunk_location ) );
-					}
+					Chunk13       chunk          = ( Chunk13 ) chunk_provider.getChunk ( chunk_location );
 					
 					// then extracting block
 					ChunkSection13 section = chunk != null ? chunk.getSectionFromYCoordinate ( yy ) : null;
@@ -132,10 +111,6 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 				}
 			}
 		}
-		
-		// disposing resources
-		chunk_map.clear ( );
-		region_map.clear ( );
 		
 		// re-enabling auto-save
 		world.setAutoSave ( autosave );
@@ -232,9 +207,7 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 		root.put ( "BlockEntities" , ListBinaryTag.from ( tile_entities ) );
 		
 		// then writing to output file
-		FileOutputStream output = null;
-		
-		try {
+		try ( FileOutputStream output = new FileOutputStream ( out ) ) {
 			CompoundBinaryTag compound = CompoundBinaryTag.from ( root );
 			Map.Entry < String, CompoundBinaryTag > named = new Map.Entry < String, CompoundBinaryTag > ( ) {
 				@Override
@@ -253,20 +226,10 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 				}
 			};
 			
-			BinaryTagIO.writer ( )
-					.writeNamed ( named ,
-								  output = new FileOutputStream ( out ) ,
-								  BinaryTagIO.Compression.GZIP );
+			BinaryTagIO.writer ( ).writeNamed (
+					named , output , BinaryTagIO.Compression.GZIP );
 		} catch ( IOException e ) {
 			e.printStackTrace ( );
-		} finally {
-			try {
-				if ( output != null ) {
-					output.close ( );
-				}
-			} catch ( IOException e ) {
-				e.printStackTrace ( );
-			}
 		}
 	}
 }

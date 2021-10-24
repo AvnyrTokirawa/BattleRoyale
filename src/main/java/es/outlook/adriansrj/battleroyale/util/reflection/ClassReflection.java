@@ -5,8 +5,7 @@ import es.outlook.adriansrj.core.util.reflection.DataType;
 import java.util.Objects;
 
 /**
- * TODO: Description
- * </p>
+ * Useful class for dealing with classes.
  *
  * @author AdrianSR / 22/08/2021 / Time: 09:06 p. m.
  */

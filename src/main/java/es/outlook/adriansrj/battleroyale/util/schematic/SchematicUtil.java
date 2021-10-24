@@ -47,43 +47,6 @@ public class SchematicUtil {
 		}
 	}
 	
-	//	public static void saveSchematic ( Clipboard schematic , File out ) throws IOException {
-	//		ClipboardWriter writer = null;
-	//
-	//		if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_13_R1 ) ) {
-	//			FileOutputStream output = new FileOutputStream ( out );
-	//
-	//			writer = com.sk89q.worldedit.extent.clipboard.io
-	//					.BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter ( output );
-	//			writer.write ( schematic );
-	//		} else {
-	//			NBTOutputStream output = new NBTOutputStream ( new GZIPOutputStream ( new FileOutputStream ( out ) ) );
-	//
-	//			try {
-	//				writer = ConstructorReflection.newInstance (
-	//						Class.forName ( "com.sk89q.worldedit.extent.clipboard.io.SchematicWriter" ) ,
-	//						new Class < ? >[] { NBTOutputStream.class } ,
-	//						output );
-	//
-	//				Method write_method = MethodReflection.getAccessible (
-	//						ClipboardWriter.class , "write" ,
-	//						Clipboard.class , Class.forName ( "com.sk89q.worldedit.world.registry.WorldData" ) );
-	//
-	//				write_method.invoke ( writer , schematic , null );
-	//			} catch ( ClassNotFoundException | InvocationTargetException
-	//					| InstantiationException | NoSuchMethodException | IllegalAccessException e ) {
-	//				e.printStackTrace ( );
-	//			}
-	//		}
-	//
-	//		writer.close ( );
-	//	}
-	//
-	//	public static Clipboard createBattleRoyaleSchematic ( World world , Vector min_corner , Vector max_corner ) {
-	//		// TODO
-	//		return null;
-	//	}
-	
 	public static Clipboard loadSchematic ( File file )
 			throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
 			IllegalAccessException, InstantiationException {

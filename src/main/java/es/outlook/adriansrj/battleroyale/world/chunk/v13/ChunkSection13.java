@@ -177,9 +177,7 @@ public class ChunkSection13 implements NBTSerializable {
 	
 	public void setMaterials ( Material[] materials ) {
 		if ( materials.length == this.materials.length ) {
-			for ( int i = 0; i < materials.length; i++ ) {
-				this.materials[ i ] = materials[ i ];
-			}
+			System.arraycopy ( materials , 0 , this.materials , 0 , materials.length );
 		} else {
 			throw new IllegalArgumentException (
 					"materials array length must be: " + this.materials.length );
@@ -188,9 +186,7 @@ public class ChunkSection13 implements NBTSerializable {
 	
 	public void setBlocksLight ( byte[] blocks_light ) {
 		if ( blocks_light.length == this.block_light.length ) {
-			for ( int i = 0; i < blocks_light.length; i++ ) {
-				this.block_light[ i ] = blocks_light[ i ];
-			}
+			System.arraycopy ( blocks_light , 0 , this.block_light , 0 , blocks_light.length );
 		} else {
 			throw new IllegalArgumentException (
 					"blocks light array length must be: " + this.block_light.length );
@@ -199,9 +195,7 @@ public class ChunkSection13 implements NBTSerializable {
 	
 	public void setSkyLight ( byte[] sky_light ) {
 		if ( sky_light.length == this.sky_light.length ) {
-			for ( int i = 0; i < sky_light.length; i++ ) {
-				this.sky_light[ i ] = sky_light[ i ];
-			}
+			System.arraycopy ( sky_light , 0 , this.sky_light , 0 , sky_light.length );
 		} else {
 			throw new IllegalArgumentException (
 					"sky light array length must be: " + this.sky_light.length );

@@ -49,7 +49,8 @@ public class RegionProviderWorldFolder implements RegionProvider {
 													location.getX ( ) , location.getZ ( ) ) );
 			
 			if ( file.exists ( ) ) {
-				region_map.put ( location , region = Region.newRegion ( location , file ) );
+				region = Region.newRegion ( location , file );
+				region_map.put ( location , region );
 			}
 		}
 		

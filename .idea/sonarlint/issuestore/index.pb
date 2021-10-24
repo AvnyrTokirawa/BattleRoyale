@@ -93,10 +93,6 @@ Csrc/main/java/es/outlook/adriansrj/battleroyale/bus/BusHandler.java,b\c\bc3001
 _src/main/java/es/outlook/adriansrj/battleroyale/placeholder/processor/PlaceholderProcessor.java,e\3\e3d5e6ca39bd6a6a2a494f5bb101992d2228469b
  
 psrc/main/java/es/outlook/adriansrj/battleroyale/placeholder/processor/internal/InternalPlaceholderProcessor.java,b\a\ba2acc4cd617b5fed47c5a0e897781bbde068381
-ƒ
-Ssrc/main/java/es/outlook/adriansrj/battleroyale/world/chunk/v13/ChunkSection13.java,b\8\b866a91f6b9a4de1de33641b83f8c43e85a2ac79
-ƒ
-Ssrc/main/java/es/outlook/adriansrj/battleroyale/world/chunk/v12/ChunkSection12.java,d\5\d5973725cbdc5e24b2c29143ccf04a830ba606da
 ~
 Nsrc/main/java/es/outlook/adriansrj/battleroyale/world/region/v13/Region13.java,4\3\43c1e897c433679796961b0d7b855557d62da68e
 „
@@ -253,14 +249,6 @@ Ssrc/main/java/es/outlook/adriansrj/battleroyale/placeholder/PlaceholderHandler.
 dsrc/main/java/es/outlook/adriansrj/battleroyale/battlefield/setup/tool/BattlefieldSetupToolItem.java,e\0\e0741824b335dd00da5cbe53804d69845b9b9496
 –
 fsrc/main/java/es/outlook/adriansrj/battleroyale/battlefield/setup/tool/BattlefieldSetupToolBounds.java,1\9\197b7ef10ea257f2be99f2c2cbd387bf5a634f7d
-‡
-Wsrc/main/java/es/outlook/adriansrj/battleroyale/world/chunk/provider/ChunkProvider.java,1\a\1a0a145d06b3e8ab47b4502c7a23588da8f75b15
-’
-bsrc/main/java/es/outlook/adriansrj/battleroyale/world/chunk/provider/ChunkProviderWorldFolder.java,e\9\e9f217341772d5ff721f2f3fef35b82669c75a10
-”
-dsrc/main/java/es/outlook/adriansrj/battleroyale/world/region/provider/RegionProviderWorldFolder.java,8\8\8898be922246b886fbab6daf6885b2cc5b8990bb
-x
-Hsrc/main/java/es/outlook/adriansrj/battleroyale/world/region/Region.java,4\c\4cf1afb099be16409a401ad4424840f5f86b573c
 ‡
 Wsrc/main/java/es/outlook/adriansrj/battleroyale/gui/arena/ArenaSelectorGUIIconType.java,0\f\0f076af5458b08c45ba7bdf79b3bd8be5f1b5002
 ‡

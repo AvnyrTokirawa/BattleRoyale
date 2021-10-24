@@ -240,6 +240,7 @@ public class Chunk13 implements Chunk {
 		getSectionFromYCoordinate ( y ).setMaterial ( x & 0xF , y & 0xF , z & 0xF , material );
 	}
 	
+	@SuppressWarnings ( "deprecation" )
 	public int getBlockIDAt ( int x , int y , int z ) {
 		Material material = getMaterial ( x , y , z );
 		
@@ -253,6 +254,7 @@ public class Chunk13 implements Chunk {
 		return 0;
 	}
 	
+	@SuppressWarnings ( "deprecation" )
 	public int getBlockDataAt ( int x , int y , int z ) {
 		Material material = getMaterial ( x , y , z );
 		
@@ -325,8 +327,8 @@ public class Chunk13 implements Chunk {
 		}
 		
 		level.put ( NBTConstants.Post13.CHUNK_STATUS_TAG , StringBinaryTag.of ( status.getName ( ) ) );
-		level.put ( NBTConstants.Post13.CHUNK_ENTITIES_TAG , ListBinaryTag.empty ( ) /* TODO */ );
-		level.put ( NBTConstants.Post13.CHUNK_TILE_ENTITIES_TAG , ListBinaryTag.empty ( ) /* TODO */ );
+		level.put ( NBTConstants.Post13.CHUNK_ENTITIES_TAG , ListBinaryTag.empty ( ) );
+		level.put ( NBTConstants.Post13.CHUNK_TILE_ENTITIES_TAG , ListBinaryTag.empty ( ) );
 		
 		root.put ( NBTConstants.Post13.CHUNK_LEVEL_TAG , CompoundBinaryTag.from ( level ) );
 		root.put ( NBTConstants.Post13.CHUNK_DATA_VERSION_TAG , IntBinaryTag.of ( data_version ) );
