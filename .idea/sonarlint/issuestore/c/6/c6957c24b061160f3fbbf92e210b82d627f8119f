@@ -1,0 +1,11 @@
+
+-
+java:S2176"Rename this class.(£ìœÊøÿÿÿÿ
+K
+java:S1874/"5Remove this use of "setDurability"; it is deprecated.(—Ûíò
+K
+java:S1874Y"5Remove this use of "getDurability"; it is deprecated.(ºÈ¡¼
+C
+java:S1905]"(Remove this unnecessary cast to "short".(¯ä„Æùÿÿÿÿ
+P
+java:S1874]"5Remove this use of "getDurability"; it is deprecated.(¯ä„Æùÿÿÿÿ

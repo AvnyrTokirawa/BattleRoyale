@@ -14,7 +14,7 @@ public enum EnumDirectory {
 	/**
 	 * Directory that stores the modalities.
 	 */
-	MODE_DIRECTORY ( "mode" , true ),
+	MODE_DIRECTORY ( "mode" , false ),
 	
 	/**
 	 * Directory that stores the battlefields.

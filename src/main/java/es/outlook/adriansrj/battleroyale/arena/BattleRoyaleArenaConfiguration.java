@@ -150,7 +150,7 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	
 	public void setBattlefield ( String battlefield_name ) {
 		this.battlefield_name = Validate.notBlank (
-				battlefield_name , "battlefield name cannot be null/empty" );
+				battlefield_name , "battlefield name cannot be null/empty" ).trim ( );
 		this.battlefield      = null;
 	}
 	
@@ -233,14 +233,10 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	 *
 	 * @return the mode to be played in the arena.
 	 */
-	public BattleRoyaleMode getMode ( ) {
+	public BattleRoyaleMode getMode ( ) throws FileNotFoundException {
 		if ( mode == null && StringUtil.isNotBlank ( mode_filename ) ) {
-			try {
-				this.mode = MODE_MANAGER.load ( new File (
-						EnumDirectory.MODE_DIRECTORY.getDirectory ( ) , mode_filename ) );
-			} catch ( FileNotFoundException ex ) {
-				ex.printStackTrace ( );
-			}
+			this.mode = MODE_MANAGER.load ( new File (
+					EnumDirectory.MODE_DIRECTORY.getDirectory ( ) , mode_filename ) );
 		}
 		return mode;
 	}
@@ -398,7 +394,16 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	
 	@Override
 	public boolean isValid ( ) {
-		return getBattlefield ( ) != null && getMode ( ) != null
-				&& getMode ( ).isValid ( ) && ( world != null || StringUtil.isNotBlank ( world_name ) );
+		Battlefield      battlefield = getBattlefield ( );
+		BattleRoyaleMode mode;
+		
+		try {
+			mode = getMode ( );
+		} catch ( FileNotFoundException ex ) {
+			return false;
+		}
+		
+		return battlefield != null && mode != null && mode.isValid ( )
+				&& ( world != null || StringUtil.isNotBlank ( world_name ) );
 	}
 }

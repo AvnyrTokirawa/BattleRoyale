@@ -26,8 +26,6 @@ public final class ScoreboardConfigHandler extends ConfigurationHandler {
 			StringUtil.concatenate ( ChatColor.GOLD , ChatColor.BOLD ) + "Arena %br_arena_name%" ,
 			Arrays.asList (
 					"" ,
-					ChatColor.WHITE + "Players: " + ChatColor.GREEN + "%br_arena_count%/%br_arena_limit%" ,
-					"" ,
 					ChatColor.WHITE + "%br_arena_autostart_state%" ,
 					"" ,
 					ChatColor.WHITE + "Server: " + ChatColor.GREEN + "My Server" ,
@@ -43,13 +41,12 @@ public final class ScoreboardConfigHandler extends ConfigurationHandler {
 					"%br_arena_border_state%" ,
 					"" ,
 					"%br_arena_left%/%br_arena_limit%" ,
-					"%br_player_arena_kills%" ,
 					"" ,
-					"%br_player_safe_dir_0%" ,
-					"%br_player_safe_dir_1%" ,
-					"%br_player_safe_dir_2% " + ChatColor.RESET + ChatColor.GREEN + "%br_player_safe%" ,
+					"%br_player_safecompass_0%" ,
+					"%br_player_safecompass_1%" ,
+					"%br_player_safecompass_2% " + ChatColor.RESET + ChatColor.GREEN + "%br_player_safe%" ,
 					"" ,
-					"%br_team_members_f%" ,
+					"%br_team_members_formatted%" ,
 					"" ,
 					ChatColor.YELLOW + "www.SpigotMC.org"
 			)

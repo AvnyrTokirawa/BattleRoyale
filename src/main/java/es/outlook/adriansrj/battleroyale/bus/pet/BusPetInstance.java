@@ -1,12 +1,13 @@
 package es.outlook.adriansrj.battleroyale.bus.pet;
 
 import es.outlook.adriansrj.battleroyale.bus.BusInstanceBase;
+import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerJumpOffBusEvent;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.packet.reader.PacketReaderService;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
 import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityTeleport;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.packet.interceptor.PacketInterceptorAcceptor;
 import es.outlook.adriansrj.battleroyale.util.packet.interceptor.PacketInterceptorInjector;
 import es.outlook.adriansrj.battleroyale.util.packet.interceptor.entity.PacketEntityRelativeMoveInterceptorSimple;
@@ -325,6 +326,12 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 			// player seems to be offline.
 			this.finish ( );
 		}
+	}
+	
+	@Override
+	protected void jumpTutorial ( ) {
+		this.player.sendTitle ( EnumLanguage.BUS_JUMP_TITLE.getAsString ( ) ,
+								EnumLanguage.BUS_JUMP_SUBTITLE.getAsString ( ) );
 	}
 	
 	@Override

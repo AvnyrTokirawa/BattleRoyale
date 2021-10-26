@@ -20,6 +20,7 @@ import es.outlook.adriansrj.core.util.yaml.comment.YamlConfigurationComments;
 import org.bukkit.ChatColor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -37,13 +38,13 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 		EXAMPLE_ARENA_CONFIGURATION = new BattleRoyaleArenaConfiguration (
 				"battlefield name here" ,
 				"world-1" ,
-				"Duos.yml" ,
+				"Solo.yml" ,
 				Constants.DEFAULT_YAML_FILE_NAME ,
 				null ,
 				true ,
 				// auto-start
 				15 ,
-				2 ,
+				0 ,
 				5 ,
 				Duration.ofSeconds ( 15 ) ,
 				// restart
@@ -64,21 +65,6 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 	public void initialize ( ) {
 		File folder       = EnumDirectory.ARENA_DIRECTORY.getDirectory ( );
 		File example_file = new File ( folder , "example.yml" );
-		
-		// saving example configuration
-		if ( !folder.exists ( ) ) {
-			folder.mkdirs ( );
-			
-			try {
-				if ( example_file.createNewFile ( ) ) {
-					EXAMPLE_ARENA_CONFIGURATION.save ( example_file );
-				} else {
-					throw new IllegalStateException ( "couldn't save default arena configuration file" );
-				}
-			} catch ( IOException e ) {
-				e.printStackTrace ( );
-			}
-		}
 		
 		// saving default modes
 		if ( !EnumDirectory.MODE_DIRECTORY.getDirectory ( ).exists ( ) ) {
@@ -124,6 +110,21 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 					.build ( ) );
 		}
 		
+		// saving example configuration
+		if ( !folder.exists ( ) ) {
+			folder.mkdirs ( );
+			
+			try {
+				if ( example_file.createNewFile ( ) ) {
+					EXAMPLE_ARENA_CONFIGURATION.save ( example_file );
+				} else {
+					throw new IllegalStateException ( "couldn't save default arena configuration file" );
+				}
+			} catch ( IOException e ) {
+				e.printStackTrace ( );
+			}
+		}
+		
 		// then loading configurations
 		loadConfiguration ( );
 	}
@@ -136,7 +137,17 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 			String                         name          = FilenameUtil.getBaseName ( file ).trim ( );
 			BattleRoyaleArenaConfiguration configuration = BattleRoyaleArenaConfiguration.of ( file );
 			Battlefield                    battlefield   = configuration.getBattlefield ( );
-			BattleRoyaleMode               mode          = configuration.getMode ( );
+			BattleRoyaleMode               mode;
+			
+			// loading mode
+			try {
+				mode = configuration.getMode ( );
+			} catch ( FileNotFoundException ex ) {
+				logInvalidConfiguration (
+						name , "Mode file couldn't be found " +
+								"(" + configuration.getModeFilename ( ) + ")" );
+				continue;
+			}
 			
 			// logging invalid configurations
 			if ( configuration.isInvalid ( ) ) {

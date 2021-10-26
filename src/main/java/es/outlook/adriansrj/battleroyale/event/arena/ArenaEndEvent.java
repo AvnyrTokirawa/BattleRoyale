@@ -68,6 +68,10 @@ public class ArenaEndEvent extends ArenaEvent {
 		return winner_team;
 	}
 	
+	public boolean hasWinner ( ) {
+		return winner_player != null || winner_team != null;
+	}
+	
 	@Override
 	public HandlerList getHandlers ( ) {
 		return HANDLER_LIST;

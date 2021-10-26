@@ -94,20 +94,6 @@ class PacketSenderServiceHandle_v1_17_R1 extends PacketSenderServiceHandleBase {
 	}
 	
 	@Override
-	public void sendEntityRelativeMovePacket ( Player player , int id ,
-			double x , double y , double z ,
-			double previous_x , double previous_y , double previous_z ,
-			boolean on_ground ) {
-		
-	}
-	
-	@Override
-	public void sendEntityRelativeMoveLookPacket ( Player player , int id , double delta_x , double delta_y ,
-			double delta_z , float yaw , float pitch , boolean on_ground ) {
-		
-	}
-	
-	@Override
 	public void sendEntityTeleportPacket ( Player player , int id , boolean on_ground , double x , double y ,
 			double z , float yaw , float pitch ) {
 		PacketDataSerializer data = new PacketDataSerializer ( Unpooled.buffer ( ) );

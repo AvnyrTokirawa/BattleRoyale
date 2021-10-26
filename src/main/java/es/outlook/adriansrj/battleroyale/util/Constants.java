@@ -70,6 +70,16 @@ public class Constants {
 	
 	public static final String LOOT_CHEST_METADATA_KEY = UUID.randomUUID ( ).toString ( );
 	
+	/**
+	 * Key to the metadata to be set for players
+	 * who have been shot in the head.
+	 * <br>
+	 * The metadata to be set is a system that enables
+	 * another plugins to tell BattleRoyale that a headshot
+	 * was performed.
+	 */
+	public static final String HEADSHOT_METADATA_KEY = UUID.randomUUID ( ).toString ( );
+	
 	// ---------- placeholder
 	
 	public static final String BATTLE_ROYALE_PLACEHOLDER_IDENTIFIER = "br";
@@ -85,8 +95,6 @@ public class Constants {
 	public static final String HEART_TEXT = String.valueOf ( ( char ) 10084 );
 	
 	// ---------- packet class names
-	
-	// TODO: packet names in 1.17+ might be different
 	
 	public static final String PACKET_IN_ARM_ANIMATION_NAME              = "PacketPlayInArmAnimation";
 	public static final String PACKET_IN_POSITION_NAME                   = "PacketPlayInPosition";

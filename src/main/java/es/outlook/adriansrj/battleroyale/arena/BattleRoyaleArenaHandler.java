@@ -4,6 +4,7 @@ import es.outlook.adriansrj.battleroyale.arena.listener.BattleRoyaleArenaListene
 import es.outlook.adriansrj.battleroyale.battlefield.Battlefield;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
+import es.outlook.adriansrj.battleroyale.enums.EnumItem;
 import es.outlook.adriansrj.battleroyale.enums.EnumWorldGenerator;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaLeaveEvent;
@@ -229,6 +230,7 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 		player.setArena ( arena );
 	}
 	
+	@SuppressWarnings ( "deprecation" )
 	public void joinArena ( Player br_player , BattleRoyaleArena arena ) {
 		br_player.setArena ( arena );
 		br_player.getBukkitPlayerOptional ( ).ifPresent ( player -> {
@@ -236,6 +238,21 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 			
 			if ( Objects.equals ( player.getWorld ( ) , lobby.getWorld ( ) )
 					&& arena.getState ( ) == EnumArenaState.WAITING ) {
+				// preparing inventory
+				player.getInventory ( ).clear ( );
+				player.getInventory ( ).setArmorContents ( null );
+				
+				EnumItem.ARENA_SELECTOR.give ( player );
+				
+				if ( arena.getMode ( ).isTeamSelectionEnabled ( ) ) {
+					EnumItem.TEAM_SELECTOR.give ( player );
+				}
+				
+				EnumItem.SETTINGS.give ( player );
+				EnumItem.LEAVE_ARENA.give ( player );
+				
+				player.updateInventory ( );
+				
 				// sending back to lobby spawn
 				lobby.sendToSpawn ( player );
 				
@@ -261,10 +278,10 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 	}
 	
 	public void leaveArena ( Player br_player ) {
-		br_player.leaveArena ( );
-		br_player.getBukkitPlayerOptional ( ).ifPresent ( player -> {
-			BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( ).introduce ( player );
-		} );
+		if ( br_player.leaveArena ( ) ) {
+			br_player.getBukkitPlayerOptional ( ).ifPresent (
+					player -> BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( ).introduce ( player ) );
+		}
 	}
 	
 	@Override

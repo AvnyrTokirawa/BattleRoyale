@@ -92,10 +92,11 @@ public final class PlayerDataStorage {
 					uuid , stat_type , current_value , value ).callSafe ( );
 			
 			// then uploading
-			if ( upload && EnumMainConfiguration.ENABLE_DATABASE.getAsBoolean ( ) ) {
+			DataStorage data_storage = DataStorageHandler.getInstance ( ).getDataStorage ( );
+			
+			if ( upload && data_storage != null ) {
 				try {
-					DataStorageHandler.getInstance ( ).getDataStorage ( )
-							.setStatValue ( this , stat_type , value );
+					data_storage.setStatValue ( this , stat_type , value );
 				} catch ( Exception e ) {
 					e.printStackTrace ( );
 				}
@@ -207,10 +208,11 @@ public final class PlayerDataStorage {
 		this.dirty = true;
 		
 		// then uploading
-		if ( upload && EnumMainConfiguration.ENABLE_DATABASE.getAsBoolean ( ) ) {
+		DataStorage data_storage = DataStorageHandler.getInstance ( ).getDataStorage ( );
+		
+		if ( upload && data_storage != null ) {
 			try {
-				DataStorageHandler.getInstance ( ).getDataStorage ( )
-						.setSettingValue ( this , setting_type , value );
+				data_storage.setSettingValue ( this , setting_type , value );
 			} catch ( Exception e ) {
 				e.printStackTrace ( );
 			}
@@ -272,10 +274,11 @@ public final class PlayerDataStorage {
 		cosmetics.add ( cosmetic );
 		
 		// then uploading
-		if ( upload && EnumMainConfiguration.ENABLE_DATABASE.getAsBoolean ( ) ) {
+		DataStorage data_storage = DataStorageHandler.getInstance ( ).getDataStorage ( );
+		
+		if ( upload && data_storage != null ) {
 			try {
-				DataStorageHandler.getInstance ( ).getDataStorage ( )
-						.addCosmetic ( this , cosmetic );
+				data_storage.addCosmetic ( this , cosmetic );
 			} catch ( Exception e ) {
 				e.printStackTrace ( );
 			}
@@ -295,10 +298,11 @@ public final class PlayerDataStorage {
 		cosmetics.remove ( cosmetic );
 		
 		// then uploading
-		if ( upload && EnumMainConfiguration.ENABLE_DATABASE.getAsBoolean ( ) ) {
+		DataStorage data_storage = DataStorageHandler.getInstance ( ).getDataStorage ( );
+		
+		if ( upload && data_storage != null ) {
 			try {
-				DataStorageHandler.getInstance ( ).getDataStorage ( )
-						.removeCosmetic ( this , cosmetic );
+				data_storage.removeCosmetic ( this , cosmetic );
 			} catch ( Exception e ) {
 				e.printStackTrace ( );
 			}
@@ -311,73 +315,81 @@ public final class PlayerDataStorage {
 	
 	/**
 	 * Fetches the values from the database.
+	 * <br>
+	 * Note that this will not have any effect if
+	 * the option {@link EnumMainConfiguration#ENABLE_DATABASE} is false,
+	 * or if it could not connect to the database.
 	 *
 	 * <strong>This means that this method will fetch the values that corresponds to this
 	 * player from the database.<strong/>
 	 */
 	public void fetch ( ) {
-		Validate.isTrue ( EnumMainConfiguration.ENABLE_DATABASE.getAsBoolean ( ) , "database not enabled" );
-		
 		DataStorage database = DataStorageHandler.getInstance ( ).getDataStorage ( );
 		
-		// fetching stats
-		try {
-			database.loadStatValues ( this );
-		} catch ( Exception e ) {
-			e.printStackTrace ( );
-		}
-		
-		// fetching settings
-		try {
-			database.loadSettingValues ( this );
-		} catch ( Exception e ) {
-			e.printStackTrace ( );
-		}
-		
-		// fetching cosmetics
-		try {
-			database.loadCosmetics ( this );
-		} catch ( Exception e ) {
-			e.printStackTrace ( );
+		if ( database != null ) {
+			// fetching stats
+			try {
+				database.loadStatValues ( this );
+			} catch ( Exception e ) {
+				e.printStackTrace ( );
+			}
+			
+			// fetching settings
+			try {
+				database.loadSettingValues ( this );
+			} catch ( Exception e ) {
+				e.printStackTrace ( );
+			}
+			
+			// fetching cosmetics
+			try {
+				database.loadCosmetics ( this );
+			} catch ( Exception e ) {
+				e.printStackTrace ( );
+			}
 		}
 	}
 	
 	/**
 	 * Upload the values to the database.
+	 * <br>
+	 * Note that this will not have any effect if
+	 * the option {@link EnumMainConfiguration#ENABLE_DATABASE} is false,
+	 * or if it could not connect to the database.
 	 *
 	 * <strong>This means that this method will upload to the database the values stored in this object.<strong/>
 	 */
 	public void upload ( ) {
-		Validate.isTrue ( EnumMainConfiguration.ENABLE_DATABASE.getAsBoolean ( ) , "database not enabled" );
-		
 		DataStorage database = DataStorageHandler.getInstance ( ).getDataStorage ( );
 		
-		// uploading stats
-		stat_values.forEach ( ( stat_type , value ) -> {
-			try {
-				database.setStatValue ( this , stat_type , value );
-			} catch ( Exception e ) {
-				e.printStackTrace ( );
-			}
-		} );
-		
-		// uploading settings
-		setting_values.forEach ( ( setting_type , value ) -> {
-			try {
-				database.setSettingValue ( this , setting_type , value );
-			} catch ( Exception e ) {
-				e.printStackTrace ( );
-			}
-		} );
-		
-		// uploading cosmetics
-		cosmetics.forEach ( cosmetic -> {
-			try {
-				database.addCosmetic ( this , cosmetic );
-			} catch ( Exception e ) {
-				e.printStackTrace ( );
-			}
-		} );
+		if ( database != null ) {
+			// uploading stats
+			stat_values.forEach ( ( stat_type , value ) -> {
+				try {
+					database.setStatValue ( this , stat_type , value );
+				} catch ( Exception e ) {
+					e.printStackTrace ( );
+				}
+			} );
+			
+			// uploading settings
+			setting_values.forEach ( ( setting_type , value ) -> {
+				try {
+					database.setSettingValue ( this , setting_type , value );
+				} catch ( Exception e ) {
+					e.printStackTrace ( );
+				}
+			} );
+			
+			// uploading cosmetics
+			cosmetics.forEach ( cosmetic -> {
+				try {
+					database.addCosmetic ( this , cosmetic );
+				} catch ( Exception e ) {
+					e.printStackTrace ( );
+				}
+			} );
+		}
 	}
 	
 	@Override

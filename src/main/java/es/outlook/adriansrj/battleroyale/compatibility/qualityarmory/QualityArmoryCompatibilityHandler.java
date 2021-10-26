@@ -8,11 +8,13 @@ import es.outlook.adriansrj.battleroyale.event.player.PlayerCloseParachuteEvent;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.util.Constants;
 import me.zombie_striker.qg.api.QACustomItemInteractEvent;
 import me.zombie_striker.qg.api.QAWeaponDamageEntityEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -46,7 +48,7 @@ public final class QualityArmoryCompatibilityHandler extends PluginCompatibility
 		// players cannot shoot from the bus or the parachute
 		BattleRoyaleArena            arena     = br_player.getArena ( );
 		BattleRoyaleArenaBusRegistry registry  = arena != null ? arena.getBusRegistry ( ) : null;
-		BusInstance                  bus       = registry != null ? registry.getBus ( player ) : null;
+		BusInstance < ? >            bus       = registry != null ? registry.getBus ( player ) : null;
 		ParachuteInstance            parachute = br_player.getParachute ( );
 		
 		if ( ( bus != null && bus.isStarted ( ) && !bus.isFinished ( ) && bus.isPassenger ( br_player ) )
@@ -73,8 +75,7 @@ public final class QualityArmoryCompatibilityHandler extends PluginCompatibility
 	}
 	
 	@EventHandler ( priority = EventPriority.LOWEST, ignoreCancelled = true )
-	public void onShootTeammate ( QAWeaponDamageEntityEvent event ) {
-		// stopping friendly-fire
+	public void onShoot ( QAWeaponDamageEntityEvent event ) {
 		org.bukkit.entity.Player player    = event.getPlayer ( );
 		Player                   br_player = Player.getPlayer ( player );
 		Entity                   entity    = event.getDamaged ( );
@@ -83,8 +84,16 @@ public final class QualityArmoryCompatibilityHandler extends PluginCompatibility
 			org.bukkit.entity.Player damaged    = ( org.bukkit.entity.Player ) entity;
 			Player                   br_damaged = Player.getPlayer ( damaged );
 			
+			// stopping friendly-fire
 			if ( Objects.equals ( br_player.getTeam ( ) , br_damaged.getTeam ( ) ) ) {
 				event.setCancelled ( true );
+			}
+			
+			// detecting headshots
+			if ( event.isHeadshot ( ) ) {
+				damaged.setMetadata (
+						Constants.HEADSHOT_METADATA_KEY , new FixedMetadataValue (
+								BattleRoyale.getInstance ( ) , true ) );
 			}
 		}
 	}

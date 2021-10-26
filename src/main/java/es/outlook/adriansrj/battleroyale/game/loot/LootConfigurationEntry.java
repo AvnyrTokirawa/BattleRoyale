@@ -185,6 +185,7 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 		return required;
 	}
 	
+	@SuppressWarnings ( "deprecation" )
 	public ItemStack toItemStack ( org.bukkit.entity.Player player ) {
 		int amount = Math.max ( 1 , this.amount );
 		
@@ -222,9 +223,6 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 					return result;
 				}
 			}
-			
-			// MMOItems object
-			
 		}
 		
 		// ordinary item stack
@@ -236,7 +234,7 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 			if ( data > 0 ) {
 				try {
 					result.setData ( result.getType ( ).getNewData ( ( byte ) data ) );
-				} catch ( Throwable ex ) {
+				} catch ( Exception ex ) {
 					// ignored
 				}
 				

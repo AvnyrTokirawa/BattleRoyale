@@ -50,22 +50,6 @@ public final class PacketSenderService extends PluginHandler implements PacketSe
 	}
 	
 	@Override
-	public void sendEntityRelativeMovePacket ( Player player , int id ,
-			double x , double y , double z ,
-			double previous_x , double previous_y , double previous_z ,
-			boolean on_ground ) {
-		handle.sendEntityRelativeMovePacket ( player , id , x , y , z , previous_x , previous_y , previous_z ,
-											  on_ground );
-	}
-	
-	@Override
-	public void sendEntityRelativeMoveLookPacket ( Player player , int id , double delta_x , double delta_y ,
-			double delta_z , float yaw , float pitch , boolean on_ground ) {
-		handle.sendEntityRelativeMoveLookPacket ( player , id , delta_x , delta_y , delta_z , yaw , pitch ,
-												  on_ground );
-	}
-	
-	@Override
 	public void sendEntityTeleportPacket ( Player player , int id , boolean on_ground , double x , double y ,
 			double z , float yaw , float pitch ) {
 		handle.sendEntityTeleportPacket ( player , id , on_ground , x , y , z , yaw , pitch );

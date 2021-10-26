@@ -105,7 +105,7 @@ public final class PlayerSpectatorHandler extends PluginHandler implements Packe
 			
 			br_player.getBukkitPlayerOptional ( ).ifPresent ( player -> {
 				if ( flag ) {
-					if ( arena.getState ( ) == EnumArenaState.RUNNING ) {
+					if ( arena != null && arena.getState ( ) == EnumArenaState.RUNNING ) {
 						if ( !toggleCamera ( player ) && br_player.hasTeam ( ) ) {
 							// there are no players the player can spectate,
 							// but since the player was playing we have no choice

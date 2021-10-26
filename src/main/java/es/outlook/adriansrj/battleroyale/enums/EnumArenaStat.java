@@ -7,8 +7,6 @@ package es.outlook.adriansrj.battleroyale.enums;
  */
 public enum EnumArenaStat {
 	
-	// TODO: HEADSHOTS
-	
 	KILLS,
 	HEADSHOTS,
 	KNOCKS,

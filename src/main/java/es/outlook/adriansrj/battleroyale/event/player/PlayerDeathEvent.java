@@ -219,26 +219,34 @@ public class PlayerDeathEvent extends PlayerEventCancellable {
 	
 	protected final Player  killer;
 	protected final Cause   cause;
+	protected final boolean headshot;
 	protected final boolean cancellable;
 	protected       boolean keep_level;
 	protected       boolean keep_inventory;
 	protected       String  death_message;
 	
-	public PlayerDeathEvent ( Player player , Player killer , Cause cause , String death_message , boolean cancellable ) {
+	public PlayerDeathEvent ( Player player , Player killer , Cause cause ,
+			boolean headshot , String death_message , boolean cancellable ) {
 		super ( player );
 		
 		this.killer        = killer;
 		this.cause         = cause;
+		this.headshot      = headshot;
 		this.death_message = death_message;
 		this.cancellable   = cancellable;
 	}
 	
-	public PlayerDeathEvent ( Player player , Cause cause , String death_message , boolean cancellable ) {
-		this ( player , null , cause , death_message , cancellable );
+	public PlayerDeathEvent ( Player player , Cause cause ,
+			String death_message , boolean headshot , boolean cancellable ) {
+		this ( player , null , cause , headshot , death_message , cancellable );
 	}
 	
 	public Cause getCause ( ) {
 		return cause;
+	}
+	
+	public boolean isHeadshot ( ) {
+		return headshot;
 	}
 	
 	public boolean isKeepLevel ( ) {

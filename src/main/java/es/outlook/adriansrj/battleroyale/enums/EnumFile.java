@@ -56,6 +56,11 @@ public enum EnumFile {
 	PARACHUTE_CONFIGURATION ( "BattleRoyaleParachute.yml" ),
 	
 	/**
+	 * Battle royale item configuration file.
+	 */
+	ITEM_CONFIGURATION ( "BattleRoyaleItems.yml" ) ,
+	
+	/**
 	 * Arena selector GUI configuration file.
 	 */
 	ARENA_SELECTOR_GUI ( "BattleRoyaleArenaSelectorGUI.yml" ) ,

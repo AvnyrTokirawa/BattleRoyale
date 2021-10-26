@@ -155,11 +155,14 @@ public class BattleRoyaleArenaRegion {
 	}
 	
 	protected void reassignRegion ( ) throws WorldRegionLimitReached {
-		Validate.isTrue ( Bukkit.isPrimaryThread ( ) , "must run on server thread" );
-		
 		// players within the region will be kicked, unless
 		// they are moved before calling this method.
-		disposeCurrentRegion ( null );
+		if ( Bukkit.isPrimaryThread ( ) ) {
+			disposeCurrentRegion ( null );
+		} else {
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , ( ) -> disposeCurrentRegion ( null ) );
+		}
 		
 		// bounds are calculated based on
 		// the size of the battlefield,

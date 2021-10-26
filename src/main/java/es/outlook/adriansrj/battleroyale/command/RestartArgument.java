@@ -6,12 +6,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author AdrianSR / 28/08/2021 / 12:28 p. m.
  */
-class RestartArgument extends BaseArgument {
+class RestartArgument extends ArenaArgument {
 	
 	RestartArgument ( BattleRoyaleCommandHandler handler ) {
 		super ( handler );
@@ -23,45 +24,40 @@ class RestartArgument extends BaseArgument {
 	}
 	
 	@Override
-	public String getUsage ( ) {
-		return super.getUsage ( ) + " [arena]";
-	}
-	
-	@Override
 	public boolean execute ( CommandSender sender , Command command , String label , String[] subargs ) {
-		if ( subargs.length > 0 ) {
-			String arena_name = subargs[ 0 ];
-			Optional < BattleRoyaleArena > optional = BattleRoyaleArenaHandler.getInstance ( )
-					.getArena ( arena_name );
-			
-			if ( optional.isPresent ( ) ) {
-				BattleRoyaleArena arena = optional.get ( );
+		BattleRoyaleArena arena = matchArena ( sender , subargs );
+		
+		if ( arena != null ) {
+			switch ( arena.getState ( ) ) {
+				case WAITING:
+				case RUNNING:
+					arena.restart ( );
+					
+					sender.sendMessage (
+							ChatColor.GREEN + "Arena '" + arena.getName ( ) + "' restarted successfully!" );
+					break;
 				
-				switch ( arena.getState ( ) ) {
-					case WAITING:
-					case RUNNING:
-						arena.restart ( );
-						
-						sender.sendMessage (
-								ChatColor.GREEN + "Arena '" + arena_name + "' restarted successfully!" );
-						break;
-					
-					case RESTARTING:
-						sender.sendMessage ( ChatColor.RED + "This arena is already being restarted!" );
-						break;
-					
-					case STOPPED:
-						sender.sendMessage (
-								ChatColor.RED + "The server must be restarted in order to start this arena!" );
-						break;
-				}
-			} else {
-				sender.sendMessage ( ChatColor.RED + "Couldn't find any arena with name '" + arena_name + "'!" );
+				case RESTARTING:
+					sender.sendMessage ( ChatColor.RED + "This arena is already being restarted!" );
+					break;
+				
+				case STOPPED:
+					sender.sendMessage (
+							ChatColor.RED + "The server must be restarted in order to start this arena!" );
+					break;
 			}
-		} else {
-			sender.sendMessage ( ChatColor.RED + getUsage ( ) );
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public List < String > tab ( CommandSender sender , Command command , String alias , String[] subargs ) {
+		if ( subargs.length == 1 ) {
+			return BattleRoyaleArenaHandler.getInstance ( ).getArenas ( )
+					.stream ( ).map ( BattleRoyaleArena :: getName ).collect ( Collectors.toList ( ) );
+		} else {
+			return super.tab ( sender , command , alias , subargs );
+		}
 	}
 }

@@ -1,11 +1,13 @@
 package es.outlook.adriansrj.battleroyale.arena.listener;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
+import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaTeamRegistry;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaStat;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.enums.EnumStat;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaEndEvent;
+import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaPreLeaveEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerDeathEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerStatSetEvent;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
@@ -14,6 +16,7 @@ import es.outlook.adriansrj.battleroyale.game.player.Team;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
+import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.util.mode.BattleRoyaleModeUtil;
@@ -36,6 +39,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -242,6 +246,7 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		BattleRoyaleArena        arena     = br_player.getArena ( );
 		
 		if ( arena != null && arena.getState ( ) == EnumArenaState.RUNNING
+				&& !arena.isOver ( )
 				&& br_player.hasTeam ( ) && !br_player.isSpectator ( ) ) {
 			BattleRoyaleMode mode       = arena.getMode ( );
 			boolean          respawning = mode.isRespawnEnabled ( );
@@ -332,6 +337,28 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		}
 	}
 	
+	@EventHandler ( priority = EventPriority.MONITOR )
+	public void onDesert ( PlayerArenaPreLeaveEvent event ) {
+		Player            player = event.getPlayer ( );
+		BattleRoyaleArena arena  = event.getArena ( );
+		
+		if ( arena.getState ( ) == EnumArenaState.RUNNING
+				&& !arena.isOver ( )
+				&& player.hasTeam ( ) && !player.isSpectator ( ) ) {
+			processRanking ( event );
+		}
+	}
+	
+	// this handler will cancel the respawn task
+	// when the arena ends, as it would override
+	// the rank titles; and as them are not necessary
+	// at this point, then we can cancel them.
+	@EventHandler ( priority = EventPriority.MONITOR )
+	public void onEnd ( ArenaEndEvent event ) {
+		task_map.values ( ).forEach ( RespawnTask :: cancel );
+		task_map.clear ( );
+	}
+	
 	// -------------- utils
 	
 	private PlayerDeathEvent processDeathEvent ( org.bukkit.event.entity.PlayerDeathEvent event ) {
@@ -343,6 +370,7 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		
 		PlayerDeathEvent.Cause cause = last_damage != null
 				? PlayerDeathEvent.Cause.of ( last_damage.getCause ( ) ) : null;
+		boolean headshot = false;
 		
 		if ( last_damage instanceof EntityDamageByEntityEvent ) {
 			// the player was killed by another player
@@ -356,7 +384,23 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 				
 				if ( shooter instanceof org.bukkit.entity.Player ) {
 					br_killer = Player.getPlayer ( ( org.bukkit.entity.Player ) shooter );
+					
+					// checking headshot
+					if ( ( projectile.getLocation ( ).getY ( )
+							- player.getLocation ( ).getY ( ) ) > 1.35D ) {
+						headshot = true;
+					}
 				}
+			}
+		}
+		
+		// headshot from metadata
+		if ( player.hasMetadata ( Constants.HEADSHOT_METADATA_KEY ) ) {
+			headshot = true;
+			
+			// disposing metadata
+			for ( Plugin plugin : Bukkit.getPluginManager ( ).getPlugins ( ) ) {
+				player.removeMetadata ( Constants.HEADSHOT_METADATA_KEY , plugin );
 			}
 		}
 		
@@ -375,7 +419,7 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		
 		// finally firing
 		PlayerDeathEvent wrapper = new PlayerDeathEvent (
-				br_player , br_killer , cause , event.getDeathMessage ( ) , false );
+				br_player , br_killer , cause , headshot , event.getDeathMessage ( ) , false );
 		
 		wrapper.setDeathMessage ( event.getDeathMessage ( ) );
 		wrapper.setKeepInventory ( event.getKeepInventory ( ) );
@@ -561,17 +605,72 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		}
 	}
 	
-	// this handler will cancel the respawn task
-	// when the arena ends, as it would override
-	// the rank titles; and as them are not necessary
-	// at this point, then we can cancel them.
-	@EventHandler ( priority = EventPriority.MONITOR )
-	public void onEnd ( ArenaEndEvent event ) {
-		task_map.values ( ).forEach ( RespawnTask :: cancel );
-		task_map.clear ( );
+	private void processRanking ( PlayerArenaPreLeaveEvent event ) {
+		Player                        deserter      = event.getPlayer ( );
+		BattleRoyaleArena             arena         = event.getArena ( );
+		BattleRoyaleArenaTeamRegistry team_registry = arena.getTeamRegistry ( );
+		BattleRoyaleMode              mode          = arena.getMode ( );
+		
+		int count = ( int ) team_registry.stream ( )
+				.filter ( Team :: isAlive ).count ( );
+		
+		if ( count <= 2 ) {
+			Player winning_player = null;
+			Team   winning_team   = null;
+			String error_message  = null;
+			
+			if ( count == 2 ) {
+				if ( mode.isSolo ( ) ) {
+					winning_player = arena.getPlayers ( ).stream ( )
+							.filter ( other -> !Objects.equals ( other , deserter ) )
+							.filter ( Player :: isPlaying )
+							.findFirst ( ).orElse ( null );
+				} else {
+					winning_team = arena.getTeamRegistry ( ).stream ( )
+							.filter ( other -> !Objects.equals ( other , deserter.getTeam ( ) ) )
+							.filter ( Team :: isAlive )
+							.findFirst ( ).orElse ( null );
+				}
+				
+				if ( winning_team != null ) {
+					// best rank for the winning team
+					// and its members
+					winning_team.setRank ( 0 );
+					winning_team.getPlayers ( ).forEach ( member -> {
+						member.setRank ( 0 );
+						sendRankTitle ( member , 0 );
+						
+						// incrementing stat
+						incrementWinStat ( member );
+					} );
+				} else if ( winning_player != null ) {
+					// best rank for the winner
+					winning_player.setRank ( 0 );
+					sendRankTitle ( winning_player , 0 );
+					
+					// incrementing stat
+					incrementWinStat ( winning_player );
+				}
+			} else {
+				if ( mode.isSolo ( ) ) {
+					error_message = "The winner could not be determined " +
+							"as the only player who was alive has deserted";
+				} else {
+					error_message = "The winning-team could not be determined " +
+							"as there is only one team in the arena";
+				}
+			}
+			
+			// couldn't determine winner
+			if ( error_message != null ) {
+				ConsoleUtil.sendPluginMessage (
+						ChatColor.RED , error_message , BattleRoyale.getInstance ( ) );
+			}
+			
+			// then ending
+			arena.end ( winning_player , winning_team );
+		}
 	}
-	
-	// -------------- utils
 	
 	/**
 	 * Increments the {@link EnumStat#WINS} for the

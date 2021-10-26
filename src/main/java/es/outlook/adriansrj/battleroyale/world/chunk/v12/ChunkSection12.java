@@ -17,8 +17,6 @@ import java.util.Map;
  */
 public class ChunkSection12 implements NBTSerializable {
 	
-	// TODO: chests and signs are not getting saved (and probably the furnaces)
-	
 	// 16 * 16 * 16 block area (4096)
 	protected final byte[] blocks      = new byte[ 16 * 16 * 16 ];
 	protected final byte[] blocks_add  = new byte[ 128 * 16 ];

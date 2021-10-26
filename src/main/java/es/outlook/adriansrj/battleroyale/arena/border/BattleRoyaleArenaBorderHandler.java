@@ -37,7 +37,7 @@ public final class BattleRoyaleArenaBorderHandler extends PluginHandler implemen
 	@Override
 	public void run ( ) {
 		for ( BattleRoyaleArena arena : BattleRoyaleArenaHandler.getInstance ( ).getArenas ( ) ) {
-			if ( arena.getState ( ) != EnumArenaState.RUNNING ) { continue; }
+			if ( arena.getState ( ) != EnumArenaState.RUNNING || arena.isOver ( ) ) { continue; }
 			
 			ZoneBounds              bounds         = arena.getBorder ( ).getCurrentBounds ( );
 			BattlefieldBorderResize point          = arena.getBorder ( ).getPoint ( );
@@ -57,7 +57,7 @@ public final class BattleRoyaleArenaBorderHandler extends PluginHandler implemen
 					BusInstance < ? > bus = br_player.getBus ( );
 					
 					if ( !br_player.isPlaying ( )
-							|| ( !bus.isFinished ( ) && bus.isPassenger ( br_player ) ) ) {
+							|| ( bus.isStarted ( ) && !bus.isFinished ( ) && bus.isPassenger ( br_player ) ) ) {
 						continue;
 					}
 					

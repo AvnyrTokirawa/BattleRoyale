@@ -14,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Battle royale lobby handler.
@@ -82,7 +83,7 @@ public final class BattleRoyaleLobbyHandler extends PluginHandler {
 			world = WorldUtil.loadWorldEmpty ( world_folder );
 		} else {
 			if ( ( world = Bukkit.getWorld ( world_path ) ) == null && ( world = Bukkit.getWorlds ( ).stream ( )
-					.filter ( other -> other.getWorldFolder ( ).equals ( world_folder ) )
+					.filter ( other -> same ( other.getWorldFolder ( ) , world_folder ) )
 					.findAny ( ).orElse ( null ) ) == null ) {
 				System.out.println ( ">>>>>>> Loading existing world...." );
 				// loading existing world
@@ -101,6 +102,13 @@ public final class BattleRoyaleLobbyHandler extends PluginHandler {
 	
 	public BattleRoyaleLobby getLobby ( ) {
 		return lobby;
+	}
+	
+	// ------- utils
+	
+	private boolean same ( File folder_a , File folder_b ) {
+		return Objects.equals ( folder_a , folder_b )
+				|| folder_a.getAbsolutePath ( ).equals ( folder_b.getAbsolutePath ( ) );
 	}
 	
 	@Override

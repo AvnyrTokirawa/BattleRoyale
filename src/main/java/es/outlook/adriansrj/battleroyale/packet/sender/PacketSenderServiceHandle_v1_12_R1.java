@@ -92,33 +92,33 @@ class PacketSenderServiceHandle_v1_12_R1 extends PacketSenderServiceHandleBase {
 		tracker.updatePlayer ( ( ( CraftPlayer ) player ).getHandle ( ) );
 	}
 	
-	@Override
-	public void sendEntityRelativeMovePacket ( Player player , int id ,
-			double x , double y , double z ,
-			double previous_x , double previous_y , double previous_z ,
-			boolean on_ground ) {
-		send ( player , new PacketPlayOutEntity.PacketPlayOutRelEntityMove (
-				id ,
-				EntityTracker.a ( x - previous_x ) ,
-				EntityTracker.a ( y - previous_y ) ,
-				EntityTracker.a ( z - previous_z ) ,
-				false
-		) );
-	}
-	
-	@Override
-	public void sendEntityRelativeMoveLookPacket ( Player player , int id , double delta_x , double delta_y ,
-			double delta_z , float yaw , float pitch , boolean on_ground ) {
-		send ( player , new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook (
-				id ,
-				EntityTracker.a ( delta_x ) ,
-				EntityTracker.a ( delta_y ) ,
-				EntityTracker.a ( delta_z ) ,
-				( byte ) MathHelper.d ( yaw * 256.0F / 360.0F ) ,
-				( byte ) MathHelper.d ( pitch * 256.0F / 360.0F ) ,
-				false
-		) );
-	}
+//	@Override
+	//	public void sendEntityRelativeMovePacket ( Player player , int id ,
+	//			double x , double y , double z ,
+	//			double previous_x , double previous_y , double previous_z ,
+	//			boolean on_ground ) {
+	//		send ( player , new PacketPlayOutEntity.PacketPlayOutRelEntityMove (
+	//				id ,
+	//				EntityTracker.a ( x - previous_x ) ,
+	//				EntityTracker.a ( y - previous_y ) ,
+	//				EntityTracker.a ( z - previous_z ) ,
+	//				false
+	//		) );
+	//	}
+	//
+	//	@Override
+	//	public void sendEntityRelativeMoveLookPacket ( Player player , int id , double delta_x , double delta_y ,
+	//			double delta_z , float yaw , float pitch , boolean on_ground ) {
+	//		send ( player , new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook (
+	//				id ,
+	//				EntityTracker.a ( delta_x ) ,
+	//				EntityTracker.a ( delta_y ) ,
+	//				EntityTracker.a ( delta_z ) ,
+	//				( byte ) MathHelper.d ( yaw * 256.0F / 360.0F ) ,
+	//				( byte ) MathHelper.d ( pitch * 256.0F / 360.0F ) ,
+	//				false
+	//		) );
+	//	}
 	
 	@Override
 	public void sendEntityTeleportPacket ( Player player , int id , boolean on_ground , double x , double y ,

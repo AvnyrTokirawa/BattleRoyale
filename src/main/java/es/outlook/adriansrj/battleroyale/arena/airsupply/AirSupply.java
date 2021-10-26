@@ -8,6 +8,7 @@ import es.outlook.adriansrj.battleroyale.enums.EnumMainConfiguration;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfiguration;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationContainer;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationEntry;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
 import es.outlook.adriansrj.battleroyale.util.Validate;
@@ -27,7 +28,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -330,7 +334,7 @@ public class AirSupply {
 	 *
 	 * @param player the player who opens the air supply, or <b>null</b> if not opened by a player.
 	 */
-	public void open ( Player player ) {
+	public void open ( org.bukkit.entity.Player player ) {
 		Validate.isTrue ( Bukkit.isPrimaryThread ( ) , "must run on server thread" );
 		
 		// dropping contents
@@ -341,10 +345,10 @@ public class AirSupply {
 			LootConfiguration loot_configuration = arena.getBattlefield ( ).getConfiguration ( )
 					.getLootConfiguration ( );
 			LootConfigurationContainer container = loot_configuration != null
-					? loot_configuration.getContainer ( EnumLootContainer.CHEST ) : null;
+					? loot_configuration.getContainer ( EnumLootContainer.AIR_SUPPLY ) : null;
 			
 			if ( container != null ) {
-				BattleRoyaleArena arena = es.outlook.adriansrj.battleroyale.game.player.Player.getPlayer ( player ).getArena ( );
+				BattleRoyaleArena arena = Player.getPlayer ( player ).getArena ( );
 				Set < LootConfigurationEntry > contents = container.getRandomEntries ( Math.max ( RandomUtil.nextInt (
 						( container.getMaximum ( ) * ( inventory.getSize ( ) / 9 ) ) + 1 ) , 1 ) );
 				

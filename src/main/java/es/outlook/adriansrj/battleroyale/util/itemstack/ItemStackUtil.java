@@ -4,6 +4,7 @@ import es.outlook.adriansrj.battleroyale.battlefield.minimap.renderer.MinimapRen
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import es.outlook.adriansrj.core.util.server.Version;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -12,6 +13,7 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 /**
  * Useful class for dealing with {@link org.bukkit.inventory.ItemStack}s.
@@ -102,6 +104,49 @@ public class ItemStackUtil extends es.outlook.adriansrj.core.util.itemstack.Item
 			}
 		} else {
 			return null;
+		}
+	}
+	
+	/**
+	 * Checks whether the provided {@link ItemStack} has the provided name.
+	 * <p>
+	 * @param item the item to check.
+	 * @param name the name for comparing.
+	 * @param colors whether to consider colors or not.
+	 * @return true if the item has the provided name
+	 */
+	public static boolean itemHasName ( ItemStack item , String name , boolean colors ) {
+		return Objects.equals ( extractName ( item , !colors ) , name );
+	}
+	
+	/**
+	 * Checks whether the provided {@link ItemStack} has the provided name.
+	 * <p>
+	 * <strong>Note that colors will be considered.</strong>
+	 * <p>
+	 * @param item the item to check.
+	 * @param name the name for comparing.
+	 * @return true if the item has the provided name
+	 */
+	public static boolean itemHasName ( ItemStack item , String name ) {
+		return itemHasName ( item , name , true );
+	}
+	
+	/**
+	 * Performs a fast comparison between the provided items, returning true if
+	 * both item have the same name and are of the same {@link Material}.
+	 * <p>
+	 * @param item_a the item a.
+	 * @param item_b the item b.
+	 * @return true if both item have the same name and are of the same
+	 *         {@link Material}
+	 */
+	public static boolean fastEqual ( ItemStack item_a , ItemStack item_b ) {
+		if ( item_a != null && item_b != null ) {
+			return item_a.getType ( ) == item_b.getType ( )
+					&& itemHasName ( item_b , extractName ( item_a , false ) , true );
+		} else {
+			return item_a == null && item_b == null;
 		}
 	}
 }

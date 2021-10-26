@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
+ * Simple scoreboard implementation.
  *
  * @author AdrianSR / 08/10/2021 / 09:32 a. m.
  */
@@ -54,6 +54,7 @@ public class ScoreboardSimple extends ScoreboardBase {
 					}
 				}
 				
+				handle.clear ( );
 				handle.addAll ( resulting_elements.toArray ( new String[ 0 ] ) );
 			}
 			

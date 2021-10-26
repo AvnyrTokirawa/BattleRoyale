@@ -6,7 +6,6 @@ import es.outlook.adriansrj.battleroyale.arena.autostarter.AutoStarterHandler;
 import es.outlook.adriansrj.battleroyale.arena.bombing.BombingZoneGeneratorHandler;
 import es.outlook.adriansrj.battleroyale.arena.border.BattleRoyaleArenaBorderHandler;
 import es.outlook.adriansrj.battleroyale.arena.drop.ItemDropHandler;
-import es.outlook.adriansrj.battleroyale.arena.restarter.RestarterHandler;
 import es.outlook.adriansrj.battleroyale.arena.sign.BattleRoyaleArenaSignHandler;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldRegistry;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.MinimapHandler;
@@ -34,6 +33,7 @@ import es.outlook.adriansrj.battleroyale.configuration.parachute.ParachutesConfi
 import es.outlook.adriansrj.battleroyale.configuration.scoreboard.ScoreboardConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.vehicle.BattleRoyaleVehiclesConfigHandler;
 import es.outlook.adriansrj.battleroyale.data.DataStorageHandler;
+import es.outlook.adriansrj.battleroyale.game.item.BattleRoyaleItemHandler;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationRegistry;
 import es.outlook.adriansrj.battleroyale.game.player.*;
 import es.outlook.adriansrj.battleroyale.gui.arena.ArenaSelectorGUIHandler;
@@ -96,6 +96,7 @@ public enum EnumPluginHandler {
 	KNOCK_HANDLER ( PlayerKnockHandler.class ),
 	REANIMATION_HANDLER ( PlayerReviveHandler.class ),
 	
+	ITEM_HANDLER ( BattleRoyaleItemHandler.class ),
 	SETTINGS_GUIS_CONFIGURATION_HANDLER ( SettingsGUIsConfigHandler.class ),
 	SETTINGS_GUI ( SettingsGUIHandler.class ),
 	BUS_SETTINGS_GUI ( BusSettingsGUIHandler.class ),
@@ -129,7 +130,6 @@ public enum EnumPluginHandler {
 	ARENA_SIGN_CONTAINER_HANDLER ( BattleRoyaleArenaSignContainerHandler.class ),
 	ARENA_BORDER_HANDLER ( BattleRoyaleArenaBorderHandler.class ),
 	ARENA_AUTO_STARTER_HANDLER ( AutoStarterHandler.class ),
-	ARENA_RESTARTER_HANDLER ( RestarterHandler.class ),
 	ARENA_AIR_SUPPLY_HANDLER ( AirSupplyGeneratorHandler.class ),
 	ARENA_BOMBING_ZONE_HANDLER ( BombingZoneGeneratorHandler.class ),
 	ARENA_ITEM_DROP_HANDLER ( ItemDropHandler.class ),
@@ -156,7 +156,7 @@ public enum EnumPluginHandler {
 	QUALITY_ARMORY_COMPATIBILITY_HANDLER (
 			QualityArmoryCompatibilityHandler.class , PluginUtil :: isQualityArmoryEnabled ),
 	
-	PLAYER_STUFF_CHEST_HANDLER ( PlayerStuffChestHandler.class ) ,
+	PLAYER_STUFF_CHEST_HANDLER ( PlayerStuffChestHandler.class ),
 	
 	;
 	

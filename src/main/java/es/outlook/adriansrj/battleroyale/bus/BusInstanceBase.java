@@ -46,8 +46,8 @@ public abstract class BusInstanceBase < C extends Bus > extends BusInstance < C 
 			
 			// route finished
 			if ( out_bounds && entered_bounds ) {
-				if ( !this.bus.isFinished ( ) ) {
-					this.bus.finish ( );
+				if ( !bus.isFinished ( ) ) {
+					bus.finish ( );
 				}
 				
 				this.dispose ( );
@@ -64,6 +64,11 @@ public abstract class BusInstanceBase < C extends Bus > extends BusInstance < C 
 			
 			bus.setLocation ( bus.location );
 			bus.displace ( bus.location );
+			
+			// jump tutorial
+			if ( bus.isDoorOpen ( ) ) {
+				bus.jumpTutorial ( );
+			}
 		}
 		
 		protected void dispose ( ) {
@@ -125,6 +130,14 @@ public abstract class BusInstanceBase < C extends Bus > extends BusInstance < C 
 	}
 	
 	protected abstract void displace ( Vector location );
+	
+	/**
+	 * Sends the jump tutorial (titles, messages, whatever)
+	 * to the passengers once the door is open.
+	 */
+	protected void jumpTutorial ( ) {
+		// nothing by default
+	}
 	
 	@Override
 	protected void start ( ) {

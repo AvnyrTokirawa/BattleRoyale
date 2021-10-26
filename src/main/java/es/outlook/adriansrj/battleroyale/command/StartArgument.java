@@ -3,17 +3,17 @@ package es.outlook.adriansrj.battleroyale.command;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
-import es.outlook.adriansrj.core.util.StringUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author AdrianSR / 28/08/2021 / 12:28 p. m.
  */
-class StartArgument extends BaseArgument {
+class StartArgument extends ArenaArgument {
 	
 	StartArgument ( BattleRoyaleCommandHandler handler ) {
 		super ( handler );
@@ -25,49 +25,51 @@ class StartArgument extends BaseArgument {
 	}
 	
 	@Override
-	public String getUsage ( ) {
-		return super.getUsage ( ) + " [arena]";
-	}
-	
-	@Override
 	public boolean execute ( CommandSender sender , Command command , String label , String[] subargs ) {
-		if ( subargs.length > 0 && StringUtil.isNotBlank ( subargs[ 0 ] ) ) {
-			String arena_name = subargs[ 0 ];
-			Optional < BattleRoyaleArena > optional = BattleRoyaleArenaHandler.getInstance ( )
-					.getArena ( arena_name );
-			
-			if ( optional.isPresent ( ) ) {
-				BattleRoyaleArena arena = optional.get ( );
+		BattleRoyaleArena arena = matchArena ( sender , subargs );
+		
+		if ( arena != null ) {
+			if ( arena.getState ( ) == EnumArenaState.WAITING && arena.isPrepared ( ) ) {
+				arena.start ( );
 				
-				if ( arena.getState ( ) == EnumArenaState.WAITING ) {
-					arena.start ( );
-					
-					sender.sendMessage ( ChatColor.GREEN + "Arena '" + arena_name + "' started successfully!" );
-				} else {
-					switch ( arena.getState ( ) ) {
-						case RUNNING:
-							sender.sendMessage ( ChatColor.RED + "This arena is already running!" );
-							break;
-						case RESTARTING:
-							sender.sendMessage ( ChatColor.RED + "This arena is being restarted!" );
-							break;
-						case STOPPED:
-							sender.sendMessage (
-									ChatColor.RED + "The server must be restarted in order to start this arena!" );
-							break;
-							
-						default:
-							break;
-					}
-					
-				}
+				sender.sendMessage ( ChatColor.GREEN + "Arena '" + arena.getName ( ) + "' started successfully!" );
 			} else {
-				sender.sendMessage ( ChatColor.RED + "Couldn't find any arena with name '" + arena_name + "'!" );
+				switch ( arena.getState ( ) ) {
+					case RUNNING:
+						sender.sendMessage ( ChatColor.RED + "This arena is already running!" );
+						break;
+					case RESTARTING:
+						sender.sendMessage ( ChatColor.RED + "This arena is being restarted!" );
+						break;
+					case STOPPED:
+						sender.sendMessage (
+								ChatColor.RED + "The world of the arena must be restarted in order to start!" );
+						break;
+					
+					default:
+						if ( !arena.isPrepared ( ) ) {
+							if ( arena.isPreparing ( ) ) {
+								sender.sendMessage ( ChatColor.RED + "This arena is being prepared!" );
+							} else {
+								arena.prepare ( arena :: start );
+							}
+						}
+						
+						break;
+				}
 			}
-		} else {
-			sender.sendMessage ( ChatColor.RED + getUsage ( ) );
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public List < String > tab ( CommandSender sender , Command command , String alias , String[] subargs ) {
+		if ( subargs.length == 1 ) {
+			return BattleRoyaleArenaHandler.getInstance ( ).getArenas ( )
+					.stream ( ).map ( BattleRoyaleArena :: getName ).collect ( Collectors.toList ( ) );
+		} else {
+			return super.tab ( sender , command , alias , subargs );
+		}
 	}
 }

@@ -80,14 +80,18 @@ public class PlayerPlaceholderNode extends PlaceholderNode {
 		}
 		
 		// stats
-		for ( EnumStat stat_type : EnumStat.values ( ) ) { // br_player_stat_{stat}
-			if ( params.toLowerCase ( ).startsWith ( stat_type.name ( ).toLowerCase ( ) ) ) {
-				return String.valueOf ( br_player.getDataStorage ( ).getStat ( stat_type ) );
+		if ( params.toLowerCase ( ).startsWith ( "stat" ) ) {
+			params = extractIdentifier ( params );
+			
+			for ( EnumStat stat_type : EnumStat.values ( ) ) { // br_player_stat_{stat}
+				if ( params.toLowerCase ( ).startsWith ( stat_type.name ( ).toLowerCase ( ) ) ) {
+					return String.valueOf ( br_player.getDataStorage ( ).getStat ( stat_type ) );
+				}
 			}
 		}
 		
-		// requires the player to actually be playing
-		if ( br_player.isPlaying ( ) ) {
+		// requires the player to actually be in an arena
+		if ( br_player.isInArena ( ) ) {
 			if ( params.toLowerCase ( ).startsWith ( "safecompass" ) ) { // br_player_safecompass_{index}
 				return safeZoneCompass ( player , br_player , params );
 			} else if ( params.toLowerCase ( ).startsWith ( "safe" ) ) { // br_player_safe
@@ -114,7 +118,7 @@ public class PlayerPlaceholderNode extends PlaceholderNode {
 			ZoneBounds        future_bounds   = arena.getBorder ( ).getFutureBounds ( );
 			SafeZoneDirection right_direction = null;
 			
-			if ( future_bounds != null && !future_bounds.contains (
+			if ( br_player.isPlaying ( ) && future_bounds != null && !future_bounds.contains (
 					player_location.getBlockX ( ) , player_location.getBlockZ ( ) ) ) {
 				Location2I center     = future_bounds.getCenter ( );
 				float      player_dir = DirectionUtil.normalize ( player_location.getYaw ( ) );
@@ -183,7 +187,8 @@ public class PlayerPlaceholderNode extends PlaceholderNode {
 		boolean           upper_case      = extractIdentifier ( params ).equalsIgnoreCase ( "upper" );
 		Location          player_location = player.getLocation ( );
 		
-		if ( future_bounds == null || future_bounds.contains ( player_location.getX ( ) , player_location.getZ ( ) ) ) {
+		if ( !br_player.isPlaying ( ) || future_bounds == null
+				|| future_bounds.contains ( player_location.getX ( ) , player_location.getZ ( ) ) ) {
 			String word = EnumLanguage.SAFE_WORD.getAsStringStripColors ( );
 			return upper_case ? word.toUpperCase ( ) : word;
 		} else {

@@ -10,10 +10,12 @@ import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.world.Material;
 import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
+import es.outlook.adriansrj.battleroyale.world.block.BlockTileEntity;
 import es.outlook.adriansrj.battleroyale.world.chunk.Chunk;
 import es.outlook.adriansrj.battleroyale.world.chunk.v13.Chunk13;
 import es.outlook.adriansrj.battleroyale.world.data.v13.WorldData13;
 import es.outlook.adriansrj.battleroyale.world.region.v13.Region13;
+import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.world.WorldUtil;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import org.apache.commons.lang.Validate;
@@ -107,6 +109,11 @@ public class ArenaWorldGenerator13 implements ArenaWorldGenerator {
 		getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).setMaterial ( x & 15 , y , z & 15 , material );
 	}
 	
+	public void addTileEntity ( BlockTileEntity tile_entity ) {
+		getChunk ( new ChunkLocation ( tile_entity.getX ( ) >> 4 , tile_entity.getZ ( ) >> 4 ) )
+				.getTileEntities ( ).add ( tile_entity );
+	}
+	
 	@Override
 	public void insert ( Clipboard schematic , Vector location , boolean ignore_air_blocks ) {
 		BlockVector3    dimensions = schematic.getDimensions ( );
@@ -116,6 +123,11 @@ public class ArenaWorldGenerator13 implements ArenaWorldGenerator {
 			for ( int x = 0 ; x < dimensions.getX ( ) ; x++ ) {
 				for ( int y = 0 ; y < dimensions.getY ( ) ; y++ ) {
 					for ( int z = 0 ; z < dimensions.getZ ( ) ; z++ ) {
+						int xx = ( int ) Math.floor ( location.getX ( ) + x );
+						int yy = ( int ) Math.floor ( location.getY ( ) + y );
+						int zz = ( int ) Math.floor ( location.getZ ( ) + z );
+						
+						// material
 						BaseBlock block = blocks[ x ][ y ][ z ];
 						BlockType type  = block != null ? block.getBlockType ( ) : null;
 						
@@ -123,11 +135,14 @@ public class ArenaWorldGenerator13 implements ArenaWorldGenerator {
 							continue;
 						}
 						
-						setMaterialAt (
-								( int ) Math.floor ( location.getX ( ) + x ) ,
-								( int ) Math.floor ( location.getY ( ) + y ) ,
-								( int ) Math.floor ( location.getZ ( ) + z ) ,
-								Material.from ( block ) );
+						setMaterialAt ( xx , yy , zz , Material.from ( block ) );
+						
+						// tile entity
+						String nbt_id = block != null ? block.getNbtId ( ) : null;
+						
+						if ( StringUtil.isNotBlank ( nbt_id ) ) {
+							addTileEntity ( new BlockTileEntity ( nbt_id , xx , yy , zz ) );
+						}
 					}
 				}
 			}
@@ -164,7 +179,7 @@ public class ArenaWorldGenerator13 implements ArenaWorldGenerator {
 		File level_data_file = new File ( world_folder , WorldUtil.LEVEL_DATA_FILE_NAME );
 		
 		try {
-			if ( ! level_data_file.exists ( ) ) {
+			if ( !level_data_file.exists ( ) ) {
 				level_data_file.getParentFile ( ).mkdirs ( );
 				level_data_file.createNewFile ( );
 			}
@@ -178,7 +193,7 @@ public class ArenaWorldGenerator13 implements ArenaWorldGenerator {
 		// saving chunks
 		File region_folder = new File ( world_folder , WorldUtil.REGION_FOLDER_NAME );
 		
-		if ( ! region_folder.exists ( ) ) {
+		if ( !region_folder.exists ( ) ) {
 			region_folder.mkdirs ( );
 		}
 		

@@ -36,16 +36,6 @@ interface PacketSenderServiceHandle {
 	
 	void sendSpawnEntityPacket ( Player player , Entity entity );
 	
-	void sendEntityRelativeMovePacket ( Player player , int id ,
-			double x , double y , double z ,
-			double previous_x , double previous_y , double previous_z ,
-			boolean on_ground );
-	
-	void sendEntityRelativeMoveLookPacket ( Player player , int id ,
-			double delta_x , double delta_y , double delta_z ,
-			float yaw , float pitch ,
-			boolean on_ground );
-	
 	void sendEntityTeleportPacket ( Player player , int id , boolean on_ground ,
 			double x , double y , double z , float yaw , float pitch );
 	

@@ -36,8 +36,7 @@ public final class BattlefieldRegistry extends PluginHandler {
 		// loading battlefields
 		outer:
 		for ( File folder : Objects.requireNonNull (
-				EnumDirectory.BATTLEFIELD_DIRECTORY.getDirectory ( )
-						.listFiles ( new FileDirectoryFilter ( ) ) ) ) {
+				EnumDirectory.BATTLEFIELD_DIRECTORY.getDirectory ( ).listFiles ( new FileDirectoryFilter ( ) ) ) ) {
 			for ( EnumDirectory other : EnumDirectory.values ( ) ) {
 				if ( other.getDirectory ( ).equals ( folder ) ) {
 					continue outer;

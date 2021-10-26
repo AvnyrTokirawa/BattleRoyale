@@ -9,6 +9,7 @@ import es.outlook.adriansrj.battleroyale.compass.CompassBarSimple;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaLeaveEvent;
+import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaPreLeaveEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaSetEvent;
 import es.outlook.adriansrj.battleroyale.parachute.Parachute;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
@@ -272,7 +273,7 @@ public final class Player extends PlayerWrapper {
 			data_storage.resetTempStats ( );
 			
 			// firing event
-			new PlayerArenaSetEvent ( this , arena ).call ( );
+			new PlayerArenaSetEvent ( this , arena ).callSafe ( );
 		}
 	}
 	
@@ -280,6 +281,9 @@ public final class Player extends PlayerWrapper {
 		final BattleRoyaleArena current = this.arena;
 		
 		if ( current != null ) {
+			// firing pre-event
+			new PlayerArenaPreLeaveEvent ( this , current ).callSafe ( );
+			
 			// resetting values
 			resetValues ( );
 			// must leave team too
@@ -288,7 +292,7 @@ public final class Player extends PlayerWrapper {
 			this.arena = null;
 			
 			// firing event
-			new PlayerArenaLeaveEvent ( this , current ).call ( );
+			new PlayerArenaLeaveEvent ( this , current ).callSafe ( );
 			return true;
 		} else {
 			return false;

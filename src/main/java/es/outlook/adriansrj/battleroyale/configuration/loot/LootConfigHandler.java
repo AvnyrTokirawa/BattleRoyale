@@ -47,7 +47,15 @@ public final class LootConfigHandler extends ConfigurationHandler {
 		
 		containers.put ( EnumLootContainer.CHEST , new LootConfigurationContainer ( chest ) );
 		
-		// TODO: air supply
+		// air supply
+		Map < String, LootConfigurationEntry > air_supply = new HashMap <> ( );
+		
+		air_supply.put ( "sandstone" , new LootConfigurationEntry ( UniversalMaterial.SANDSTONE , 128 ) );
+		air_supply.put ( "diamond-sword" , new LootConfigurationEntry ( UniversalMaterial.DIAMOND_SWORD , 1 ) );
+		air_supply.put ( "bow" , new LootConfigurationEntry ( UniversalMaterial.BOW , 1 ) );
+		air_supply.put ( "arrow" , new LootConfigurationEntry ( UniversalMaterial.ARROW , 30 ) );
+		
+		containers.put ( EnumLootContainer.AIR_SUPPLY , new LootConfigurationContainer ( air_supply ) );
 		
 		DEFAULT_LOOT_CONFIGURATION = new LootConfiguration ( containers );
 	}

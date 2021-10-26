@@ -8,6 +8,7 @@ import es.outlook.adriansrj.battleroyale.world.RegionFile;
 import es.outlook.adriansrj.battleroyale.world.block.BlockColor;
 import es.outlook.adriansrj.battleroyale.world.block.BlockColorCustom;
 import es.outlook.adriansrj.battleroyale.world.block.BlockColorDefault;
+import es.outlook.adriansrj.battleroyale.world.block.BlockTileEntity;
 import es.outlook.adriansrj.battleroyale.world.block.v12.BlockColorMap12;
 import es.outlook.adriansrj.battleroyale.world.chunk.Chunk;
 import es.outlook.adriansrj.battleroyale.world.chunk.ChunkHeightmap;
@@ -18,10 +19,9 @@ import java.awt.*;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Chunk for minecraft versions 1.9 - 1.12.2.
@@ -31,7 +31,9 @@ import java.util.Map;
 public class Chunk12 implements Chunk {
 	
 	// 16 sections. 0 - 15 (bottom to top)
-	protected final ChunkSection12[] sections = new ChunkSection12[ 16 ];
+	protected final ChunkSection12[]         sections      = new ChunkSection12[ 16 ];
+	// tile entities
+	protected final List < BlockTileEntity > tile_entities = new ArrayList <> ( );
 	
 	protected final ChunkLocation  location;
 	protected final ChunkHeightmap heightmap;
@@ -60,6 +62,11 @@ public class Chunk12 implements Chunk {
 			sections[ section.y & 0xF ] = section;
 		}
 		
+		// reading tile entities
+		for ( BinaryTag tile_entity_tag : level.getList ( NBTConstants.Pre13.CHUNK_TILE_ENTITIES_TAG ) ) {
+			tile_entities.add ( new BlockTileEntity ( ( CompoundBinaryTag ) tile_entity_tag , EnumDataVersion.v1_12 ) );
+		}
+		
 		// heightmap and surface
 		this.heightmap = new ChunkHeightmap ( );
 		this.surface   = new ChunkSurface ( this );
@@ -70,6 +77,11 @@ public class Chunk12 implements Chunk {
 		this.data_version = EnumDataVersion.v1_12.getId ( );
 		this.heightmap    = new ChunkHeightmap ( );
 		this.surface      = new ChunkSurface ( this );
+	}
+	
+	@Override
+	public List < BlockTileEntity > getTileEntities ( ) {
+		return tile_entities;
 	}
 	
 	@Override
@@ -268,15 +280,20 @@ public class Chunk12 implements Chunk {
 		Map < String, BinaryTag > level = new HashMap <> ( );
 		
 		// sections
-		List < CompoundBinaryTag > sections = new ArrayList <> ( );
+		level.put ( NBTConstants.Pre13.CHUNK_SECTIONS_TAG , ListBinaryTag.from (
+				Arrays.stream ( this.sections )
+						.filter ( Objects :: nonNull )
+						.filter ( section -> !section.isEmpty ( ) )
+						.map ( ChunkSection12 :: toNBT )
+						.collect ( Collectors.toList ( ) ) ) );
 		
-		for ( ChunkSection12 section : this.sections ) {
-			if ( section != null && !section.isEmpty ( ) ) {
-				sections.add ( section.toNBT ( ) );
-			}
-		}
+		// tile entities
+		level.put ( NBTConstants.Pre13.CHUNK_TILE_ENTITIES_TAG , ListBinaryTag.from (
+				this.tile_entities.stream ( )
+						.filter ( Objects :: nonNull )
+						.map ( BlockTileEntity :: toNBT )
+						.collect ( Collectors.toList ( ) ) ) );
 		
-		level.put ( NBTConstants.Pre13.CHUNK_SECTIONS_TAG , ListBinaryTag.from ( sections ) );
 		level.put ( NBTConstants.Pre13.CHUNK_X_POS_TAG , IntBinaryTag.of ( location.getX ( ) ) );
 		level.put ( NBTConstants.Pre13.CHUNK_Z_POS_TAG , IntBinaryTag.of ( location.getZ ( ) ) );
 		level.put ( NBTConstants.Pre13.CHUNK_LAST_UPDATE_TAG , LongBinaryTag.of ( last_update ) );
@@ -285,7 +302,6 @@ public class Chunk12 implements Chunk {
 		level.put ( NBTConstants.Pre13.CHUNK_LIGHT_POPULATED_TAG ,
 					ByteBinaryTag.of ( ( byte ) ( light_populated ? 1 : 0 ) ) );
 		level.put ( NBTConstants.Pre13.CHUNK_ENTITIES_TAG , ListBinaryTag.empty ( ) );
-		level.put ( NBTConstants.Pre13.CHUNK_TILE_ENTITIES_TAG , ListBinaryTag.empty ( ) );
 		
 		root.put ( NBTConstants.Pre13.CHUNK_LEVEL_TAG , CompoundBinaryTag.from ( level ) );
 		root.put ( NBTConstants.Pre13.CHUNK_DATA_VERSION_TAG , IntBinaryTag.of ( data_version ) );

@@ -3,6 +3,7 @@ package es.outlook.adriansrj.battleroyale.schematic.generator.v12;
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
+import es.outlook.adriansrj.battleroyale.world.block.BlockTileEntity;
 import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProvider;
 import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProviderWorldFolder;
 import es.outlook.adriansrj.battleroyale.world.chunk.v12.Chunk12;
@@ -15,8 +16,8 @@ import org.bukkit.util.Vector;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Schematic creator for versions pre-{@link EnumDataVersion#v1_13}.
@@ -48,10 +49,11 @@ public class SchematicGenerator_v12 implements es.outlook.adriansrj.battleroyale
 		int    height = ( int ) Math.round ( bounds.getHeight ( ) );
 		int    depth  = ( int ) Math.round ( bounds.getDepth ( ) );
 		
-		byte[]        blocks         = new byte[ width * height * depth ];
-		byte[]        add_blocks     = null;
-		byte[]        block_data     = new byte[ width * height * depth ];
-		ChunkProvider chunk_provider = new ChunkProviderWorldFolder ( folder );
+		byte[]                   blocks         = new byte[ width * height * depth ];
+		byte[]                   add_blocks     = null;
+		byte[]                   block_data     = new byte[ width * height * depth ];
+		List < BlockTileEntity > tile_entities  = new ArrayList <> ( );
+		ChunkProvider            chunk_provider = new ChunkProviderWorldFolder ( folder );
 		
 		for ( int y = 0 ; y < height ; y++ ) {
 			int yy = origin.getBlockY ( ) + y;
@@ -64,7 +66,7 @@ public class SchematicGenerator_v12 implements es.outlook.adriansrj.battleroyale
 					ChunkLocation chunk_location = new ChunkLocation ( xx >> 4 , zz >> 4 );
 					Chunk12       chunk          = ( Chunk12 ) chunk_provider.getChunk ( chunk_location );
 					
-					// extracting block
+					// extracting block id & data
 					ChunkSection12 section = chunk != null ? chunk.getSectionFromYCoordinate ( yy ) : null;
 					
 					if ( section != null ) {
@@ -85,6 +87,23 @@ public class SchematicGenerator_v12 implements es.outlook.adriansrj.battleroyale
 						blocks[ index ]     = ( byte ) id;
 						block_data[ index ] = data;
 					}
+					
+					// tile entity block
+					BlockTileEntity tile_entity = chunk != null ? chunk.getTileEntity ( xx , yy , zz ) : null;
+					
+					if ( tile_entity != null ) {
+						// relocating
+						BlockTileEntity relocated = new BlockTileEntity ( tile_entity );
+						
+						relocated.setX ( x );
+						relocated.setY ( y );
+						relocated.setZ ( z );
+						
+						// done
+						if ( !tile_entities.contains ( relocated ) ) {
+							tile_entities.add ( relocated );
+						}
+					}
 				}
 			}
 		}
@@ -93,11 +112,11 @@ public class SchematicGenerator_v12 implements es.outlook.adriansrj.battleroyale
 		world.setAutoSave ( autosave );
 		
 		// then generating
-		generate ( width , height , depth , blocks , add_blocks , block_data , out );
+		generate ( width , height , depth , blocks , add_blocks , block_data , tile_entities , out );
 	}
 	
 	protected void generate ( int width , int height , int depth , byte[] blocks , byte[] add_blocks ,
-			byte[] block_data , File out ) {
+			byte[] block_data , List < BlockTileEntity > tile_entities , File out ) {
 		Map < String, BinaryTag > root = new HashMap <> ( );
 		
 		root.put ( "Width" , ShortBinaryTag.of ( ( short ) width ) );
@@ -112,7 +131,11 @@ public class SchematicGenerator_v12 implements es.outlook.adriansrj.battleroyale
 			root.put ( "AddBlocks" , ByteArrayBinaryTag.of ( add_blocks ) );
 		}
 		
-		root.put ( "TileEntities" , ListBinaryTag.empty ( ) );
+		root.put ( "TileEntities" , ListBinaryTag.from (
+				tile_entities.stream ( )
+						.filter ( Objects :: nonNull )
+						.map ( BlockTileEntity :: toNBT )
+						.collect ( Collectors.toList ( ) ) ) );
 		
 		// then writing to output file
 		CompoundBinaryTag compound = CompoundBinaryTag.from ( root );

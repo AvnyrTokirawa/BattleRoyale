@@ -110,6 +110,11 @@ public enum EnumLanguage implements ConfigurationEntry {
 			"announcement subtitle to warn players that the border is resizing (intended to show the time)" ,
 			ChatColor.GOLD + "%s" ),
 	
+	BUS_JUMP_TITLE ( "bus.jump.title" , "bus jump title" , "" ),
+	
+	BUS_JUMP_SUBTITLE ( "bus.jump.subtitle" , "bus jump subtitle" ,
+						ChatColor.BLUE + "PRESS " + ChatColor.AQUA + "SNEAK" + ChatColor.BLUE + " TO JUMP" ),
+	
 	KNOCKED_BEING_REVIVED ( "knocked.being-revived" , "being revived action bar message" ,
 							StringUtil.concatenate ( ChatColor.GOLD , ChatColor.BOLD ) + "You are being revived" ),
 	
@@ -244,8 +249,8 @@ public enum EnumLanguage implements ConfigurationEntry {
 	// -------- restarter
 	
 	RESTARTER_COUNTDOWN_ACTIONBAR ( "restart.countdown.actionbar" ,
-								   "restarter countdown actionbar" ,
-								   ChatColor.DARK_RED + "Restarting in " + ChatColor.BOLD + "%s" ),
+									"restarter countdown actionbar" ,
+									ChatColor.DARK_RED + "Restarting in " + ChatColor.BOLD + "%s" ),
 	
 	;
 	

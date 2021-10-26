@@ -3,6 +3,7 @@ package es.outlook.adriansrj.battleroyale.schematic.generator.v13;
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
 import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
 import es.outlook.adriansrj.battleroyale.world.Material;
+import es.outlook.adriansrj.battleroyale.world.block.BlockTileEntity;
 import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProvider;
 import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProviderWorldFolder;
 import es.outlook.adriansrj.battleroyale.world.chunk.v13.Chunk13;
@@ -33,14 +34,12 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 	 */
 	protected static class BlockData {
 		
-		protected final Vector3D          location;
-		protected final Material          material;
-		protected final CompoundBinaryTag tile_data;
+		protected final Vector3D location;
+		protected final Material material;
 		
-		public BlockData ( Vector3D location , Material material , CompoundBinaryTag tile_data ) {
-			this.location  = location;
-			this.material  = material;
-			this.tile_data = tile_data;
+		public BlockData ( Vector3D location , Material material ) {
+			this.location = location;
+			this.material = material;
 		}
 		
 		public String getKey ( ) {
@@ -77,13 +76,14 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 		world.setAutoSave ( false );
 		
 		// extracting required data
-		File            folder         = world.getWorldFolder ( );
-		Vector          origin         = bounds.getMinimum ( );
-		int             width          = ( int ) Math.round ( bounds.getWidth ( ) );
-		int             height         = ( int ) Math.round ( bounds.getHeight ( ) );
-		int             depth          = ( int ) Math.round ( bounds.getDepth ( ) );
-		BlockData[][][] blocks         = new BlockData[ width ][ height ][ depth ];
-		ChunkProvider   chunk_provider = new ChunkProviderWorldFolder ( folder );
+		File                     folder         = world.getWorldFolder ( );
+		Vector                   origin         = bounds.getMinimum ( );
+		int                      width          = ( int ) Math.round ( bounds.getWidth ( ) );
+		int                      height         = ( int ) Math.round ( bounds.getHeight ( ) );
+		int                      depth          = ( int ) Math.round ( bounds.getDepth ( ) );
+		BlockData[][][]          blocks         = new BlockData[ width ][ height ][ depth ];
+		List < BlockTileEntity > tile_entities  = new ArrayList <> ( );
+		ChunkProvider            chunk_provider = new ChunkProviderWorldFolder ( folder );
 		
 		for ( int y = 0 ; y < height ; y++ ) {
 			int yy = origin.getBlockY ( ) + y;
@@ -96,16 +96,31 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 					ChunkLocation chunk_location = new ChunkLocation ( xx >> 4 , zz >> 4 );
 					Chunk13       chunk          = ( Chunk13 ) chunk_provider.getChunk ( chunk_location );
 					
-					// then extracting block
+					// block material
 					ChunkSection13 section = chunk != null ? chunk.getSectionFromYCoordinate ( yy ) : null;
 					
 					if ( section != null ) {
 						Material material = section.getMaterial ( xx & 0xF , yy & 0xF , zz & 0xF );
 						
 						if ( material != null && !material.isEmpty ( ) ) {
-							blocks[ x ][ y ][ z ] = new BlockData (
-									new Vector3D ( x , y , z ) , material ,
-									null /* tile entities will probably be implemented in the future */ );
+							blocks[ x ][ y ][ z ] = new BlockData ( new Vector3D ( x , y , z ) , material );
+						}
+					}
+					
+					// tile entity
+					BlockTileEntity tile_entity = chunk != null ? chunk.getTileEntity ( xx , yy , zz ) : null;
+					
+					if ( tile_entity != null ) {
+						// relocating
+						BlockTileEntity relocated = new BlockTileEntity ( tile_entity );
+						
+						relocated.setX ( x );
+						relocated.setY ( y );
+						relocated.setZ ( z );
+						
+						// done
+						if ( !tile_entities.contains ( relocated ) ) {
+							tile_entities.add ( relocated );
 						}
 					}
 				}
@@ -116,11 +131,11 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 		world.setAutoSave ( autosave );
 		
 		// then generating
-		generate ( width , height , depth , blocks , out );
+		generate ( width , height , depth , blocks , tile_entities , out );
 	}
 	
-	protected void generate ( int width , int height , int depth , BlockData[][][] blocks ,
-			File out ) {
+	protected void generate ( int width , int height , int depth ,
+			BlockData[][][] blocks , List < BlockTileEntity > tile_entities , File out ) {
 		Map < String, BinaryTag > root = new HashMap <> ( );
 		
 		root.put ( "Version" , IntBinaryTag.of ( 2 ) );
@@ -129,10 +144,9 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 		root.put ( "Height" , ShortBinaryTag.of ( ( short ) height ) );
 		root.put ( "Length" , ShortBinaryTag.of ( ( short ) depth ) );
 		
-		int                        palette_max   = 0;
-		Map < String, Integer >    palette       = new HashMap <> ( );
-		List < CompoundBinaryTag > tile_entities = new ArrayList <> ( );
-		ByteArrayOutputStream      buffer        = new ByteArrayOutputStream ( width * height * depth );
+		int                     palette_max = 0;
+		Map < String, Integer > palette     = new HashMap <> ( );
+		ByteArrayOutputStream   buffer      = new ByteArrayOutputStream ( width * height * depth );
 		
 		for ( int y = 0 ; y < height ; y++ ) {
 			for ( int z = 0 ; z < depth ; z++ ) {
@@ -140,36 +154,7 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 					BlockData block = blocks[ x ][ y ][ z ];
 					
 					if ( block == null ) {
-						block = new BlockData ( new Vector3D ( x , y , z ) , Material.AIR , null );
-					}
-					
-					if ( block.tile_data != null ) {
-						Map < String, BinaryTag > values = new HashMap <> ( );
-						
-						for ( Map.Entry < String, ? extends BinaryTag > value : block.tile_data ) {
-							switch ( value.getKey ( ) ) {
-								// ignore 'id' if it exists. it must be 'Id'
-								case "id":
-									values.put ( "Id" , value.getValue ( ) );
-									break;
-								
-								// actual positions are kept in NBT, ignoring.
-								case "x":
-								case "y":
-								case "z":
-									break;
-								
-								default: {
-									values.put ( value.getKey ( ) , value.getValue ( ) );
-									break;
-								}
-							}
-						}
-						
-						// position within schematic bounds
-						values.put ( "Pos" , IntArrayBinaryTag.of ( x , y , z ) );
-						
-						tile_entities.add ( CompoundBinaryTag.from ( values ) );
+						block = new BlockData ( new Vector3D ( x , y , z ) , Material.AIR );
 					}
 					
 					String block_key = block.getKey ( );
@@ -204,7 +189,18 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 		
 		// blocks
 		root.put ( "BlockData" , ByteArrayBinaryTag.of ( buffer.toByteArray ( ) ) );
-		root.put ( "BlockEntities" , ListBinaryTag.from ( tile_entities ) );
+		root.put ( "BlockEntities" , ListBinaryTag.from (
+				tile_entities.stream ( ).filter ( Objects :: nonNull ).map ( tile_entity -> {
+					// tile entities are saved in the schematic in
+					// a different  way than vanilla.
+					Map < String, BinaryTag > data = new HashMap <> ( );
+					
+					data.put ( "Id" , StringBinaryTag.of ( tile_entity.getId ( ) ) );
+					data.put ( "Pos" , IntArrayBinaryTag.of (
+							tile_entity.getX ( ) , tile_entity.getY ( ) , tile_entity.getZ ( ) ) );
+					
+					return CompoundBinaryTag.from ( data );
+				} ).collect ( Collectors.toList ( ) ) ) );
 		
 		// then writing to output file
 		try ( FileOutputStream output = new FileOutputStream ( out ) ) {

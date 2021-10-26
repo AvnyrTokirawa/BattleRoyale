@@ -1,6 +1,7 @@
 package es.outlook.adriansrj.battleroyale.lobby;
 
 import es.outlook.adriansrj.battleroyale.compass.CompassBar;
+import es.outlook.adriansrj.battleroyale.enums.EnumItem;
 import es.outlook.adriansrj.battleroyale.enums.EnumLobbyConfiguration;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.entity.EntityUtil;
@@ -80,8 +81,15 @@ public class BattleRoyaleLobby implements Listener {
 		EntityUtil.setMaxHealth ( player , 20.0D );
 		player.setHealth ( 20.0D );
 		EntityUtil.clearPotionEffects ( player );
+		
+		// inventory
 		player.getInventory ( ).clear ( );
 		player.getInventory ( ).setArmorContents ( null );
+		
+		EnumItem.ARENA_SELECTOR.give ( player );
+		EnumItem.SETTINGS.give ( player );
+		EnumItem.LEAVE_ARENA.give ( player );
+		
 		player.updateInventory ( );
 		
 		// sending to spawn

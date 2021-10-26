@@ -7,8 +7,6 @@ package es.outlook.adriansrj.battleroyale.enums;
  */
 public enum EnumStat {
 	
-	// TODO: WINS, LOSSES, HEADSHOTS
-	
 	KILLS,
 	DEATHS,
 	WINS,

@@ -4,6 +4,7 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.arena.autostarter.AutoStarter;
 import es.outlook.adriansrj.battleroyale.arena.border.BattleRoyaleArenaBorder;
 import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderResize;
+import es.outlook.adriansrj.battleroyale.enums.EnumArenaStat;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderNode;
@@ -160,6 +161,13 @@ public class ArenaPlaceholderNode extends PlaceholderNode {
 					}
 				} else {
 					return null;
+				}
+			}
+			
+			// arena/match temporal stats
+			for ( EnumArenaStat stat_type : EnumArenaStat.values ( ) ) { // br_arena_{stat}
+				if ( params.toLowerCase ( ).startsWith ( stat_type.name ( ).toLowerCase ( ) ) ) {
+					return String.valueOf ( arena.getStats ( ).get ( stat_type ) );
 				}
 			}
 		}

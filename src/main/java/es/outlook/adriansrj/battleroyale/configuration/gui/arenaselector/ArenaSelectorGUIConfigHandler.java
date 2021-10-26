@@ -40,14 +40,11 @@ public final class ArenaSelectorGUIConfigHandler extends ConfigurationHandler {
 				1 , 0 ,
 				ChatColor.GOLD + "%s" ,
 				
-				Arrays.asList ( "" , ChatColor.GREEN + "Click to Join" ,
-								"" , ChatColor.DARK_GRAY + "%br_arena_count%/%br_arena_limit%" ) ,
-				
-				Arrays.asList ( "" , ChatColor.DARK_RED + "In Game" , "" ) ,
-				Arrays.asList ( "" , ChatColor.DARK_RED + "Full" ,
-								"" , ChatColor.DARK_RED + "%br_arena_count%/%br_arena_limit%" ) ,
-				Arrays.asList ( "" , ChatColor.DARK_RED + "Restarting..." , "" ) ,
-				Arrays.asList ( "" , ChatColor.DARK_RED + "Unavailable" , "" )
+				Arrays.asList ( "" , ChatColor.GREEN + "Click to Join" ) ,
+				Arrays.asList ( "" , ChatColor.DARK_RED + "In Game" ) ,
+				Arrays.asList ( "" , ChatColor.DARK_RED + "Full" ) ,
+				Arrays.asList ( "" , ChatColor.DARK_RED + "Restarting..." ) ,
+				Arrays.asList ( "" , ChatColor.DARK_RED + "Unavailable" )
 		) );
 		
 		icons.add ( new ArenaSelectorGUIButtonLeaveArena (

@@ -42,6 +42,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.io.FileNotFoundException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -83,6 +84,8 @@ public class BattleRoyaleArena {
 	/** current state of the arena */
 	protected volatile EnumArenaState state;
 	protected volatile long           state_time;
+	/** whether the battlefield is being prepared */
+	protected volatile boolean        preparing;
 	/** whether the battlefield is prepared */
 	protected volatile boolean        prepared;
 	/** whether this arena is over */
@@ -97,9 +100,15 @@ public class BattleRoyaleArena {
 		this.configuration = new BattleRoyaleArenaConfiguration ( configuration );
 		this.world         = Validate.notNull ( configuration.getWorld ( ) , "world cannot be null" );
 		this.battlefield   = Validate.notNull ( configuration.getBattlefield ( ) , "battlefield cannot be null" );
-		this.mode          = Validate.notNull ( configuration.getMode ( ) , "mode cannot be null" );
-		this.region        = new BattleRoyaleArenaRegion ( this );
-		this.border        = new BattleRoyaleArenaBorder ( this );
+		
+		try {
+			this.mode = Validate.notNull ( configuration.getMode ( ) , "mode cannot be null" );
+		} catch ( FileNotFoundException ex ) {
+			throw new IllegalStateException ( "configuration couldn't resolve the mode: " , ex );
+		}
+		
+		this.region = new BattleRoyaleArenaRegion ( this );
+		this.border = new BattleRoyaleArenaBorder ( this );
 		
 		if ( configuration.isAutostartEnabled ( ) ) {
 			this.auto_starter = new AutoStarter ( this );
@@ -236,9 +245,18 @@ public class BattleRoyaleArena {
 	}
 	
 	/**
-	 * Gets whether this arena is prepared to start or not.
+	 * Gets whether this arena is being prepared or not.
 	 *
-	 * @return whether this arena is prepared to start or not.
+	 * @return whether this arena is being prepared or not.
+	 */
+	public synchronized boolean isPreparing ( ) {
+		return preparing;
+	}
+	
+	/**
+	 * Gets whether this arena is prepared or not.
+	 *
+	 * @return whether this arena is prepared or not.
 	 */
 	public synchronized boolean isPrepared ( ) {
 		return prepared;
@@ -460,7 +478,11 @@ public class BattleRoyaleArena {
 					bus_registry.start ( );
 				}
 			} else {
-				throw new IllegalStateException ( "call prepare() first" );
+				if ( preparing ) {
+					throw new IllegalStateException ( "battlefield is being prepared" );
+				} else {
+					throw new IllegalStateException ( "call prepare() first" );
+				}
 			}
 		} else {
 			Bukkit.getScheduler ( ).runTask (
@@ -607,7 +629,7 @@ public class BattleRoyaleArena {
 				throw new IllegalStateException ( "arena requires the world to be restarted" );
 		}
 		
-		if ( !prepared ) {
+		if ( !prepared && !preparing ) {
 			prepare0 ( callback );
 		}
 	}
@@ -653,9 +675,12 @@ public class BattleRoyaleArena {
 	
 	protected void prepare0 ( Runnable callback ) {
 		if ( Bukkit.isPrimaryThread ( ) ) {
+			this.preparing = true;
 			this.region.shape ( ( ) -> {
 				this.preparation ( );
-				this.prepared = true;
+				
+				this.preparing = false;
+				this.prepared  = true;
 				
 				// callback
 				if ( callback != null ) {

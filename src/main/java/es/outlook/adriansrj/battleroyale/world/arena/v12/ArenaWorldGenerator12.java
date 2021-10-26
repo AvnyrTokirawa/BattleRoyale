@@ -7,10 +7,12 @@ import es.outlook.adriansrj.battleroyale.util.WorldEditUtil;
 import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
+import es.outlook.adriansrj.battleroyale.world.block.BlockTileEntity;
 import es.outlook.adriansrj.battleroyale.world.chunk.Chunk;
 import es.outlook.adriansrj.battleroyale.world.chunk.v12.Chunk12;
 import es.outlook.adriansrj.battleroyale.world.data.v12.WorldData12;
 import es.outlook.adriansrj.battleroyale.world.region.v12.Region12;
+import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.math.Vector3D;
 import es.outlook.adriansrj.core.util.world.WorldUtil;
 import net.kyori.adventure.nbt.BinaryTagIO;
@@ -23,6 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -124,19 +127,26 @@ public class ArenaWorldGenerator12 implements ArenaWorldGenerator {
 		getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).setBlockData ( x & 15 , y , z & 15 , data );
 	}
 	
+	public void addTileEntity ( BlockTileEntity tile_entity ) {
+		getChunk ( new ChunkLocation ( tile_entity.getX ( ) >> 4 , tile_entity.getZ ( ) >> 4 ) )
+				.getTileEntities ( ).add ( tile_entity );
+	}
+	
 	@Override
 	public void insert ( Clipboard schematic , Vector location , boolean ignore_air_blocks ) {
 		// we are assuming that it is an instance of BlockArrayClipboard clipboard,
 		// since we are not expecting to have to include here new implementations
 		// of Clipboard for this world edit version.
 		BlockArrayClipboard array      = ( BlockArrayClipboard ) schematic;
-		Vector3D            dimensions = WorldEditUtil.getDimensions ( schematic );
+		Vector3D            dimensions = Objects.requireNonNull ( WorldEditUtil.getDimensions ( schematic ) );
 		
 		try {
-			Class < ? > legacy_block_class = Class.forName ( "com.sk89q.worldedit.foundation.Block" );
-			Method      id_getter          = legacy_block_class.getMethod ( "getId" );
-			Method      data_getter        = legacy_block_class.getMethod ( "getData" );
-			Field       blocks_field       = BlockArrayClipboard.class.getDeclaredField ( "blocks" );
+			Class < ? > legacy_block_class      = Class.forName ( "com.sk89q.worldedit.foundation.Block" );
+			Class < ? > legacy_tile_block_class = Class.forName ( "com.sk89q.worldedit.blocks.TileEntityBlock" );
+			Method      id_getter               = legacy_block_class.getMethod ( "getId" );
+			Method      data_getter             = legacy_block_class.getMethod ( "getData" );
+			Method      nbt_id_getter           = legacy_tile_block_class.getMethod ( "getNbtId" );
+			Field       blocks_field            = BlockArrayClipboard.class.getDeclaredField ( "blocks" );
 			
 			blocks_field.setAccessible ( true );
 			
@@ -147,7 +157,13 @@ public class ArenaWorldGenerator12 implements ArenaWorldGenerator {
 					for ( int z = 0 ; z < dimensions.getZ ( ) ; z++ ) {
 						Object uncast_block = uncast[ x ][ y ][ z ];
 						
-						if ( legacy_block_class.isAssignableFrom ( uncast_block.getClass ( ) ) ) {
+						if ( uncast_block != null && legacy_block_class
+								.isAssignableFrom ( uncast_block.getClass ( ) ) ) {
+							int xx = ( int ) Math.floor ( location.getX ( ) + x );
+							int yy = ( int ) Math.floor ( location.getY ( ) + y );
+							int zz = ( int ) Math.floor ( location.getZ ( ) + z );
+							
+							// id & data
 							int id   = ( int ) id_getter.invoke ( legacy_block_class.cast ( uncast_block ) );
 							int data = ( int ) data_getter.invoke ( legacy_block_class.cast ( uncast_block ) );
 							
@@ -155,12 +171,17 @@ public class ArenaWorldGenerator12 implements ArenaWorldGenerator {
 								continue;
 							}
 							
-							setBlockAt (
-									( int ) Math.floor ( location.getX ( ) + x ) ,
-									( int ) Math.floor ( location.getY ( ) + y ) ,
-									( int ) Math.floor ( location.getZ ( ) + z ) ,
-									
-									id , ( byte ) data );
+							setBlockAt ( xx , yy , zz , id , ( byte ) data );
+							
+							// tile entity
+							if ( legacy_tile_block_class.isAssignableFrom ( uncast_block.getClass ( ) ) ) {
+								String uncast_nbt_id = ( String ) nbt_id_getter.invoke (
+										legacy_tile_block_class.cast ( uncast_block ) );
+								
+								if ( StringUtil.isNotBlank ( uncast_nbt_id ) ) {
+									addTileEntity ( new BlockTileEntity ( uncast_nbt_id , xx , yy , zz ) );
+								}
+							}
 						}
 					}
 				}
@@ -179,7 +200,7 @@ public class ArenaWorldGenerator12 implements ArenaWorldGenerator {
 		File level_data_file = new File ( world_folder , WorldUtil.LEVEL_DATA_FILE_NAME );
 		
 		try {
-			if ( ! level_data_file.exists ( ) ) {
+			if ( !level_data_file.exists ( ) ) {
 				level_data_file.getParentFile ( ).mkdirs ( );
 				level_data_file.createNewFile ( );
 			}
@@ -193,7 +214,7 @@ public class ArenaWorldGenerator12 implements ArenaWorldGenerator {
 		// saving chunks
 		File region_folder = new File ( world_folder , WorldUtil.REGION_FOLDER_NAME );
 		
-		if ( ! region_folder.exists ( ) ) {
+		if ( !region_folder.exists ( ) ) {
 			region_folder.mkdirs ( );
 		}
 		
