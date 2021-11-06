@@ -7,6 +7,7 @@ import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.ByteArrayBinaryTag;
 import net.kyori.adventure.nbt.ByteBinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.querz.nbt.tag.CompoundTag;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,6 +56,26 @@ public class ChunkSection12 implements NBTSerializable {
 		System.arraycopy ( sky_light , 0 , this.sky_light , 0 , sky_light.length );
 	}
 	
+	public ChunkSection12 ( Chunk12 chunk , CompoundTag tag ) {
+		this ( chunk , tag.getNumber ( NBTConstants.Pre13.CHUNK_SECTION_Y_TAG ).byteValue ( ) & 0xF );
+		
+		// reading blocks
+		byte[] blocks = tag.getByteArray ( NBTConstants.Pre13.CHUNK_SECTION_BLOCKS_TAG );
+		System.arraycopy ( blocks , 0 , this.blocks , 0 , blocks.length );
+		// reading blocks add
+		byte[] blocks_add = tag.getByteArray ( NBTConstants.Pre13.CHUNK_SECTION_ADD_TAG );
+		System.arraycopy ( blocks_add , 0 , this.blocks_add , 0 , blocks_add.length );
+		// reading blocks data
+		byte[] block_data = tag.getByteArray ( NBTConstants.Pre13.CHUNK_SECTION_DATA_TAG );
+		System.arraycopy ( block_data , 0 , this.block_data , 0 , block_data.length );
+		// reading blocks light
+		byte[] block_light = tag.getByteArray ( NBTConstants.Pre13.CHUNK_SECTION_BLOCK_LIGHT_TAG );
+		System.arraycopy ( block_light , 0 , this.block_light , 0 , block_light.length );
+		// reading skylight
+		byte[] sky_light = tag.getByteArray ( NBTConstants.Pre13.CHUNK_SECTION_SKY_LIGHT_TAG );
+		System.arraycopy ( sky_light , 0 , this.sky_light , 0 , sky_light.length );
+	}
+	
 	public Chunk getChunk ( ) {
 		return chunk;
 	}
@@ -84,9 +105,9 @@ public class ChunkSection12 implements NBTSerializable {
 	}
 	
 	public boolean isEmpty ( ) {
-		for ( int x = 0; x < 16; x++ ) {
-			for ( int y = 0; y < 16; y++ ) {
-				for ( int z = 0; z < 16; z++ ) {
+		for ( int x = 0 ; x < 16 ; x++ ) {
+			for ( int y = 0 ; y < 16 ; y++ ) {
+				for ( int z = 0 ; z < 16 ; z++ ) {
 					if ( getBlockId ( x , y , z ) != 0 ) {
 						return false;
 					}
@@ -97,9 +118,9 @@ public class ChunkSection12 implements NBTSerializable {
 	}
 	
 	public boolean hasExtendedId ( ) {
-		for ( int x = 0; x < 16; x++ ) {
-			for ( int y = 0; y < 16; y++ ) {
-				for ( int z = 0; z < 16; z++ ) {
+		for ( int x = 0 ; x < 16 ; x++ ) {
+			for ( int y = 0 ; y < 16 ; y++ ) {
+				for ( int z = 0 ; z < 16 ; z++ ) {
 					if ( getBlockAdd ( x , y , z ) != 0 ) {
 						return true;
 					}

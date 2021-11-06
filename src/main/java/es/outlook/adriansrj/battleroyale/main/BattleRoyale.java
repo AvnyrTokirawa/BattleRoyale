@@ -6,35 +6,22 @@ import es.outlook.adriansrj.battleroyale.configuration.ConfigurationHandler;
 import es.outlook.adriansrj.battleroyale.data.DataStorageHandler;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
 import es.outlook.adriansrj.battleroyale.enums.EnumPluginHandler;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
-import es.outlook.adriansrj.battleroyale.gui.arena.ArenaSelectorGUIHandler;
-import es.outlook.adriansrj.battleroyale.gui.setting.SettingsGUIHandler;
-import es.outlook.adriansrj.battleroyale.gui.team.TeamSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.world.chunk.EmptyChunkGenerator;
 import es.outlook.adriansrj.core.dependency.MavenDependency;
+import es.outlook.adriansrj.core.dependency.MavenDependencyRepository;
 import es.outlook.adriansrj.core.handler.PluginHandler;
-import es.outlook.adriansrj.core.player.PlayerWrapper;
 import es.outlook.adriansrj.core.plugin.Plugin;
 import es.outlook.adriansrj.core.plugin.PluginAdapter;
 import es.outlook.adriansrj.core.util.console.ConsoleUtil;
-import es.outlook.adriansrj.core.util.packet.PacketAdapter;
-import es.outlook.adriansrj.core.util.packet.PacketChannelHandler;
-import es.outlook.adriansrj.core.util.packet.PacketEvent;
-import es.outlook.adriansrj.core.util.packet.PacketListener;
-import es.outlook.adriansrj.core.util.reflection.bukkit.BukkitReflection;
-import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
-import net.minecraft.server.v1_12_R1.PacketPlayOutOpenSignEditor;
 import org.apache.commons.io.FileDeleteStrategy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.io.File;
@@ -52,11 +39,19 @@ public final class BattleRoyale extends PluginAdapter implements Listener {
 	}
 	
 	@Override
+	public MavenDependencyRepository[] getLibraryRepositories ( ) {
+		return new MavenDependencyRepository[] {
+				new MavenDependencyRepository ( "jitpack" , "https://jitpack.io/" )
+		};
+	}
+	
+	@Override
 	public MavenDependency[] getLibraries ( ) {
 		return new MavenDependency[] {
 				new MavenDependency ( "com.zaxxer:HikariCP:3.4.5" ) ,
 				new MavenDependency ( "org.mongodb:mongodb-driver-sync:4.2.1" ) ,
-				new MavenDependency ( "net.kyori:adventure-nbt:4.8.1" ) ,
+				new MavenDependency ( "net.kyori:adventure-nbt:4.9.2" ) ,
+				new MavenDependency ( "com.github.Querz:NBT:6.1" ) ,
 				new MavenDependency ( "xyz.xenondevs:particle:1.6.4" ) ,
 		};
 	}

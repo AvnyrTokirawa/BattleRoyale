@@ -8,7 +8,6 @@ import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.menu.ItemMenu;
 import es.outlook.adriansrj.core.menu.item.action.ActionItem;
 import es.outlook.adriansrj.core.menu.size.ItemMenuSize;
-import es.outlook.adriansrj.core.util.file.FilenameUtil;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import es.outlook.adriansrj.core.util.world.GameRuleType;
 import org.bukkit.ChatColor;
@@ -65,11 +64,10 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 						ChatColor.GRAY + "the spawn of the" ,
 						ChatColor.GRAY + "lobby."
 				) ).addAction ( action -> {
-			Location location = action.getPlayer ( ).getLocation ( );
+			Player   player   = action.getPlayer ( );
+			Location location = player.getLocation ( );
 			
-			EnumLobbyConfiguration.WORLD_PATH.setValue ( FilenameUtil.filePathSubPlugins (
-					location.getWorld ( ).getWorldFolder ( ).getAbsolutePath ( ) ) );
-			
+			EnumLobbyConfiguration.WORLD_NAME.setValue ( player.getWorld ( ).getName ( ) );
 			EnumLobbyConfiguration.SPAWN_X.setValue ( location.getX ( ) );
 			EnumLobbyConfiguration.SPAWN_Y.setValue ( location.getY ( ) );
 			EnumLobbyConfiguration.SPAWN_Z.setValue ( location.getZ ( ) );
@@ -108,7 +106,7 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 								ChatColor.GRAY + "Click to disable" ,
 								ChatColor.GRAY + "the damage in" ,
 								ChatColor.GRAY + "the lobby." ) ).addAction ( action -> {
-			boolean flag = ! EnumLobbyConfiguration.WORLD_DISABLE_DAMAGE.getAsBoolean ( );
+			boolean flag = !EnumLobbyConfiguration.WORLD_DISABLE_DAMAGE.getAsBoolean ( );
 			
 			EnumLobbyConfiguration.WORLD_DISABLE_DAMAGE.setValue ( flag );
 			EnumLobbyConfiguration.saveConfiguration ( );
@@ -145,10 +143,10 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 								ChatColor.GRAY + "Click to disable" ,
 								ChatColor.GRAY + "the hunger in" ,
 								ChatColor.GRAY + "the lobby." ) ).addAction ( action -> {
-			boolean flag = ! EnumLobbyConfiguration.WORLD_DISABLE_HUNGER.getAsBoolean ( );
+			boolean flag = !EnumLobbyConfiguration.WORLD_DISABLE_HUNGER.getAsBoolean ( );
 			
 			GameRuleType.DISABLE_HUNGER.apply (
-					BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( ).getWorld ( ) , ! flag );
+					BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( ).getWorld ( ) , !flag );
 			EnumLobbyConfiguration.WORLD_DISABLE_HUNGER.setValue ( flag );
 			EnumLobbyConfiguration.saveConfiguration ( );
 			
@@ -186,7 +184,7 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 								ChatColor.GRAY + "Click to disable" ,
 								ChatColor.GRAY + "the mobs in" ,
 								ChatColor.GRAY + "the lobby." ) ).addAction ( action -> {
-			boolean flag = ! EnumLobbyConfiguration.WORLD_DISABLE_MOBS.getAsBoolean ( );
+			boolean flag = !EnumLobbyConfiguration.WORLD_DISABLE_MOBS.getAsBoolean ( );
 			
 			GameRuleType.MOB_SPAWNING.apply (
 					BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( ).getWorld ( ) , flag );
@@ -231,7 +229,7 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 								ChatColor.GRAY + "joining the server." ,
 								"" ,
 								ChatColor.GRAY + "Click to enable." ) ).addAction ( action -> {
-			boolean flag = ! EnumLobbyConfiguration.SPAWN_JOIN.getAsBoolean ( );
+			boolean flag = !EnumLobbyConfiguration.SPAWN_JOIN.getAsBoolean ( );
 			
 			EnumLobbyConfiguration.SPAWN_JOIN.setValue ( flag );
 			EnumLobbyConfiguration.saveConfiguration ( );
@@ -263,7 +261,7 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 								"" ,
 								ChatColor.GRAY + "The players will be" ,
 								ChatColor.GRAY + "sent back to the spawn" ,
-								ChatColor.GRAY + "when falling into the void.",
+								ChatColor.GRAY + "when falling into the void." ,
 								"" ,
 								ChatColor.GRAY + "Click to disable." ) :
 						
@@ -271,10 +269,10 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 								"" ,
 								ChatColor.GRAY + "The players will not be" ,
 								ChatColor.GRAY + "sent back to the spawn" ,
-								ChatColor.GRAY + "when falling into the void.",
+								ChatColor.GRAY + "when falling into the void." ,
 								"" ,
 								ChatColor.GRAY + "Click to enable." ) ).addAction ( action -> {
-			boolean flag = ! EnumLobbyConfiguration.SPAWN_VOID.getAsBoolean ( );
+			boolean flag = !EnumLobbyConfiguration.SPAWN_VOID.getAsBoolean ( );
 			
 			EnumLobbyConfiguration.SPAWN_VOID.setValue ( flag );
 			EnumLobbyConfiguration.saveConfiguration ( );

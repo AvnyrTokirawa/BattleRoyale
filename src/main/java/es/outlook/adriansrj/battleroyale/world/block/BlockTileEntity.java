@@ -9,6 +9,7 @@ import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.IntBinaryTag;
 import net.kyori.adventure.nbt.StringBinaryTag;
+import net.querz.nbt.tag.CompoundTag;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -38,6 +39,26 @@ public class BlockTileEntity implements NBTSerializable {
 	}
 	
 	public BlockTileEntity ( CompoundBinaryTag tag , EnumDataVersion data_version ) {
+		this.data_version = Objects.requireNonNull ( data_version , "data version cannot be null" );
+		
+		if ( data_version.getId ( ) < EnumDataVersion.v1_13.getId ( ) ) {
+			// id
+			this.id = tag.getString ( NBTConstants.Pre13.CHUNK_TILE_ENTITY_ID_TAG );
+			// coordinates
+			this.x = tag.getInt ( NBTConstants.Pre13.CHUNK_TILE_ENTITY_X_TAG );
+			this.y = tag.getInt ( NBTConstants.Pre13.CHUNK_TILE_ENTITY_Y_TAG );
+			this.z = tag.getInt ( NBTConstants.Pre13.CHUNK_TILE_ENTITY_Z_TAG );
+		} else { // legacy versions.
+			// id
+			this.id = tag.getString ( NBTConstants.Post13.CHUNK_TILE_ENTITY_ID_TAG );
+			// coordinates
+			this.x = tag.getInt ( NBTConstants.Post13.CHUNK_TILE_ENTITY_X_TAG );
+			this.y = tag.getInt ( NBTConstants.Post13.CHUNK_TILE_ENTITY_Y_TAG );
+			this.z = tag.getInt ( NBTConstants.Post13.CHUNK_TILE_ENTITY_Z_TAG );
+		}
+	}
+	
+	public BlockTileEntity ( CompoundTag tag , EnumDataVersion data_version ) {
 		this.data_version = Objects.requireNonNull ( data_version , "data version cannot be null" );
 		
 		if ( data_version.getId ( ) < EnumDataVersion.v1_13.getId ( ) ) {

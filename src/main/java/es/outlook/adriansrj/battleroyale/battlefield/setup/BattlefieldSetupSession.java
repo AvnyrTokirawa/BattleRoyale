@@ -335,6 +335,14 @@ public class BattlefieldSetupSession {
 		return world != null && !closed;
 	}
 	
+	public synchronized boolean isNameSet ( ) {
+		return StringUtil.isNotBlank ( name );
+	}
+	
+	public synchronized boolean isBoundsSet ( ) {
+		return bounds != null && minimap != null;
+	}
+	
 	/**
 	 * Sets the name of the battlefield.
 	 *

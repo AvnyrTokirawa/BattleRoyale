@@ -5,9 +5,10 @@ import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.world.RegionFile;
 import es.outlook.adriansrj.battleroyale.world.chunk.v12.Chunk12;
 import es.outlook.adriansrj.battleroyale.world.region.Region;
-import net.kyori.adventure.nbt.BinaryTagIO;
+import net.querz.nbt.io.NBTDeserializer;
+import net.querz.nbt.io.NamedTag;
+import net.querz.nbt.tag.CompoundTag;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -63,15 +64,33 @@ public class Region12 implements Region {
 		if ( chunk == null ) {
 			// reading from file
 			if ( file != null ) {
+				// adventure nbt is not working properly, so we will
+				// use querz nbt to load the chunk.
 				try ( RegionFile handler = new RegionFile ( file , true ) ;
 						DataInputStream input = handler.getChunkDataInputStream ( x , z ) ) {
 					if ( input != null ) {
-						chunks[ x ][ z ] = ( chunk = new Chunk12 (
-								BinaryTagIO.reader ( ).read ( ( DataInput ) input ) ) );
+						NamedTag tag = new NBTDeserializer ( false ).fromStream ( input );
+						
+						if ( tag != null && tag.getTag ( ) instanceof CompoundTag ) {
+							chunks[ x ][ z ] = ( chunk = new Chunk12 ( ( CompoundTag ) tag.getTag ( ) ) );
+						} else {
+							throw new IOException (
+									"invalid data tag: " + ( tag == null ? "null" : tag.getClass ( ).getName ( ) ) );
+						}
 					}
 				} catch ( IOException ex ) {
 					ex.printStackTrace ( );
 				}
+				
+				//				try ( RegionFile handler = new RegionFile ( file , true ) ;
+				//						DataInputStream input = handler.getChunkDataInputStream ( x , z ) ) {
+				//					if ( input != null ) {
+				//						chunks[ x ][ z ] = ( chunk = new Chunk12 (
+				//								BinaryTagIO.reader ( ).read ( ( DataInput ) input ) ) );
+				//					}
+				//				} catch ( IOException ex ) {
+				//					ex.printStackTrace ( );
+				//				}
 			}
 			
 			// file not specified, or couldn't read it,

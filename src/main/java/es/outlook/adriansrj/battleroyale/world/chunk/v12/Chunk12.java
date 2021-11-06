@@ -14,6 +14,8 @@ import es.outlook.adriansrj.battleroyale.world.chunk.Chunk;
 import es.outlook.adriansrj.battleroyale.world.chunk.ChunkHeightmap;
 import es.outlook.adriansrj.battleroyale.world.chunk.ChunkSurface;
 import net.kyori.adventure.nbt.*;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
 
 import java.awt.*;
 import java.io.DataOutput;
@@ -65,6 +67,40 @@ public class Chunk12 implements Chunk {
 		// reading tile entities
 		for ( BinaryTag tile_entity_tag : level.getList ( NBTConstants.Pre13.CHUNK_TILE_ENTITIES_TAG ) ) {
 			tile_entities.add ( new BlockTileEntity ( ( CompoundBinaryTag ) tile_entity_tag , EnumDataVersion.v1_12 ) );
+		}
+		
+		// heightmap and surface
+		this.heightmap = new ChunkHeightmap ( );
+		this.surface   = new ChunkSurface ( this );
+	}
+	
+	public Chunk12 ( CompoundTag tag ) {
+		CompoundTag level = tag.getCompoundTag ( NBTConstants.Pre13.CHUNK_LEVEL_TAG );
+		
+		// reading location
+		this.location = new ChunkLocation ( level.getInt ( NBTConstants.Pre13.CHUNK_X_POS_TAG ) ,
+											level.getInt ( NBTConstants.Pre13.CHUNK_Z_POS_TAG ) );
+		// reading data version
+		this.data_version = level.getInt ( NBTConstants.Pre13.CHUNK_DATA_VERSION_TAG );
+		// reading last update
+		this.last_update = level.getLong ( NBTConstants.Pre13.CHUNK_LAST_UPDATE_TAG );
+		
+		// reading sections
+		for ( CompoundTag section_tag : level.getListTag (
+				NBTConstants.Pre13.CHUNK_SECTIONS_TAG ).asCompoundTagList ( ) ) {
+			ChunkSection12 section = new ChunkSection12 ( this , section_tag );
+			
+			// between 0 - 15
+			sections[ section.y & 0xF ] = section;
+		}
+		
+		// reading tile entities
+		ListTag < ? > raw_tile_entities = level.getListTag ( NBTConstants.Pre13.CHUNK_TILE_ENTITIES_TAG );
+		
+		if ( raw_tile_entities != null ) {
+			for ( CompoundTag tile_entity_tag : raw_tile_entities.asCompoundTagList ( ) ) {
+				tile_entities.add ( new BlockTileEntity ( tile_entity_tag , EnumDataVersion.v1_12 ) );
+			}
 		}
 		
 		// heightmap and surface

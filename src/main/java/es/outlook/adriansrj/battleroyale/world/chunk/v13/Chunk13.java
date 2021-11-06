@@ -22,6 +22,8 @@ import es.outlook.adriansrj.battleroyale.world.chunk.ChunkHeightmap;
 import es.outlook.adriansrj.battleroyale.world.chunk.ChunkSurface;
 import es.outlook.adriansrj.core.util.reflection.general.EnumReflection;
 import net.kyori.adventure.nbt.*;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
 import org.apache.commons.lang.Validate;
 
 import java.awt.*;
@@ -77,6 +79,44 @@ public class Chunk13 implements Chunk {
 		// reading tile entities
 		for ( BinaryTag tile_entity_tag : level.getList ( NBTConstants.Post13.CHUNK_TILE_ENTITIES_TAG ) ) {
 			tile_entities.add ( new BlockTileEntity ( ( CompoundBinaryTag ) tile_entity_tag , EnumDataVersion.v1_13 ) );
+		}
+		
+		// heightmap and surface
+		this.heightmap = new ChunkHeightmap ( );
+		this.surface   = new ChunkSurface ( this );
+	}
+	
+	public Chunk13 ( CompoundTag tag ) {
+		CompoundTag level = tag.getCompoundTag ( NBTConstants.Post13.CHUNK_LEVEL_TAG );
+		
+		// reading location
+		this.location = new ChunkLocation ( level.getNumber ( NBTConstants.Post13.CHUNK_X_POS_TAG ).intValue ( ) ,
+											level.getNumber ( NBTConstants.Post13.CHUNK_Z_POS_TAG ).intValue ( ) );
+		// reading data version
+		this.data_version = level.getNumber ( NBTConstants.Post13.CHUNK_DATA_VERSION_TAG ).intValue ( );
+		// reading status
+		this.status = EnumReflection.getEnumConstant (
+				Chunk13Status.class , tag.getString ( NBTConstants.Post13.CHUNK_STATUS_TAG ) );
+		this.status = status == null ? Chunk13Status.POST_PROCESSED : status;
+		// reading last update
+		this.last_update = level.getLong ( NBTConstants.Post13.CHUNK_LAST_UPDATE_TAG );
+		
+		// reading sections
+		for ( CompoundTag section_tag : level.getListTag (
+				NBTConstants.Post13.CHUNK_SECTIONS_TAG ).asCompoundTagList ( ) ) {
+			ChunkSection13 section = new ChunkSection13 ( this , section_tag );
+			
+			// between 0 - 15
+			sections[ section.y & 0xF ] = section;
+		}
+		
+		// reading tile entities
+		ListTag < ? > raw_tile_entities = level.getListTag ( NBTConstants.Post13.CHUNK_TILE_ENTITIES_TAG );
+		
+		if ( raw_tile_entities != null ) {
+			for ( CompoundTag tile_entity_tag : raw_tile_entities.asCompoundTagList ( ) ) {
+				tile_entities.add ( new BlockTileEntity ( tile_entity_tag , EnumDataVersion.v1_13 ) );
+			}
 		}
 		
 		// heightmap and surface

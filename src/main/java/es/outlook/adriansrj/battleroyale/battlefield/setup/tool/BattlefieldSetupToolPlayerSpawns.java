@@ -1,8 +1,8 @@
 package es.outlook.adriansrj.battleroyale.battlefield.setup.tool;
 
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.item.ActionItem;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
@@ -55,11 +55,12 @@ public class BattlefieldSetupToolPlayerSpawns extends BattlefieldSetupToolItem {
 				handle.setBasePlate ( false );
 				handle.setMetadata ( MANIPULATOR_METADATA_KEY ,
 									 new FixedMetadataValue ( BattleRoyale.getInstance ( ) , this ) );
-				handle.setHelmet ( UniversalMaterial.WHITE_BED.getItemStack ( ) );
+				handle.getEquipment ( ).setHelmet ( UniversalMaterial.WHITE_BED.getItemStack ( ) );
 				handle.setCustomNameVisible ( true );
 				handle.setCustomName ( ChatColor.DARK_GREEN + "Player Spawn" );
 			}
 			
+			//			handle.teleport ( location.toLocation ( world ).add ( 0.0D , -0.5D , 0.0D ) );
 			handle.teleport ( location.toLocation ( world ) );
 		}
 		

@@ -2,9 +2,7 @@ package es.outlook.adriansrj.battleroyale.enums;
 
 import es.outlook.adriansrj.battleroyale.configuration.ConfigurationEntrySettable;
 import es.outlook.adriansrj.battleroyale.configuration.lobby.BattleRoyaleLobbyConfigHandler;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
-import es.outlook.adriansrj.core.util.file.FilenameUtil;
 import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -15,20 +13,7 @@ import org.bukkit.configuration.ConfigurationSection;
  */
 public enum EnumLobbyConfiguration implements ConfigurationEntrySettable {
 	
-	WORLD_PATH ( "world.path" , "path to the world of the lobby" , FilenameUtil.filePathSubPlugins (
-			EnumDirectory.LOBBY_DIRECTORY.getDirectory ( ).getAbsolutePath ( )
-					.replace ( "\\" , "/" ) + "/world" ) ) {
-		@Override
-		public void setValue ( Object value ) {
-			if ( value instanceof String ) {
-				super.setValue ( ( ( String ) value ).replace ( '\\' , '/' ) );
-			} else {
-				// let the super throw the exception
-				super.setValue ( value );
-			}
-		}
-	},
-	
+	WORLD_NAME ( "world.name" , "name of the world for the lobby" , "lobby-world" ),
 	WORLD_DISABLE_DAMAGE ( "world.disable-damage" ,
 						   "whether to disable damage in the world of the lobby" , true ),
 	WORLD_DISABLE_HUNGER ( "world.disable-hunger" ,

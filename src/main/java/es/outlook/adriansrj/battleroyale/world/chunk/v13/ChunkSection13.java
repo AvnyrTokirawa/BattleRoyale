@@ -4,6 +4,10 @@ import es.outlook.adriansrj.battleroyale.util.nbt.NBTConstants;
 import es.outlook.adriansrj.battleroyale.util.nbt.NBTSerializable;
 import es.outlook.adriansrj.battleroyale.world.Material;
 import net.kyori.adventure.nbt.*;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
+import net.querz.nbt.tag.StringTag;
+import net.querz.nbt.tag.Tag;
 
 import java.util.*;
 
@@ -43,91 +47,49 @@ public class ChunkSection13 implements NBTSerializable {
 		List < CompoundBinaryTag > palette = new ArrayList <> ( );
 		
 		for ( BinaryTag palette_tag : tag.getList ( "Palette" ) ) {
-			CompoundBinaryTag compound = ( CompoundBinaryTag ) palette_tag;
-			
-			palette.add ( compound );
+			if ( palette_tag instanceof CompoundBinaryTag ) {
+				palette.add ( ( CompoundBinaryTag ) palette_tag );
+			}
 		}
 		
 		Material[] palette_materials = new Material[ palette.size ( ) ];
 		
-		for ( int i = 0; i < palette_materials.length; i++ ) {
+		for ( int i = 0 ; i < palette_materials.length ; i++ ) {
 			palette_materials[ i ] = getPaletteMaterial ( palette.get ( i ) );
 		}
 		
-		int wordSize = Math.max ( 4 , ( int ) Math.ceil (
-				Math.log ( palette_materials.length ) / Math.log ( 2 ) ) );
-		int blockStateArrayLengthInBytes               = block_states.length * 8;
-		int expectedPackedBlockStateArrayLengthInBytes = wordSize * 512;
-		
-		if ( wordSize == 4 ) {
-			// optimised special case
-			for ( int w = 0; w < materials.length; w += 16 ) {
-				final long data = block_states[ w >> 4 ];
-				
-				materials[ w ]      = palette_materials[ ( int ) ( data & 0xf ) ];
-				materials[ w + 1 ]  = palette_materials[ ( int ) ( ( data & 0xf0 ) >> 4 ) ];
-				materials[ w + 2 ]  = palette_materials[ ( int ) ( ( data & 0xf00 ) >> 8 ) ];
-				materials[ w + 3 ]  = palette_materials[ ( int ) ( ( data & 0xf000 ) >> 12 ) ];
-				materials[ w + 4 ]  = palette_materials[ ( int ) ( ( data & 0xf0000 ) >> 16 ) ];
-				materials[ w + 5 ]  = palette_materials[ ( int ) ( ( data & 0xf00000 ) >> 20 ) ];
-				materials[ w + 6 ]  = palette_materials[ ( int ) ( ( data & 0xf000000 ) >> 24 ) ];
-				materials[ w + 7 ]  = palette_materials[ ( int ) ( ( data & 0xf0000000L ) >> 28 ) ];
-				materials[ w + 8 ]  = palette_materials[ ( int ) ( ( data & 0xf00000000L ) >> 32 ) ];
-				materials[ w + 9 ]  = palette_materials[ ( int ) ( ( data & 0xf000000000L ) >> 36 ) ];
-				materials[ w + 10 ] = palette_materials[ ( int ) ( ( data & 0xf0000000000L ) >> 40 ) ];
-				materials[ w + 11 ] = palette_materials[ ( int ) ( ( data & 0xf00000000000L ) >> 44 ) ];
-				materials[ w + 12 ] = palette_materials[ ( int ) ( ( data & 0xf000000000000L ) >> 48 ) ];
-				materials[ w + 13 ] = palette_materials[ ( int ) ( ( data & 0xf0000000000000L ) >> 52 ) ];
-				materials[ w + 14 ] = palette_materials[ ( int ) ( ( data & 0xf00000000000000L ) >> 56 ) ];
-				materials[ w + 15 ] = palette_materials[ ( int ) ( ( data & 0xf000000000000000L ) >>> 60 ) ];
-			}
-		} else if ( blockStateArrayLengthInBytes != expectedPackedBlockStateArrayLengthInBytes ) {
-			// a weird format where the block states are packed per
-			// long (leaving bits unused). Unpack each long individually
-			final long mask          = ( long ) ( Math.pow ( 2 , wordSize ) ) - 1;
-			final int  bitsInUse     = ( 64 / wordSize ) * wordSize;
-			int        materialIndex = 0;
-			
-			outer:
-			for ( long packedStates : block_states ) {
-				for ( int offset = 0; offset < bitsInUse; offset += wordSize ) {
-					materials[ materialIndex++ ] =
-							palette_materials[ ( int ) ( ( packedStates & ( mask << offset ) ) >>> offset ) ];
-					if ( materialIndex >= materials.length ) {
-						// The last long was not fully used
-						break outer;
-					}
-				}
-			}
-		} else {
-			final BitSet bitSet = BitSet.valueOf ( block_states );
-			
-			for ( int w = 0; w < materials.length; w++ ) {
-				final int wordOffset = w * wordSize;
-				int       index      = 0;
-				
-				for ( int b = 0; b < wordSize; b++ ) {
-					index |= bitSet.get ( wordOffset + b ) ? 1 << b : 0;
-				}
-				
-				materials[ w ] = palette_materials[ index ];
-			}
-		}
+		readPalette ( block_states , palette_materials );
 	}
 	
-	protected Material getPaletteMaterial ( CompoundBinaryTag tag ) {
-		Material material = new Material ( tag.getString ( "Name" ) );
+	public ChunkSection13 ( Chunk13 chunk , CompoundTag tag ) {
+		this ( chunk , tag.getNumber ( NBTConstants.Post13.CHUNK_SECTION_Y_TAG ).byteValue ( ) & 0xF );
 		
-		// properties
-		for ( Map.Entry < String, ? extends BinaryTag > entry : tag.getCompound ( "Properties" ) ) {
-			if ( entry.getValue ( ) instanceof StringBinaryTag ) {
-				material.setProperty (
-						entry.getKey ( ).toLowerCase ( Locale.ROOT ) ,
-						( ( StringBinaryTag ) entry.getValue ( ) ).value ( )
-								.toLowerCase ( Locale.ROOT ) );
+		// reading blocks light
+		byte[] block_light = tag.getByteArray ( NBTConstants.Post13.CHUNK_SECTION_BLOCK_LIGHT_TAG );
+		System.arraycopy ( block_light , 0 , this.block_light , 0 , block_light.length );
+		// reading skylight
+		byte[] sky_light = tag.getByteArray ( NBTConstants.Post13.CHUNK_SECTION_SKY_LIGHT_TAG );
+		System.arraycopy ( sky_light , 0 , this.sky_light , 0 , sky_light.length );
+		
+		// reading palette
+		long[] block_states = tag.getLongArray (
+				NBTConstants.Post13.CHUNK_SECTION_BLOCK_STATES_TAG );
+		ListTag < ? >        raw_palette = tag.getListTag ( "Palette" );
+		List < CompoundTag > palette     = new ArrayList <> ( );
+		
+		if ( raw_palette != null ) {
+			for ( CompoundTag palette_tag : raw_palette.asCompoundTagList ( ) ) {
+				palette.add ( palette_tag );
 			}
 		}
-		return material;
+		
+		Material[] palette_materials = new Material[ palette.size ( ) ];
+		
+		for ( int i = 0 ; i < palette_materials.length ; i++ ) {
+			palette_materials[ i ] = getPaletteMaterial ( palette.get ( i ) );
+		}
+		
+		readPalette ( block_states , palette_materials );
 	}
 	
 	public int getY ( ) {
@@ -147,9 +109,9 @@ public class ChunkSection13 implements NBTSerializable {
 	}
 	
 	public boolean isEmpty ( ) {
-		for ( int x = 0; x < 16; x++ ) {
-			for ( int y = 0; y < 16; y++ ) {
-				for ( int z = 0; z < 16; z++ ) {
+		for ( int x = 0 ; x < 16 ; x++ ) {
+			for ( int y = 0 ; y < 16 ; y++ ) {
+				for ( int z = 0 ; z < 16 ; z++ ) {
 					Material material = getMaterial ( x , y , z );
 					
 					if ( material != null && !material.isEmpty ( ) ) {
@@ -242,7 +204,7 @@ public class ChunkSection13 implements NBTSerializable {
 			// Optimised special case
 			long[] blockStates = new long[ 256 ];
 			
-			for ( int i = 0; i < 4096; i += 16 ) {
+			for ( int i = 0 ; i < 4096 ; i += 16 ) {
 				blockStates[ i >> 4 ] =
 						reversePalette.get ( materials[ i ] != null ? materials[ i ] : Material.AIR )
 								| ( reversePalette.get (
@@ -281,11 +243,11 @@ public class ChunkSection13 implements NBTSerializable {
 		} else {
 			BitSet blockStates = new BitSet ( 4096 * paletteIndexSize );
 			
-			for ( int i = 0; i < 4096; i++ ) {
+			for ( int i = 0 ; i < 4096 ; i++ ) {
 				int offset = i * paletteIndexSize;
 				int index  = reversePalette.get ( materials[ i ] != null ? materials[ i ] : Material.AIR );
 				
-				for ( int j = 0; j < paletteIndexSize; j++ ) {
+				for ( int j = 0 ; j < paletteIndexSize ; j++ ) {
 					if ( ( index & ( 1 << j ) ) != 0 ) {
 						blockStates.set ( offset + j );
 					}
@@ -313,5 +275,103 @@ public class ChunkSection13 implements NBTSerializable {
 		contents.put ( "SkyLight" , ByteArrayBinaryTag.of ( this.sky_light ) );
 		
 		return CompoundBinaryTag.from ( contents );
+	}
+	
+	// ------- utils
+	
+	private void readPalette ( long[] block_states , Material[] palette_materials ) {
+		int wordSize = Math.max ( 4 , ( int ) Math.ceil (
+				Math.log ( palette_materials.length ) / Math.log ( 2 ) ) );
+		int blockStateArrayLengthInBytes               = block_states.length * 8;
+		int expectedPackedBlockStateArrayLengthInBytes = wordSize * 512;
+		
+		if ( wordSize == 4 ) {
+			// optimised special case
+			for ( int w = 0 ; w < materials.length ; w += 16 ) {
+				final long data = block_states[ w >> 4 ];
+				
+				materials[ w ]      = palette_materials[ ( int ) ( data & 0xf ) ];
+				materials[ w + 1 ]  = palette_materials[ ( int ) ( ( data & 0xf0 ) >> 4 ) ];
+				materials[ w + 2 ]  = palette_materials[ ( int ) ( ( data & 0xf00 ) >> 8 ) ];
+				materials[ w + 3 ]  = palette_materials[ ( int ) ( ( data & 0xf000 ) >> 12 ) ];
+				materials[ w + 4 ]  = palette_materials[ ( int ) ( ( data & 0xf0000 ) >> 16 ) ];
+				materials[ w + 5 ]  = palette_materials[ ( int ) ( ( data & 0xf00000 ) >> 20 ) ];
+				materials[ w + 6 ]  = palette_materials[ ( int ) ( ( data & 0xf000000 ) >> 24 ) ];
+				materials[ w + 7 ]  = palette_materials[ ( int ) ( ( data & 0xf0000000L ) >> 28 ) ];
+				materials[ w + 8 ]  = palette_materials[ ( int ) ( ( data & 0xf00000000L ) >> 32 ) ];
+				materials[ w + 9 ]  = palette_materials[ ( int ) ( ( data & 0xf000000000L ) >> 36 ) ];
+				materials[ w + 10 ] = palette_materials[ ( int ) ( ( data & 0xf0000000000L ) >> 40 ) ];
+				materials[ w + 11 ] = palette_materials[ ( int ) ( ( data & 0xf00000000000L ) >> 44 ) ];
+				materials[ w + 12 ] = palette_materials[ ( int ) ( ( data & 0xf000000000000L ) >> 48 ) ];
+				materials[ w + 13 ] = palette_materials[ ( int ) ( ( data & 0xf0000000000000L ) >> 52 ) ];
+				materials[ w + 14 ] = palette_materials[ ( int ) ( ( data & 0xf00000000000000L ) >> 56 ) ];
+				materials[ w + 15 ] = palette_materials[ ( int ) ( ( data & 0xf000000000000000L ) >>> 60 ) ];
+			}
+		} else if ( blockStateArrayLengthInBytes != expectedPackedBlockStateArrayLengthInBytes ) {
+			// a weird format where the block states are packed per
+			// long (leaving bits unused). Unpack each long individually
+			final long mask          = ( long ) ( Math.pow ( 2 , wordSize ) ) - 1;
+			final int  bitsInUse     = ( 64 / wordSize ) * wordSize;
+			int        materialIndex = 0;
+			
+			outer:
+			for ( long packedStates : block_states ) {
+				for ( int offset = 0 ; offset < bitsInUse ; offset += wordSize ) {
+					materials[ materialIndex++ ] =
+							palette_materials[ ( int ) ( ( packedStates & ( mask << offset ) ) >>> offset ) ];
+					if ( materialIndex >= materials.length ) {
+						// The last long was not fully used
+						break outer;
+					}
+				}
+			}
+		} else {
+			final BitSet bitSet = BitSet.valueOf ( block_states );
+			
+			for ( int w = 0 ; w < materials.length ; w++ ) {
+				final int wordOffset = w * wordSize;
+				int       index      = 0;
+				
+				for ( int b = 0 ; b < wordSize ; b++ ) {
+					index |= bitSet.get ( wordOffset + b ) ? 1 << b : 0;
+				}
+				
+				materials[ w ] = palette_materials[ index ];
+			}
+		}
+	}
+	
+	protected Material getPaletteMaterial ( CompoundBinaryTag tag ) {
+		Material material = new Material ( tag.getString ( "Name" ) );
+		
+		// properties
+		for ( Map.Entry < String, ? extends BinaryTag > entry : tag.getCompound ( "Properties" ) ) {
+			if ( entry.getValue ( ) instanceof StringBinaryTag ) {
+				material.setProperty (
+						entry.getKey ( ).toLowerCase ( Locale.ROOT ) ,
+						( ( StringBinaryTag ) entry.getValue ( ) ).value ( ).toLowerCase ( Locale.ROOT ) );
+			}
+		}
+		return material;
+	}
+	
+	protected Material getPaletteMaterial ( CompoundTag tag ) {
+		Material material = new Material ( tag.getString ( "Name" ) );
+		
+		// properties
+		CompoundTag properties = tag.getCompoundTag ( "Properties" );
+		
+		if ( properties != null ) {
+			for ( Map.Entry < String, Tag < ? > > entry : properties.entrySet ( ) ) {
+				Tag < ? > value = entry.getValue ( );
+				
+				if ( value instanceof StringTag ) {
+					material.setProperty (
+							entry.getKey ( ).toLowerCase ( Locale.ROOT ) ,
+							( ( StringTag ) value ).getValue ( ).toLowerCase ( Locale.ROOT ) );
+				}
+			}
+		}
+		return material;
 	}
 }

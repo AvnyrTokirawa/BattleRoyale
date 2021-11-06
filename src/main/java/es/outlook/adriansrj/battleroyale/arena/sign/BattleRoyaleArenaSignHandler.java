@@ -9,6 +9,7 @@ import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.core.handler.PluginHandler;
+import es.outlook.adriansrj.core.util.EventUtil;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import es.outlook.adriansrj.core.util.math.Vector3I;
@@ -18,6 +19,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.Directional;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.SignChangeEvent;
@@ -46,8 +49,7 @@ public final class BattleRoyaleArenaSignHandler extends PluginHandler {
 	 * @param plugin the plugin to handle.
 	 */
 	public BattleRoyaleArenaSignHandler ( BattleRoyale plugin ) {
-		super ( plugin );
-		register ( );
+		super ( plugin ); register ( );
 	}
 	
 	public Collection < BattleRoyaleArenaSign > getSigns ( ) {
@@ -148,17 +150,21 @@ public final class BattleRoyaleArenaSignHandler extends PluginHandler {
 				
 				material.setFacingDirection ( sign.getFacingDirection ( ) );
 				handle.setData ( material );
-				handle.update ( );
+				handle.update ( true );
 			}
 			
 			// display text
 			String[] text_lines = EnumLanguage.ARENA_SIGN_WAITING_TEXT.getAsString ( ).split ( "\n" );
 			
-			for ( int i = 0 ; i < Math.min ( text_lines.length , handle.getLines ( ).length ) ; i++ ) {
-				handle.setLine ( i , String.format ( text_lines[ i ] , sign.getArenaName ( ) ) );
+			for ( int i = 0 ; i < handle.getLines ( ).length ; i++ ) {
+				if ( i < text_lines.length ) {
+					handle.setLine ( i , String.format ( text_lines[ i ] , sign.getArenaName ( ) ) );
+				} else {
+					handle.setLine ( i , StringUtil.EMPTY );
+				}
 			}
 			
-			handle.update ( );
+			handle.update ( true );
 		} else {
 			Bukkit.getScheduler ( ).runTask ( plugin , ( ) -> placeSign ( sign ) );
 		}
@@ -171,13 +177,28 @@ public final class BattleRoyaleArenaSignHandler extends PluginHandler {
 	
 	@EventHandler ( priority = EventPriority.HIGHEST )
 	public void onSignClick ( PlayerInteractEvent event ) {
-		Block      block = event.getClickedBlock ( );
-		BlockState state = block != null ? block.getState ( ) : null;
+		Block      block  = event.getClickedBlock ( );
+		BlockState state  = block != null ? block.getState ( ) : null;
+		Player     player = event.getPlayer ( );
 		
 		if ( state instanceof Sign ) {
-			getSign ( block.getLocation ( ).toVector ( ) ).ifPresent ( sign -> {
-				BattleRoyaleArenaHandler.getInstance ( ).joinArena ( event.getPlayer ( ) , sign.getArena ( ) );
-			} );
+			BattleRoyaleArenaSign sign = getSign ( block.getLocation ( ).toVector ( ) ).orElse ( null );
+			
+			if ( sign != null ) {
+				if ( EventUtil.isLeftClick ( event.getAction ( ) )
+						&& player.getGameMode ( ) == GameMode.CREATIVE ) {
+					event.setCancelled ( true );
+					
+					// the sign is being removed
+					block.setType ( UniversalMaterial.AIR.getMaterial ( ) );
+					
+					unregisterSign ( sign );
+					// saving
+					BattleRoyaleArenaSignContainerHandler.getInstance ( ).save ( );
+				} else {
+					BattleRoyaleArenaHandler.getInstance ( ).joinArena ( player , sign.getArena ( ) );
+				}
+			}
 		}
 	}
 	
@@ -201,9 +222,23 @@ public final class BattleRoyaleArenaSignHandler extends PluginHandler {
 		
 		if ( br_sign ) {
 			if ( arena != null ) {
-				createSign ( event.getBlock ( ).getLocation ( ).toVector ( ) ,
-							 ( ( org.bukkit.material.Sign ) ( ( Sign ) event.getBlock ( )
-									 .getState ( ) ).getData ( ) ).getFacing ( ) , arena );
+				// facing direction
+				BlockFace facing;
+				
+				if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_13_R1 ) ) {
+					facing = ( ( Directional ) block.getBlockData ( ) ).getFacing ( );
+				} else {
+					facing = ( ( org.bukkit.material.Sign ) block.getState ( ).getData ( ) ).getFacing ( );
+				}
+				
+				// the creating.
+				// sign must be registered the next tick,
+				// otherwise, the SignChangeEvent will override
+				// the changes.
+				BattleRoyaleArena final_arena = arena;
+				Bukkit.getScheduler ( ).scheduleSyncDelayedTask (
+						BattleRoyale.getInstance ( ) ,
+						( ) -> createSign ( block.getLocation ( ).toVector ( ) , facing , final_arena ) );
 				
 				// saving
 				BattleRoyaleArenaSignContainerHandler.getInstance ( ).save ( );

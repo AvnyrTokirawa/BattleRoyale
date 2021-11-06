@@ -84,7 +84,7 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 					SpawnManipulator.this.run ( );
 				}
 			};
-			this.speed_task.runTaskTimerAsynchronously ( BattleRoyale.getInstance ( ) , 0L , 0L );
+			this.speed_task.runTaskTimer ( BattleRoyale.getInstance ( ) , 0L , 0L );
 		}
 		
 		public BusSpawn getResult ( ) {
@@ -101,6 +101,8 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 			// start manipulator
 			start_manipulator = world.spawn ( start_location.toLocation ( world ).add ( 0 , -0.5D , 0 ) ,
 											  ArmorStand.class );
+			start_manipulator.setCustomNameVisible ( false );
+			start_manipulator.setCustomName ( StringUtil.EMPTY );
 			start_manipulator.getEquipment ( ).setHelmet ( UniversalMaterial.RED_WOOL.getItemStack ( ) );
 			start_manipulator.setVisible ( false );
 			start_manipulator.setGravity ( false );
@@ -113,12 +115,15 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 			description.add ( ChatColor.DARK_RED + "travel of the bus starts" );
 			
 			start_manipulator_description = spawnManipulatorDescription (
-					start_location , description , MANIPULATOR_START_METADATA_KEY );
+					start_location.clone ( ).add ( new Vector ( 0 , 1.5 , 0 ) ) ,
+					description , MANIPULATOR_START_METADATA_KEY );
 			
 			// door manipulator
 			Vector door_point_location = calculateDoorPointLocation ( );
 			
 			door_manipulator = world.spawn ( door_point_location.toLocation ( world ) , ArmorStand.class );
+			door_manipulator.setCustomNameVisible ( false );
+			door_manipulator.setCustomName ( StringUtil.EMPTY );
 			door_manipulator.getEquipment ( ).setHelmet ( UniversalMaterial.GREEN_WOOL.getItemStack ( ) );
 			door_manipulator.setVisible ( false );
 			door_manipulator.setGravity ( false );
@@ -154,7 +159,7 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 				handle.setMetadata ( metadata_key ,
 									 new FixedMetadataValue ( BattleRoyale.getInstance ( ) , this ) );
 				
-				result.add ( new UUIDEntity < ArmorStand > ( handle ) );
+				result.add ( new UUIDEntity <> ( handle ) );
 			}
 			
 			return result;
@@ -219,80 +224,76 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 				return;
 			}
 			
-			// particles display task calls
-			if ( Bukkit.isPrimaryThread ( ) ) {
-				// start point <-> door open point
-				Vector door_point = calculateDoorPointLocation ( );
-				
-				travel ( start_location.toLocation ( tool.session.getWorld ( ) ) ,
-						 door_point.toLocation ( tool.session.getWorld ( ) ) , true );
-				
-				// door open point <-> end point
-				Vector end_point = MathUtil.approximateEndPointLocation ( getResult ( ) , bounds );
-				
-				if ( end_point != null ) {
-					travel ( door_point.toLocation ( tool.session.getWorld ( ) ) ,
-							 end_point.toLocation ( tool.session.getWorld ( ) ) , false );
-				}
-			} else {
-				if ( speed_display == null ) {
-					speed_display_x              = start_location.getX ( );
-					speed_display_z              = start_location.getZ ( );
-					speed_display_entered_bounds =
-							tool.session.getResult ( ).getBounds ( ).contains ( start_location );
-					
-					// must be in server thread
-					Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
-						speed_display = tool.session.getWorld ( ).spawn (
-								start_location.toLocation ( tool.session.getWorld ( ) ) , ArmorStand.class );
-						speed_display.setGravity ( false );
-						speed_display.setVisible ( false );
-						speed_display.setHelmet ( UniversalMaterial.RED_WOOL.getItemStack ( ) );
-						speed_display.setCustomNameVisible ( true );
-						speed_display.setMetadata ( MANIPULATOR_SPEED_METADATA_KEY ,
-													new FixedMetadataValue ( BattleRoyale.getInstance ( ) ,
-																			 SpawnManipulator.this ) );
-					} );
-					return;
-				}
-				
-				// speed display task calls
-				speed_display_x += direction.getX ( ) * speed;
-				speed_display_z += direction.getZ ( ) * speed;
-				boolean out_bounds = !tool.session.getResult ( ).getBounds ( )
-						.contains ( speed_display_x , speed_display_z );
-				boolean door_open = new Vector2D ( speed_display_x , speed_display_z )
-						.distance ( new Vector2D ( start_location.getX ( ) , start_location.getZ ( ) ) )
-						>= door_point_distance;
-				
-				if ( out_bounds && speed_display_entered_bounds ) {
-					speed_display_x              = start_location.getX ( );
-					speed_display_z              = start_location.getZ ( );
-					speed_display_entered_bounds = false;
-				}
-				
-				if ( !speed_display_entered_bounds && !out_bounds ) {
-					speed_display_entered_bounds = true;
-				}
-				
-				// updating displaying
-				speed_display.setCustomName (
-						ChatColor.DARK_GREEN + "Displacement Speed: " +
-								ChatColor.DARK_BLUE + decimal_format.format ( speed ) );
-				
-				ItemStack helmet = ( door_open ? UniversalMaterial.GREEN_WOOL :
-						UniversalMaterial.RED_WOOL ).getItemStack ( );
-				
-				if ( !helmet.isSimilar ( speed_display.getHelmet ( ) ) ) {
-					speed_display.setHelmet ( helmet );
-				}
-				
-				// displacing
-				EntityReflection.setLocation (
-						speed_display , new Location (
-								tool.session.getWorld ( ) ,
-								speed_display_x , start_location.getY ( ) , speed_display_z ) );
+			/* particles display task calls */
+			// start point <-> door open point
+			Vector door_point = calculateDoorPointLocation ( );
+			
+			travel ( start_location.toLocation ( tool.session.getWorld ( ) ) ,
+					 door_point.toLocation ( tool.session.getWorld ( ) ) , true );
+			
+			// door open point <-> end point
+			Vector end_point = MathUtil.approximateEndPointLocation ( getResult ( ) , bounds );
+			
+			if ( end_point != null ) {
+				travel ( door_point.toLocation ( tool.session.getWorld ( ) ) ,
+						 end_point.toLocation ( tool.session.getWorld ( ) ) , false );
 			}
+			
+			/* displacing displayer */
+			if ( speed_display == null ) {
+				speed_display_x              = start_location.getX ( );
+				speed_display_z              = start_location.getZ ( );
+				speed_display_entered_bounds =
+						tool.session.getResult ( ).getBounds ( ).contains ( start_location );
+				
+				// spawning
+				speed_display = tool.session.getWorld ( ).spawn (
+						start_location.toLocation ( tool.session.getWorld ( ) ) , ArmorStand.class );
+				speed_display.setGravity ( false );
+				speed_display.setVisible ( false );
+				speed_display.getEquipment ( ).setHelmet ( UniversalMaterial.RED_WOOL.getItemStack ( ) );
+				speed_display.setCustomNameVisible ( true );
+				speed_display.setMetadata ( MANIPULATOR_SPEED_METADATA_KEY ,
+											new FixedMetadataValue ( BattleRoyale.getInstance ( ) ,
+																	 SpawnManipulator.this ) );
+			}
+			
+			// speed display task calls
+			speed_display_x += direction.getX ( ) * speed;
+			speed_display_z += direction.getZ ( ) * speed;
+			boolean out_bounds = !tool.session.getResult ( ).getBounds ( )
+					.contains ( speed_display_x , speed_display_z );
+			boolean door_open = new Vector2D ( speed_display_x , speed_display_z )
+					.distance ( new Vector2D ( start_location.getX ( ) , start_location.getZ ( ) ) )
+					>= door_point_distance;
+			
+			if ( out_bounds && speed_display_entered_bounds ) {
+				speed_display_x              = start_location.getX ( );
+				speed_display_z              = start_location.getZ ( );
+				speed_display_entered_bounds = false;
+			}
+			
+			if ( !speed_display_entered_bounds && !out_bounds ) {
+				speed_display_entered_bounds = true;
+			}
+			
+			// updating displaying
+			speed_display.setCustomName (
+					ChatColor.DARK_GREEN + "Displacement Speed: " +
+							ChatColor.DARK_BLUE + decimal_format.format ( speed ) );
+			
+			ItemStack helmet = ( door_open ? UniversalMaterial.GREEN_WOOL :
+					UniversalMaterial.RED_WOOL ).getItemStack ( );
+			
+			if ( !helmet.isSimilar ( speed_display.getEquipment ( ).getHelmet ( ) ) ) {
+				speed_display.getEquipment ( ).setHelmet ( helmet );
+			}
+			
+			// displacing
+			EntityReflection.setLocation (
+					speed_display , new Location (
+							tool.session.getWorld ( ) ,
+							speed_display_x , start_location.getY ( ) , speed_display_z ) );
 		}
 		
 		protected void travel ( Location from , Location to , boolean before_door ) {

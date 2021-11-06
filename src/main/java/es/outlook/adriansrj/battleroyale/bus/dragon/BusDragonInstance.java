@@ -1,10 +1,11 @@
 package es.outlook.adriansrj.battleroyale.bus.dragon;
 
 import es.outlook.adriansrj.battleroyale.bus.BusInstanceBase;
+import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerJumpOffBusEvent;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.PluginUtil;
 import es.outlook.adriansrj.battleroyale.util.VehicleUtil;
 import es.outlook.adriansrj.battleroyale.util.packet.interceptor.entity.PacketEntityTeleportInterceptorProtocolLib;
@@ -260,6 +261,19 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 		dispose.forEach ( seat_map :: remove );
 	}
 	
+	@Override
+	protected void jumpTutorial ( ) {
+		for ( Map.Entry < UUID, ArmorStand > entry : seat_map.entrySet ( ) ) {
+			Player player = Player.getPlayer ( entry.getKey ( ) );
+			
+			if ( player != null ) {
+				player.sendTitle ( EnumLanguage.BUS_JUMP_TITLE.getAsString ( ) ,
+								   EnumLanguage.BUS_JUMP_SUBTITLE.getAsString ( ) ,
+								   0 , 10 , 0 );
+			}
+		}
+	}
+	
 	public synchronized void ejectPlayer ( Player br_player ) {
 		if ( Bukkit.isPrimaryThread ( ) ) {
 			queue.remove ( br_player.getUniqueId ( ) );
@@ -323,7 +337,14 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 			super.finish ( );
 			this.dispose ( );
 		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , this :: finish );
+			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
+				// we will have to make sure that it is not already
+				// finished as we are switching threads; this can
+				// result in a desynchronization problem.
+				if ( !isFinished ( ) ) {
+					finish ( );
+				}
+			} );
 		}
 	}
 	

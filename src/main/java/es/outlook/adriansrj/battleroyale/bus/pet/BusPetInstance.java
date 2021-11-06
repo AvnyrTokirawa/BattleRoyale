@@ -192,7 +192,7 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 		seat.setSmall ( false );
 		seat.setBasePlate ( false );
 		seat.setRemoveWhenFarAway ( false );
-		seat.setVisible ( true );
+		seat.setVisible ( false );
 		
 		// seat spawned, we can now
 		// disable the queue flag
@@ -330,8 +330,13 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 	
 	@Override
 	protected void jumpTutorial ( ) {
+		// don't need to check if the player
+		// is actually in the bus as the bus
+		// will be immediately disposed when
+		// the player ejects.
 		this.player.sendTitle ( EnumLanguage.BUS_JUMP_TITLE.getAsString ( ) ,
-								EnumLanguage.BUS_JUMP_SUBTITLE.getAsString ( ) );
+								EnumLanguage.BUS_JUMP_SUBTITLE.getAsString ( ) ,
+								0 , 10 , 0 );
 	}
 	
 	@Override
@@ -343,7 +348,14 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 			super.finish ( );
 			this.dispose ( );
 		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , this :: finish );
+			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
+				// we will have to make sure that it is not already
+				// finished as we are switching threads; this can
+				// result in a desynchronization problem.
+				if ( !isFinished ( ) ) {
+					finish ( );
+				}
+			} );
 		}
 	}
 	

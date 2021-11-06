@@ -51,7 +51,10 @@ public final class BattlefieldSetupSessionGUI extends PluginHandler {
 		
 		if ( session != null ) {
 			this.handle.setItem ( 10 , new SetNameButton ( ) );
-			this.handle.setItem ( 12 , new SetBoundsButton ( ) );
+			
+			if ( session.isNameSet ( ) ) {
+				this.handle.setItem ( 12 , new SetBoundsButton ( ) );
+			}
 			
 			if ( session.getResult ( ) != null && session.getResult ( ).getBounds ( ) != null ) {
 				this.handle.setItem ( 14 , new SetBorderButton ( ) );

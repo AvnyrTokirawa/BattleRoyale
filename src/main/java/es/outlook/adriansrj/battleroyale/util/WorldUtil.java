@@ -32,13 +32,15 @@ public class WorldUtil extends es.outlook.adriansrj.core.util.world.WorldUtil {
 	 */
 	public static World loadWorldEmpty ( File world_folder ) {
 		if ( worldFolderCheck ( world_folder ) ) {
-			String path = world_folder.getPath ( ).replace ( '\\' , '/' );
-			World world = new WorldCreator ( path ).environment ( World.Environment.NORMAL )
+			World world = new WorldCreator ( world_folder.getPath ( ).replace ( '\\' , '/' ) )
+					.environment ( World.Environment.NORMAL )
 					.generator ( new EmptyChunkGenerator ( ) )
 					.generateStructures ( false ).createWorld ( );
 			
-			world.setAutoSave ( false );
-			GameRuleType.MOB_SPAWNING.apply ( world , false );
+			if ( world != null ) {
+				world.setAutoSave ( false );
+				GameRuleType.MOB_SPAWNING.apply ( world , false );
+			}
 			
 			return world;
 		} else {
