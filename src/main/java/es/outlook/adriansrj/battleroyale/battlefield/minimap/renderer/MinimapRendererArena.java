@@ -7,6 +7,7 @@ import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.core.util.math.DirectionUtil;
 import es.outlook.adriansrj.core.util.reflection.general.EnumReflection;
+import es.outlook.adriansrj.core.util.server.Version;
 import org.bukkit.Location;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapCursor;
@@ -71,6 +72,7 @@ public class MinimapRendererArena extends MinimapRendererBase {
 		}
 	}
 	
+	@SuppressWarnings ( "deprecation" )
 	protected void drawBombingZone ( BattleRoyaleArena arena , BombingZone zone , ZoneBounds display_bounds ,
 			org.bukkit.entity.Player player , MapCanvas canvas , boolean wrap ) {
 		ZoneBounds bounds = zone.getBounds ( );
@@ -100,9 +102,15 @@ public class MinimapRendererArena extends MinimapRendererBase {
 					direction = ( byte ) ( ( direction + ( 15 / 2 ) ) % 15 );
 				}
 				
-				canvas.getCursors ( ).addCursor ( new MapCursor (
-						( byte ) location.x , ( byte ) location.y ,
-						direction , type , true ) );
+				if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_12_R1 ) ) {
+					canvas.getCursors ( ).addCursor ( new MapCursor (
+							( byte ) location.x , ( byte ) location.y ,
+							direction , type , true ) );
+				} else {
+					canvas.getCursors ( ).addCursor ( new MapCursor (
+							( byte ) location.x , ( byte ) location.y ,
+							direction , type.getValue ( ) , true ) );
+				}
 			}
 		}
 	}

@@ -25,6 +25,18 @@ public final class PacketFactoryService extends PluginHandler implements PacketF
 	}
 	
 	@Override
+	public Object createEntityRelativeMovePacket ( int entity_id , int delta_x , int delta_y , int delta_z ,
+			boolean on_ground ) {
+		return handle.createEntityRelativeMovePacket ( entity_id , delta_x , delta_y , delta_z , on_ground );
+	}
+	
+	@Override
+	public Object createEntityRelativeMoveLookPacket ( int entity_id , int delta_x , int delta_y , int delta_z , byte yaw ,
+			byte pitch , boolean on_ground ) {
+		return handle.createEntityRelativeMoveLookPacket ( entity_id , delta_x , delta_y , delta_z , yaw , pitch , on_ground );
+	}
+	
+	@Override
 	public Object createEntityTeleportPacket ( int entity_id , boolean on_ground , double x , double y , double z ,
 			float yaw , float pitch ) {
 		return handle.createEntityTeleportPacket ( entity_id , on_ground , x , y , z , yaw , pitch );

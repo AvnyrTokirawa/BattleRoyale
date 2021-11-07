@@ -6,11 +6,11 @@ import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.WorldUtil;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
+import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.math.RandomUtil;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
 import org.bukkit.block.Block;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * @author AdrianSR / 14/10/2021 / 07:14 p. m.
@@ -20,7 +20,7 @@ public class BombingZone {
 	/**
 	 * @author AdrianSR / 14/10/2021 / 07:25 p. m.
 	 */
-	protected static class ThrowingBombsTask extends BukkitRunnable {
+	protected static class ThrowingBombsTask extends BukkitRunnableWrapper {
 		
 		protected final BombingZone zone;
 		protected       long        timestamp;
@@ -45,8 +45,11 @@ public class BombingZone {
 						block.getType ( ).isSolid ( ) || ( !block.isLiquid ( ) && !block.isEmpty ( ) ) );
 				
 				if ( land != null ) {
+					// stupidly, the createExplosion method that accepts a
+					// Location instead of the x,y,z parameters was implemented
+					// in newer versions.
 					SchedulerUtil.runTask ( ( ) -> zone.arena.getWorld ( ).createExplosion (
-							land.getLocation ( ).clone ( ).add ( 0.0D , 1.0D , 0.0D ) ,
+							land.getX ( ) , land.getY ( ) + 1.0D , land.getZ ( ) ,
 							5.0F , false , false ) );
 				}
 			} else {

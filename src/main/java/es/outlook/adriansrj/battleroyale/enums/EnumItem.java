@@ -6,13 +6,16 @@ import es.outlook.adriansrj.battleroyale.gui.arena.ArenaSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setting.SettingsGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.team.TeamSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
+import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.EventUtil;
 import es.outlook.adriansrj.core.util.configurable.Configurable;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import es.outlook.adriansrj.core.util.reflection.DataType;
+import es.outlook.adriansrj.core.util.reflection.general.EnumReflection;
 import es.outlook.adriansrj.core.util.server.Version;
 import es.outlook.adriansrj.core.util.yaml.YamlUtil;
 import org.bukkit.Bukkit;
@@ -25,6 +28,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -36,7 +40,7 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 	
 	ARENA_SELECTOR ( true , 0 , ChatColor.GOLD + "Arena Selector" ,
 					 UniversalMaterial.SAND , ( byte ) 0 ,
-					 true , EventPriority.HIGH , null ) {
+					 false , EventPriority.HIGH , null ) {
 		@Override
 		public void accept ( PlayerInteractEvent event ) {
 			if ( EventUtil.isRightClick ( event.getAction ( ) ) ) {
@@ -49,7 +53,7 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 	
 	LEAVE_ARENA ( true , 8 , ChatColor.DARK_RED + "Leave Arena" ,
 				  UniversalMaterial.BLACK_WOOL , ( byte ) 0 ,
-				  true , EventPriority.HIGH , null ) {
+				  false , EventPriority.HIGH , null ) {
 		@Override
 		public void accept ( PlayerInteractEvent event ) {
 			if ( EventUtil.isRightClick ( event.getAction ( ) ) ) {
@@ -63,7 +67,7 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 	
 	TEAM_SELECTOR ( true , 4 , ChatColor.GOLD + "Team Selector" ,
 					UniversalMaterial.WHITE_WOOL , ( byte ) 0 ,
-					true , EventPriority.HIGH , null ) {
+					false , EventPriority.HIGH , null ) {
 		@Override
 		public void accept ( PlayerInteractEvent event ) {
 			if ( EventUtil.isRightClick ( event.getAction ( ) ) ) {
@@ -76,7 +80,7 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 	
 	SETTINGS ( true , 2 , ChatColor.GOLD + "Settings" ,
 			   UniversalMaterial.LEVER , ( byte ) 0 ,
-			   true , EventPriority.HIGH , null ) {
+			   false , EventPriority.HIGH , null ) {
 		@Override
 		public void accept ( PlayerInteractEvent event ) {
 			if ( EventUtil.isRightClick ( event.getAction ( ) ) ) {
@@ -87,6 +91,49 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 		}
 	},
 	
+	BRIDGE_EGG ( true , -1 , ChatColor.DARK_GREEN + "Bridge Egg" ,
+				 UniversalMaterial.EGG , ( byte ) 0 , true , null , null ,
+				 // limit
+				 new Entry ( Constants.LIMIT_KEY , "the maximum distance the egg can travel" ,
+							 int.class , 50 ) ,
+				 // delay
+				 new DurationEntry ( Constants.DELAY_KEY , "how long will players have to wait" +
+						 "\nto use this item again" , Duration.ofMilliseconds ( 1000 ) ) ),
+	
+	LAUNCH_PAD ( true , -1 , ChatColor.DARK_GREEN + "Launch Pad" ,
+				 UniversalMaterial.SLIME_BLOCK , ( byte ) 0 , true , null ,
+				 // lore
+				 new String[] {
+						 "" ,
+						 ChatColor.YELLOW + "Place on the ground" ,
+						 ChatColor.YELLOW + "to re-deploy." ,
+						 "" ,
+						 ChatColor.RED + "(Only stays a few seconds)"
+				 } ,
+				 // size
+				 new Entry ( Constants.SIZE_KEY , "the size in blocks" , int.class , 3 ) ,
+				 // duration
+				 new DurationEntry ( Constants.DURATION_KEY , "launch pad life duration. " +
+						 "\n(6 seconds by default)" , Duration.ofMilliseconds ( 6000 ) ) ),
+	
+	FIREBALL ( true , -1 , ChatColor.RED + "Fireball" ,
+			   UniversalMaterial.FIRE_CHARGE , ( byte ) 0 , true , null , null ,
+			   // limit
+			   new Entry ( Constants.STRENGTH_KEY , "explosion strength" ,
+						   double.class , 1.2D ) ,
+			   // delay
+			   new DurationEntry ( Constants.DELAY_KEY , "how long will players have to wait" +
+					   "\nto use this item again" , Duration.ofMilliseconds ( 2000 ) ) ),
+	
+	TNT ( true , -1 , ChatColor.RED + "TNT" ,
+			   UniversalMaterial.TNT , ( byte ) 0 , true , null , null ,
+			   // limit
+			   new Entry ( Constants.STRENGTH_KEY , "explosion strength" ,
+						   double.class , 1.8D ) ,
+			   // delay
+			   new DurationEntry ( Constants.DELAY_KEY , "how long will players have to wait" +
+					   "\nto use this item again" , Duration.ofMilliseconds ( 2000 ) ) ),
+	
 	;
 	
 	private static final String INDEX_KEY        = "index";
@@ -96,11 +143,72 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 	private static final String DATA_KEY         = "data";
 	
 	/**
+	 * Duration configuration entry.
+	 *
+	 * @author AdrianSR / 08/08/2021 / Time: 11:49 a. m.
+	 */
+	public static class DurationEntry extends Entry {
+		
+		protected static final String DURATION_FORMAT_SEPARATOR = " ";
+		protected static final String DURATION_FORMAT           = "%d" + DURATION_FORMAT_SEPARATOR + "%s";
+		
+		public static String formatDuration ( long duration , TimeUnit unit ) {
+			return String.format ( DURATION_FORMAT , duration , unit.name ( ) );
+		}
+		
+		public static String formatDuration ( Duration duration ) {
+			return formatDuration ( duration.getDuration ( ) , duration.getUnit ( ) );
+		}
+		
+		public static Duration durationOf ( String regex ) {
+			long     duration = 0L;
+			TimeUnit unit     = null;
+			
+			if ( regex.contains ( DURATION_FORMAT_SEPARATOR ) ) {
+				String[] args = regex.split ( DURATION_FORMAT_SEPARATOR );
+				
+				if ( args.length > 1 ) {
+					String uncast_duration = args[ 0 ];
+					String uncast_unit     = args[ 1 ];
+					
+					try {
+						duration = Long.parseLong ( uncast_duration );
+						unit     = EnumReflection.getEnumConstant ( TimeUnit.class , uncast_unit );
+					} catch ( NumberFormatException ex ) {
+						// ignored exception
+					}
+				}
+			}
+			
+			return new Duration ( duration , unit );
+		}
+		
+		public DurationEntry ( String key , String comment , Duration default_value ) {
+			super ( key , comment , Duration.class , default_value );
+		}
+		
+		public Duration getAsDuration ( ) {
+			return getValueAs ( Duration.class );
+		}
+		
+		@Override
+		public DurationEntry load ( ConfigurationSection section ) {
+			this.value = durationOf ( section.getString ( key , StringUtil.EMPTY ) );
+			return this;
+		}
+		
+		@Override
+		public int save ( ConfigurationSection section ) {
+			return YamlUtil.setNotEqual ( section , key , formatDuration ( ( Duration ) value ) ) ? 1 : 0;
+		}
+	}
+	
+	/**
 	 * Configuration entry.
 	 *
 	 * @author AdrianSR / 08/08/2021 / Time: 11:49 a. m.
 	 */
-	protected static class Entry implements Configurable {
+	public static class Entry implements Configurable {
 		
 		protected final String      key;
 		protected final String      comment;
@@ -124,8 +232,20 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 			return default_value;
 		}
 		
+		public < T > T getDefaultValueAs ( Class < T > type ) {
+			return type.cast ( getDefaultValue ( ) );
+		}
+		
 		public Object getValue ( ) {
-			return value;
+			return value != null && typeCheck ( type , value ) ? value : default_value;
+		}
+		
+		public < T > T getValueAs ( Class < T > type ) {
+			return type.cast ( getValue ( ) );
+		}
+		
+		public Number getValueAsNumber ( ) {
+			return getValueAs ( Number.class );
 		}
 		
 		@Override
@@ -229,7 +349,8 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 	private final Set < Entry > extra_entries = new HashSet <> ( );
 	
 	EnumItem ( boolean configurable , int index , String display_name ,
-			UniversalMaterial material , byte data , boolean droppable , EventPriority action_priority , String[] lore ) {
+			UniversalMaterial material , byte data , boolean droppable ,
+			EventPriority action_priority , String[] lore , Entry... entries ) {
 		this.configurable         = configurable;
 		this.default_index        = index;
 		this.index                = index;
@@ -246,6 +367,8 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 		if ( action_priority != null ) {
 			registerEvent ( action_priority );
 		}
+		
+		this.extra_entries.addAll ( Arrays.asList ( entries ) );
 	}
 	
 	private void registerEvent ( EventPriority action_priority ) {
@@ -263,6 +386,16 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 						}
 					}
 				} , BattleRoyale.getInstance ( ) , false );
+	}
+	
+	public Set < Entry > getExtraConfigurationEntries ( ) {
+		return Collections.unmodifiableSet ( extra_entries );
+	}
+	
+	public Entry getExtraConfigurationEntry ( String key ) {
+		return extra_entries.stream ( )
+				.filter ( entry -> Objects.equals ( entry.key , key ) )
+				.findAny ( ).orElse ( null );
 	}
 	
 	@SuppressWarnings ( "deprecation" )

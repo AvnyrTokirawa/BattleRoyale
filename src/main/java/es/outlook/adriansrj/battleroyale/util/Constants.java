@@ -53,6 +53,13 @@ public class Constants {
 	public static final String SCHEMATIC_HEIGHT_KEY = "Height";
 	public static final String SCHEMATIC_LENGTH_KEY = "Length";
 	
+	public static final String NAME_KEY     = "name";
+	public static final String LIMIT_KEY    = "limit";
+	public static final String DELAY_KEY    = "delay";
+	public static final String DURATION_KEY = "duration";
+	public static final String SIZE_KEY     = "size";
+	public static final String STRENGTH_KEY = "strength";
+	
 	//	/** Update period of the displacement executor of the buses */
 	//	public static final long BUS_DISPLACEMENT_EXECUTOR_PERIOD    = 60L;
 	/** Parachute life-loop executor period */
@@ -99,6 +106,7 @@ public class Constants {
 	public static final String PACKET_IN_ARM_ANIMATION_NAME              = "PacketPlayInArmAnimation";
 	public static final String PACKET_IN_POSITION_NAME                   = "PacketPlayInPosition";
 	public static final String PACKET_IN_LOOK_NAME                       = "PacketPlayInPositionLook";
+	public static final String PACKET_OUT_ENTITY_NAME                    = "PacketPlayOutEntity";
 	public static final String PACKET_OUT_ENTITY_TELEPORT_NAME           = "PacketPlayOutEntityTeleport";
 	public static final String PACKET_OUT_ATTACH_ENTITY_NAME             = "PacketPlayOutAttachEntity";
 	public static final String PACKET_OUT_ENTITY_RELATIVE_MOVE_NAME      = "PacketPlayOutRelEntityMove";
@@ -106,6 +114,9 @@ public class Constants {
 	
 	// ---------- packet-related classes
 	
+	public static final Class < ? > PACKET_OUT_ENTITY_CLASS;
+	public static final Class < ? > PACKET_OUT_ENTITY_RELATIVE_MOVE_CLASS;
+	public static final Class < ? > PACKET_OUT_ENTITY_RELATIVE_MOVE_LOOK_CLASS;
 	public static final Class < ? > PACKET_OUT_ENTITY_TELEPORT_CLASS;
 	public static final Class < ? > PACKET_OUT_ATTACH_ENTITY_CLASS;
 	
@@ -119,11 +130,22 @@ public class Constants {
 	static {
 		// packet classes
 		try {
+			PACKET_OUT_ENTITY_CLASS = ClassReflection.getMinecraftClass (
+					PACKET_OUT_ENTITY_NAME , "network.protocol.game" );
+			
 			PACKET_OUT_ENTITY_TELEPORT_CLASS = ClassReflection.getMinecraftClass (
 					PACKET_OUT_ENTITY_TELEPORT_NAME , "network.protocol.game" );
 			
 			PACKET_OUT_ATTACH_ENTITY_CLASS = ClassReflection.getMinecraftClass (
 					PACKET_OUT_ATTACH_ENTITY_NAME , "network.protocol.game" );
+			
+			// entity relative move packet
+			PACKET_OUT_ENTITY_RELATIVE_MOVE_CLASS = ClassReflection.getSubClass (
+					PACKET_OUT_ENTITY_CLASS , PACKET_OUT_ENTITY_RELATIVE_MOVE_NAME );
+			
+			// entity relative move and look packet
+			PACKET_OUT_ENTITY_RELATIVE_MOVE_LOOK_CLASS = ClassReflection.getSubClass (
+					PACKET_OUT_ENTITY_CLASS , PACKET_OUT_ENTITY_RELATIVE_MOVE_LOOK_NAME );
 			
 			// class/constructor/method names may vary depending on version of the server
 			PACKET_CLASS                       = ClassReflection.getMinecraftClass (

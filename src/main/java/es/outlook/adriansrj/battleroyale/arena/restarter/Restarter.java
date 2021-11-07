@@ -4,10 +4,10 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
+import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
 import es.outlook.adriansrj.battleroyale.util.time.TimeUtil;
 import es.outlook.adriansrj.core.enums.EnumMessageType;
 import es.outlook.adriansrj.core.util.Duration;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Class responsible for restarting a certain arena
@@ -20,7 +20,7 @@ public class Restarter {
 	/**
 	 * @author AdrianSR / 21/10/2021 / 09:38 p. m.
 	 */
-	protected static class RestartTask extends BukkitRunnable {
+	protected static class RestartTask extends BukkitRunnableWrapper {
 		
 		protected final Restarter restarter;
 		protected final Duration  countdown_duration;

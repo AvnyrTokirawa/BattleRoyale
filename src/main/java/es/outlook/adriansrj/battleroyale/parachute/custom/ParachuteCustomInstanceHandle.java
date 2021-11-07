@@ -24,7 +24,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
@@ -34,7 +33,6 @@ import org.bukkit.util.Vector;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -127,8 +125,6 @@ class ParachuteCustomInstanceHandle {
 	 */
 	protected static class Part {
 		
-		protected static int ENTITY_COUNT = Integer.MAX_VALUE / 2;
-		
 		/**
 		 * The height of the ArmorStand instances. It means that this constant has the height of a small ArmorStand
 		 * entity
@@ -210,7 +206,7 @@ class ParachuteCustomInstanceHandle {
 	// parts
 	protected volatile boolean      started;
 	protected volatile boolean      destroyed;
-	protected volatile ArmorStand   seat;
+	protected          ArmorStand   seat;
 	protected final    Set < Part > parts = new HashSet <> ( );
 	
 	// location
@@ -236,23 +232,19 @@ class ParachuteCustomInstanceHandle {
 		}
 	}
 	
+	@SuppressWarnings ( "deprecation" )
 	public synchronized boolean start ( ) {
-		System.out.println ( "start: 0 | " + this );
 		if ( seat != null ) {
 			throw new IllegalStateException ( "parachute already started" );
 		}
 		
-		System.out.println ( "start: 1 | " + this );
 		if ( !Bukkit.isPrimaryThread ( ) ) {
 			throw new IllegalStateException ( "must run on server thread" );
 		}
 		
-		System.out.println ( "start: 2 | " + this );
-		
 		org.bukkit.entity.Player player = this.player.getBukkitPlayer ( );
 		
 		if ( player != null && player.isOnline ( ) ) {
-			System.out.println ( "start: 3 | " + this );
 			Location location = player.getLocation ( );
 			
 			// initial location
@@ -266,7 +258,6 @@ class ParachuteCustomInstanceHandle {
 			this.seat.setGravity ( false );
 			this.seat.setSmall ( true );
 			this.seat.setRemoveWhenFarAway ( false );
-			System.out.println ( "start: 4 | " + this );
 			
 			try {
 				seat.addPassenger ( player );
@@ -275,7 +266,6 @@ class ParachuteCustomInstanceHandle {
 				seat.setPassenger ( player );
 			}
 			
-			System.out.println ( "start: 5 | " + this );
 			// parts
 			for ( ParachuteCustomModelPart part : model.getParts ( ).values ( ) ) {
 				if ( part != null && part.isValid ( ) ) {
@@ -284,7 +274,6 @@ class ParachuteCustomInstanceHandle {
 				}
 			}
 			
-			System.out.println ( "start: 6 | " + this );
 			// marking as started
 			this.started = true;
 		} else {
@@ -319,7 +308,6 @@ class ParachuteCustomInstanceHandle {
 		org.bukkit.entity.Player player = this.player.getBukkitPlayer ( );
 		
 		if ( player == null || arena == null ) {
-			System.out.println ( "lifeloop: destroy: player/arena == null | " + this );
 			destroy ( ); return;
 		}
 		
@@ -344,7 +332,6 @@ class ParachuteCustomInstanceHandle {
 			} );
 			
 			// then destroying
-			System.out.println ( "lifeloop: destroy: on ground | " + this );
 			destroy ( ); return;
 		}
 		
@@ -418,12 +405,10 @@ class ParachuteCustomInstanceHandle {
 	}
 	
 	public synchronized void destroy ( ) {
-		System.out.println ( ">>>> destroy: 0 | " + this );
 		if ( destroyed ) {
 			throw new IllegalStateException ( "parachute already destroy" );
 		}
 		
-		System.out.println ( ">>>> destroy: 1 | " + this );
 		this.destroyed = true;
 		
 		// sending player to last location
@@ -437,7 +422,7 @@ class ParachuteCustomInstanceHandle {
 					new Location ( finalPlayer.getWorld ( ) , x , y , z , rotation , 0.0F ) ) );
 		} else {
 			if ( ( player = this.player.getLastHandle ( ) ) != null ) {
-				EntityReflection.directLocationUpdate ( player , new Vector ( x , y , z ) );
+				EntityReflection.setPositionDirty ( player , new Vector ( x , y , z ) );
 			}
 		}
 		

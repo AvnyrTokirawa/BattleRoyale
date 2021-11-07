@@ -6,6 +6,7 @@ import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.math.MathUtil;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
+import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
 import es.outlook.adriansrj.core.item.ActionItem;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.entity.UUIDEntity;
@@ -75,10 +76,10 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 			this.yaw                 = yaw;
 			this.door_point_distance = door_point_distance;
 			this.speed               = speed;
-			this.particle_displayer  = Bukkit.getScheduler ( ).runTaskTimer (
-					BattleRoyale.getInstance ( ) , this , 8L , 8L );
+			this.particle_displayer  = Bukkit.getScheduler ( ).runTaskTimerAsynchronously (
+					BattleRoyale.getInstance ( ) , this , 12L , 12L );
 			
-			this.speed_task = new BukkitRunnable ( ) {
+			this.speed_task = new BukkitRunnableWrapper ( ) {
 				@Override
 				public void run ( ) {
 					SpawnManipulator.this.run ( );
@@ -215,91 +216,94 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 		
 		@Override
 		public void run ( ) {
-			ZoneBounds bounds    = tool.session.getResult ( ).getBounds ( );
-			Vector     direction = DirectionUtil.getDirection ( yaw , 0.0F );
+			ZoneBounds bounds = tool.session.getResult ( ).getBounds ( );
 			
-			if ( !bounds.contains ( start_location ) && !IntersectionUtil.intersectRayBoundsFast (
-					new Ray ( start_location , direction ) , bounds.toBoundingBox ( ) ) ) {
-				// bus will never be within bounds
-				return;
-			}
-			
-			/* particles display task calls */
-			// start point <-> door open point
-			Vector door_point = calculateDoorPointLocation ( );
-			
-			travel ( start_location.toLocation ( tool.session.getWorld ( ) ) ,
-					 door_point.toLocation ( tool.session.getWorld ( ) ) , true );
-			
-			// door open point <-> end point
-			Vector end_point = MathUtil.approximateEndPointLocation ( getResult ( ) , bounds );
-			
-			if ( end_point != null ) {
-				travel ( door_point.toLocation ( tool.session.getWorld ( ) ) ,
-						 end_point.toLocation ( tool.session.getWorld ( ) ) , false );
-			}
-			
-			/* displacing displayer */
-			if ( speed_display == null ) {
-				speed_display_x              = start_location.getX ( );
-				speed_display_z              = start_location.getZ ( );
-				speed_display_entered_bounds =
-						tool.session.getResult ( ).getBounds ( ).contains ( start_location );
+			if ( Bukkit.isPrimaryThread ( ) ) {
+				// speed display task calls
+				Vector direction = DirectionUtil.getDirection ( yaw , 0.0F );
 				
-				// spawning
-				speed_display = tool.session.getWorld ( ).spawn (
-						start_location.toLocation ( tool.session.getWorld ( ) ) , ArmorStand.class );
-				speed_display.setGravity ( false );
-				speed_display.setVisible ( false );
-				speed_display.getEquipment ( ).setHelmet ( UniversalMaterial.RED_WOOL.getItemStack ( ) );
-				speed_display.setCustomNameVisible ( true );
-				speed_display.setMetadata ( MANIPULATOR_SPEED_METADATA_KEY ,
-											new FixedMetadataValue ( BattleRoyale.getInstance ( ) ,
-																	 SpawnManipulator.this ) );
+				if ( !bounds.contains ( start_location ) && !IntersectionUtil.intersectRayBoundsFast (
+						new Ray ( start_location , direction ) , bounds.toBoundingBox ( ) ) ) {
+					// bus will never be within bounds
+					return;
+				}
+				
+				/* displacing displayer */
+				if ( speed_display == null ) {
+					speed_display_x              = start_location.getX ( );
+					speed_display_z              = start_location.getZ ( );
+					speed_display_entered_bounds =
+							tool.session.getResult ( ).getBounds ( ).contains ( start_location );
+					
+					// spawning
+					speed_display = tool.session.getWorld ( ).spawn (
+							start_location.toLocation ( tool.session.getWorld ( ) ) , ArmorStand.class );
+					speed_display.setGravity ( false );
+					speed_display.setVisible ( false );
+					speed_display.getEquipment ( ).setHelmet ( UniversalMaterial.RED_WOOL.getItemStack ( ) );
+					speed_display.setCustomNameVisible ( true );
+					speed_display.setMetadata ( MANIPULATOR_SPEED_METADATA_KEY ,
+												new FixedMetadataValue ( BattleRoyale.getInstance ( ) ,
+																		 SpawnManipulator.this ) );
+				}
+				
+				speed_display_x += direction.getX ( ) * speed;
+				speed_display_z += direction.getZ ( ) * speed;
+				boolean out_bounds = !tool.session.getResult ( ).getBounds ( )
+						.contains ( speed_display_x , speed_display_z );
+				boolean door_open = new Vector2D ( speed_display_x , speed_display_z )
+						.distance ( new Vector2D ( start_location.getX ( ) , start_location.getZ ( ) ) )
+						>= door_point_distance;
+				
+				if ( out_bounds && speed_display_entered_bounds ) {
+					speed_display_x              = start_location.getX ( );
+					speed_display_z              = start_location.getZ ( );
+					speed_display_entered_bounds = false;
+				}
+				
+				if ( !speed_display_entered_bounds && !out_bounds ) {
+					speed_display_entered_bounds = true;
+				}
+				
+				// updating displaying
+				speed_display.setCustomName (
+						ChatColor.DARK_GREEN + "Displacement Speed: " +
+								ChatColor.DARK_BLUE + decimal_format.format ( speed ) );
+				
+				ItemStack helmet = ( door_open ? UniversalMaterial.GREEN_WOOL :
+						UniversalMaterial.RED_WOOL ).getItemStack ( );
+				
+				if ( !helmet.isSimilar ( speed_display.getEquipment ( ).getHelmet ( ) ) ) {
+					speed_display.getEquipment ( ).setHelmet ( helmet );
+				}
+				
+				// displacing
+				EntityReflection.setLocation (
+						speed_display , new Location (
+								tool.session.getWorld ( ) ,
+								speed_display_x , start_location.getY ( ) , speed_display_z ) );
+			} else {
+				// particles display task calls
+				// start point <-> door open point
+				Vector door_point = calculateDoorPointLocation ( );
+				
+				travel ( start_location.toLocation ( tool.session.getWorld ( ) ) ,
+						 door_point.toLocation ( tool.session.getWorld ( ) ) , true );
+				
+				// door open point <-> end point
+				Vector end_point = MathUtil.approximateEndPointLocation ( getResult ( ) , bounds );
+				
+				if ( end_point != null ) {
+					travel ( door_point.toLocation ( tool.session.getWorld ( ) ) ,
+							 end_point.toLocation ( tool.session.getWorld ( ) ) , false );
+				}
 			}
-			
-			// speed display task calls
-			speed_display_x += direction.getX ( ) * speed;
-			speed_display_z += direction.getZ ( ) * speed;
-			boolean out_bounds = !tool.session.getResult ( ).getBounds ( )
-					.contains ( speed_display_x , speed_display_z );
-			boolean door_open = new Vector2D ( speed_display_x , speed_display_z )
-					.distance ( new Vector2D ( start_location.getX ( ) , start_location.getZ ( ) ) )
-					>= door_point_distance;
-			
-			if ( out_bounds && speed_display_entered_bounds ) {
-				speed_display_x              = start_location.getX ( );
-				speed_display_z              = start_location.getZ ( );
-				speed_display_entered_bounds = false;
-			}
-			
-			if ( !speed_display_entered_bounds && !out_bounds ) {
-				speed_display_entered_bounds = true;
-			}
-			
-			// updating displaying
-			speed_display.setCustomName (
-					ChatColor.DARK_GREEN + "Displacement Speed: " +
-							ChatColor.DARK_BLUE + decimal_format.format ( speed ) );
-			
-			ItemStack helmet = ( door_open ? UniversalMaterial.GREEN_WOOL :
-					UniversalMaterial.RED_WOOL ).getItemStack ( );
-			
-			if ( !helmet.isSimilar ( speed_display.getEquipment ( ).getHelmet ( ) ) ) {
-				speed_display.getEquipment ( ).setHelmet ( helmet );
-			}
-			
-			// displacing
-			EntityReflection.setLocation (
-					speed_display , new Location (
-							tool.session.getWorld ( ) ,
-							speed_display_x , start_location.getY ( ) , speed_display_z ) );
 		}
 		
 		protected void travel ( Location from , Location to , boolean before_door ) {
 			Vector direction = to.clone ( ).subtract ( from ).toVector ( ).normalize ( );
 			double factor    = 0.0D;
-			double increase  = 1.0D;
+			double increase  = 5.0D;
 			double distance  = from.distance ( to );
 			RegularColor color = before_door
 					? new RegularColor ( 255 , 0 , 0 )
@@ -471,8 +475,10 @@ public class BattlefieldSetupToolBusSpawns extends BattlefieldSetupToolItem {
 	@Override
 	protected void onActionPerform ( org.bukkit.entity.Player player ,
 			ActionItem.EnumAction action , PlayerInteractEvent event ) {
-		// making sure is not clicking a manipulator
-		if ( TargetUtil.getTarget ( player , 4.0D , ArmorStand.class ) != null ) {
+		if ( !action.isRightClick ( )
+				|| TargetUtil.getTarget ( player , 8.0D , ArmorStand.class ) != null ) {
+			// making sure is right click.
+			// making sure is not clicking a manipulator
 			return;
 		}
 		

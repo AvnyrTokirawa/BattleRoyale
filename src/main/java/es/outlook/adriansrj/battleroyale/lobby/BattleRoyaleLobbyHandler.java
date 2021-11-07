@@ -13,7 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import java.io.File;
-import java.util.Objects;
 
 /**
  * Battle royale lobby handler.
@@ -91,13 +90,6 @@ public final class BattleRoyaleLobbyHandler extends PluginHandler {
 	
 	public BattleRoyaleLobby getLobby ( ) {
 		return lobby;
-	}
-	
-	// ------- utils
-	
-	private boolean same ( File folder_a , File folder_b ) {
-		return Objects.equals ( folder_a , folder_b )
-				|| folder_a.getAbsolutePath ( ).equals ( folder_b.getAbsolutePath ( ) );
 	}
 	
 	@Override

@@ -3,6 +3,7 @@ package es.outlook.adriansrj.battleroyale.packet.factory;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketDataSerializer;
 import net.minecraft.network.protocol.game.PacketPlayOutAttachEntity;
+import net.minecraft.network.protocol.game.PacketPlayOutEntity;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport;
 
 /**
@@ -12,6 +13,20 @@ class PacketFactoryServiceHandle_v1_17_R1 implements PacketFactoryServiceHandle 
 	
 	public PacketFactoryServiceHandle_v1_17_R1 ( ) {
 		// java 16 and its constructor system!
+	}
+	
+	@Override
+	public Object createEntityRelativeMovePacket ( int entity_id , int delta_x , int delta_y , int delta_z ,
+			boolean on_ground ) {
+		return new PacketPlayOutEntity.PacketPlayOutRelEntityMove (
+				entity_id , ( short ) delta_x , ( short ) delta_y , ( short ) delta_z , on_ground );
+	}
+	
+	@Override
+	public Object createEntityRelativeMoveLookPacket ( int entity_id , int delta_x , int delta_y , int delta_z , byte yaw ,
+			byte pitch , boolean on_ground ) {
+		return new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook (
+				entity_id , ( short ) delta_x , ( short ) delta_y , ( short ) delta_z , yaw , pitch , on_ground );
 	}
 	
 	@Override

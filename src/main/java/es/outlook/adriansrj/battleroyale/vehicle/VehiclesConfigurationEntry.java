@@ -77,10 +77,8 @@ public class VehiclesConfigurationEntry implements Configurable, Cloneable {
 	@Override
 	public boolean isValid ( ) {
 		if ( StringUtil.isNotBlank ( vehicle_name ) ) {
-			if ( PluginUtil.isQualityArmoryVehiclesEnabled ( )
-					&& QualityArmoryVehiclesUtil.isValidVehicle ( vehicle_name ) ) {
-				return true;
-			}
+			return PluginUtil.isQualityArmoryVehiclesEnabled ( )
+					&& QualityArmoryVehiclesUtil.isValidVehicle ( vehicle_name );
 		}
 		
 		return false;

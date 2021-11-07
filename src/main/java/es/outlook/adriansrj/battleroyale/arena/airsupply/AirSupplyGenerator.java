@@ -56,7 +56,7 @@ public class AirSupplyGenerator {
 			next.clear ( );
 			
 			// count calculated based on the size of the point
-			double     alpha   = point.getRadius ( ) / arena.getBattlefield ( ).getSizeExact ( );
+			double     alpha   = point.getRadius ( ) / arena.getBattlefield ( ).getSize ( );
 			int        count   = ( int ) Math.floor ( this.count * alpha );
 			int        attempt = 0;
 			ZoneBounds bounds  = arena.getBorder ( ).getFutureBounds ( );

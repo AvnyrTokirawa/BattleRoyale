@@ -8,8 +8,8 @@ import es.outlook.adriansrj.battleroyale.event.player.PlayerCloseParachuteEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerDeathEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerJumpOffBusEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerOpenParachuteEvent;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.VehicleUtil;
 import es.outlook.adriansrj.core.enums.EnumMessageType;
 import es.outlook.adriansrj.core.handler.PluginHandler;
@@ -123,7 +123,8 @@ public final class ParachuteHandler extends PluginHandler implements PacketListe
 		
 		if ( arena != null && arena.getState ( ) == EnumArenaState.RUNNING
 				&& !br_player.isSpectator ( ) && player.getGameMode ( ) != GameMode.CREATIVE
-				&& player.getGameMode ( ) != GameMode.SPECTATOR && !parachute.isOpen ( )
+				&& player.getGameMode ( ) != GameMode.SPECTATOR
+				&& !br_player.getBus ( ).isPassenger ( br_player ) && !parachute.isOpen ( )
 				&& ( br_player.isCanOpenParachute ( ) || arena.getMode ( ).isRedeployEnabled ( ) ) ) {
 			PlayerOpenParachuteEvent open_event = new PlayerOpenParachuteEvent ( br_player , parachute );
 			open_event.call ( );

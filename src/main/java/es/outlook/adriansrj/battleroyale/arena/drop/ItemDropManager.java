@@ -2,7 +2,7 @@ package es.outlook.adriansrj.battleroyale.arena.drop;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import org.bukkit.scheduler.BukkitRunnable;
+import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +23,7 @@ public class ItemDropManager {
 	 *
 	 * @author AdrianSR / 15/10/2021 / 08:18 p. m.
 	 */
-	protected static class DropTickTask extends BukkitRunnable {
+	protected static class DropTickTask extends BukkitRunnableWrapper {
 		
 		protected final ItemDropManager manager;
 		

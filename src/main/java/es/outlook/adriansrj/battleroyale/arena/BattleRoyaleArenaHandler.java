@@ -2,10 +2,7 @@ package es.outlook.adriansrj.battleroyale.arena;
 
 import es.outlook.adriansrj.battleroyale.arena.listener.BattleRoyaleArenaListener;
 import es.outlook.adriansrj.battleroyale.battlefield.Battlefield;
-import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
-import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
-import es.outlook.adriansrj.battleroyale.enums.EnumItem;
-import es.outlook.adriansrj.battleroyale.enums.EnumWorldGenerator;
+import es.outlook.adriansrj.battleroyale.enums.*;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaLeaveEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaSetEvent;
@@ -14,6 +11,7 @@ import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.mode.RunModeHandler;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.battleroyale.util.WorldUtil;
 import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
@@ -242,7 +240,9 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 				player.getInventory ( ).clear ( );
 				player.getInventory ( ).setArmorContents ( null );
 				
-				EnumItem.ARENA_SELECTOR.give ( player );
+				if ( RunModeHandler.getInstance ( ).getMode ( ) != EnumMode.BUNGEE ) {
+					EnumItem.ARENA_SELECTOR.give ( player );
+				}
 				
 				if ( arena.getMode ( ).isTeamSelectionEnabled ( ) ) {
 					EnumItem.TEAM_SELECTOR.give ( player );

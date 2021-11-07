@@ -7,9 +7,9 @@ import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.sound.UniversalSound;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -25,7 +25,7 @@ public class AutoStarter {
 	/**
 	 * @author AdrianSR / 20/10/2021 / 12:07 p. m.
 	 */
-	protected static class StartTask extends BukkitRunnable {
+	protected static class StartTask extends BukkitRunnableWrapper {
 		
 		protected final AutoStarter starter;
 		protected final Duration    countdown_duration;

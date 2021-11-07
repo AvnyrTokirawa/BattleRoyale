@@ -21,9 +21,8 @@ public class BattlefieldShapeData {
 	
 	public static BattlefieldShapeData of ( File file ) {
 		try ( FileInputStream input = new FileInputStream ( file ) ) {
-			CompoundBinaryTag compound = BinaryTagIO.reader ( ).read ( input , BinaryTagIO.Compression.GZIP );
-			
-			int size_exact = compound.getInt ( SIZE_EXACT_KEY );
+			CompoundBinaryTag compound   = BinaryTagIO.reader ( ).read ( input , BinaryTagIO.Compression.GZIP );
+			int               size_exact = compound.getInt ( SIZE_EXACT_KEY );
 			
 			return new BattlefieldShapeData ( size_exact );
 		} catch ( IOException ex ) {

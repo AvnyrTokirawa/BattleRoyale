@@ -31,7 +31,7 @@ public final class BombingZoneGeneratorHandler extends PluginHandler {
 		List < BombingZone > list  = arena.getBombingZoneGenerator ( ).next ( );
 		
 		for ( BombingZone next : list ) {
-			if ( next.isValidPlace ( ) ) {
+			if ( next.isValidPlace ( ) && !next.isStarted ( ) ) {
 				next.start ( );
 			}
 		}

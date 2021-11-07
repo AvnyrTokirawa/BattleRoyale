@@ -13,8 +13,8 @@ import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.math.Location2D;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
+import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
 import es.outlook.adriansrj.battleroyale.world.border.WorldBorder;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -29,7 +29,7 @@ public class BattleRoyaleArenaBorder {
 	/**
 	 * @author AdrianSR / 06/09/2021 / 01:52 p. m.
 	 */
-	protected static class BorderResizeTask extends BukkitRunnable {
+	protected static class BorderResizeTask extends BukkitRunnableWrapper {
 		
 		protected final BattleRoyaleArenaBorder           border;
 		protected       Deque < BattlefieldBorderResize > points;
@@ -171,7 +171,7 @@ public class BattleRoyaleArenaBorder {
 	protected final BattleRoyaleArena arena;
 	
 	// state
-	protected BukkitRunnable                    update_task;
+	protected BukkitRunnableWrapper             update_task;
 	protected Deque < BattlefieldBorderResize > points;
 	protected BattlefieldBorderResize           previous_point;
 	protected BattlefieldBorderResize           point;
@@ -270,7 +270,7 @@ public class BattleRoyaleArenaBorder {
 			// resize succession invalid or not set. we need
 			// to regularly notify players about world border,
 			// so lets schedule a task for that.
-			update_task = new BukkitRunnable ( ) {
+			update_task = new BukkitRunnableWrapper ( ) {
 				@Override
 				public void run ( ) {
 					BattleRoyaleArenaBorder.this.refresh ( );

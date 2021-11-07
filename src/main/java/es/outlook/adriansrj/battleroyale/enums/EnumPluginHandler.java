@@ -50,6 +50,7 @@ import es.outlook.adriansrj.battleroyale.gui.spectator.SpectatorGUI;
 import es.outlook.adriansrj.battleroyale.gui.team.TeamGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.team.TeamSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
+import es.outlook.adriansrj.battleroyale.mode.RunModeHandler;
 import es.outlook.adriansrj.battleroyale.packet.factory.PacketFactoryService;
 import es.outlook.adriansrj.battleroyale.packet.reader.PacketReaderService;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
@@ -84,6 +85,7 @@ public enum EnumPluginHandler {
 	COMMAND_HANDLER ( BattleRoyaleCommandHandler.class ),
 	PLACEHOLDER_NODE_REGISTRY ( PlaceholderNodeRegistry.class ),
 	PLACEHOLDER_HANDLER ( PlaceholderHandler.class ),
+	RUN_MODE_HANDLER ( RunModeHandler.class ),
 	DATA_STORAGE_HANDLER ( DataStorageHandler.class ),
 	PLAYER_HANDLER ( PlayerHandler.class ),
 	TEAM_HANDLER ( TeamHandler.class ),

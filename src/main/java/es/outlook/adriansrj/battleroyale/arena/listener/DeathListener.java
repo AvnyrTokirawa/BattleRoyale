@@ -21,6 +21,7 @@ import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.util.mode.BattleRoyaleModeUtil;
 import es.outlook.adriansrj.battleroyale.util.stuff.PlayerStuffChestHandler;
+import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
 import es.outlook.adriansrj.battleroyale.util.time.TimeUtil;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.StringUtil;
@@ -41,7 +42,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -76,7 +76,7 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 	 *
 	 * @author AdrianSR / 19/09/2021 / 08:52 a. m.
 	 */
-	private static class RespawnTask extends BukkitRunnable {
+	private static class RespawnTask extends BukkitRunnableWrapper {
 		
 		private final Player   br_player;
 		private final Duration duration;

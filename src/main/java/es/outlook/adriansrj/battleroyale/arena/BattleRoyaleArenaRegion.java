@@ -73,7 +73,7 @@ public class BattleRoyaleArenaRegion {
 		
 		protected static synchronized Location2I assign ( BattleRoyaleArenaRegion region ) {
 			File world_folder  = region.arena.world.getWorldFolder ( );
-			int  size          = region.arena.battlefield.getSize ( );
+			int  size          = region.arena.battlefield.getShape ( ).getRequiredSize ( );
 			int  required_size = ( int ) Math.round ( ( size / 16.0D ) / 32.0D ); // measured in regions
 			
 			Set < Location2I > reserved = RESERVED_MAP.computeIfAbsent ( world_folder , k ->
@@ -181,7 +181,7 @@ public class BattleRoyaleArenaRegion {
 		int region_center_chunk_z    = ( region_min_chunk_z + region_max_chunk_z ) >> 1;
 		int center_chunk_min_block_x = region_center_chunk_x << 4;
 		int center_chunk_min_block_z = region_center_chunk_z << 4;
-		int size_half                = arena.battlefield.getSizeExact ( ) >> 1;
+		int size_half                = arena.battlefield.getSize ( ) >> 1;
 		
 		this.bounds = new ZoneBounds ( center_chunk_min_block_x - size_half ,
 									   center_chunk_min_block_z - size_half ,

@@ -88,16 +88,23 @@ public class BattlefieldShape {
 		return data;
 	}
 	
-	public int getSizeExact ( ) {
+	public int getSize ( ) {
 		return data.getSizeExact ( );
 	}
 	
-	public int getSize ( ) {
-		return size;
-	}
-	
-	public int getSizeInBlocks ( ) {
-		return ( size + 1 ) << 7;
+	/**
+	 * Gets the required size measured in blocks.
+	 * <br>
+	 * The only purpose this method has is to return
+	 * a size based on the number of parts that were
+	 * required to hold this shape.
+	 *
+	 * @return the required size. calculated based on the
+	 * number of parts that were required to hold this shape.
+	 * @see #getSize()
+	 */
+	public int getRequiredSize ( ) {
+		return size << 7;
 	}
 	
 	public BattlefieldShapePart getPart ( Location2I location ) {

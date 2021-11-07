@@ -4,6 +4,9 @@ import es.outlook.adriansrj.battleroyale.configuration.ConfigurationEntry;
 import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 /**
  * Plugin main configuration.
  *
@@ -11,26 +14,55 @@ import org.bukkit.configuration.ConfigurationSection;
  */
 public enum EnumMainConfiguration implements ConfigurationEntry {
 	
+	// mode
+	MODE_TYPE ( "mode.type" , "the type of mode in which the plugin will run\n" +
+			"types: " + Arrays.stream ( EnumMode.values ( ) ).map ( type -> type.name ( ).toLowerCase ( ) )
+			.collect ( Collectors.joining ( ", " ) ) , EnumMode.MULTIARENA.name ( ) ),
+	
+	// bungee mode
+	MODE_BUNGEE_ARENA ( "mode.bungee.arena" ,
+						"the name of the only arena to be\n" +
+								"played in this server." , "example" ),
+	
+	MODE_BUNGEE_RESTART_COMMAND ( "mode.bungee.restart-command" ,
+						"the command to restart the server\n" +
+								"after the arena ends." , "restart" ),
+	
+	// shared mode
+	MODE_SHARED_COMMAND ( "mode.shared.command" ,
+						"the name for the command that wen\n" +
+								"executed sends the player to the\n" +
+								"battle royale lobby.\n" +
+								"you can use this command with gui\n" +
+								"plugins, or players can manually\n" +
+								"execute this command to join the battle royale." , "bttrl" ),
+	
 	// database enable
 	ENABLE_DATABASE ( "database.enable" , "enable/disable database" , true ),
 	// database type
-	DATABASE_TYPE ( "database.type" , "the type of database to use." , EnumDataStorage.MYSQL.name ( ) ),
+	DATABASE_TYPE ( "database.type" , "the type of database to use.\n" +
+			"types: " + Arrays.stream ( EnumDataStorage.values ( ) ).map ( type -> type.name ( ).toLowerCase ( ) )
+			.collect ( Collectors.joining ( ", " ) ) , EnumDataStorage.MYSQL.name ( ) ),
 	
 	// mysql database
-	DATABASE_MYSQL_HOST ( "database.mysql.host" , "MySQL host name" , "host name" ),
-	DATABASE_MYSQL_PORT ( "database.mysql.port" , "MySQL port" , 3306 ),
-	DATABASE_MYSQL_DATABASE ( "database.mysql.database" , "MySQL database name" , "database" ),
-	DATABASE_MYSQL_USERNAME ( "database.mysql.username" , "MySQL user username" , "username" ),
-	DATABASE_MYSQL_PASSWORD ( "database.mysql.password" , "MySQL user password" , "password" ),
+	DATABASE_MYSQL_HOST ( "database.mysql.host" , "MySQL host name." , "host name" ),
+	DATABASE_MYSQL_PORT ( "database.mysql.port" , "MySQL port." , 3306 ),
+	DATABASE_MYSQL_DATABASE ( "database.mysql.database" , "MySQL database name." , "database" ),
+	DATABASE_MYSQL_USERNAME ( "database.mysql.username" , "MySQL user username." , "username" ),
+	DATABASE_MYSQL_PASSWORD ( "database.mysql.password" , "MySQL user password." , "password" ),
 	
 	// sqlite database
 	DATABASE_SQLITE_PATH ( "database.sqlite.path" , "SQLite database path" , "path" ),
 	
 	// mongodb database
-	DATABASE_MONGODB_URI ( "database.mongodb.uri" , "MongoDB database uri/connection string. (Optional)" , "" ),
-	DATABASE_MONGODB_HOST ( "database.mongodb.host" , "MongoDB database host." , "host name" ),
-	DATABASE_MONGODB_PORT ( "database.mongodb.port" , "MongoDB database port." , 27017 ),
-	DATABASE_MONGODB_DATABASE ( "database.mongodb.database" , "MongoDB database name (Required)." , "database name" ),
+	DATABASE_MONGODB_URI ( "database.mongodb.uri" ,
+						   "MongoDB database uri/connection string. (Optional)" , "" ),
+	DATABASE_MONGODB_HOST ( "database.mongodb.host" ,
+							"MongoDB database host." , "host name" ),
+	DATABASE_MONGODB_PORT ( "database.mongodb.port" ,
+							"MongoDB database port." , 27017 ),
+	DATABASE_MONGODB_DATABASE ( "database.mongodb.database" ,
+								"MongoDB database name (Required)." , "database name" ),
 	
 	// game
 	GAME_ENHANCED_DROPS_ENABLE ( "game.enhanced-drops.enable" , "if enabled, drops will be enhanced. " +

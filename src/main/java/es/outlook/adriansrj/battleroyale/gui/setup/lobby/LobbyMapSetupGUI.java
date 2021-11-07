@@ -25,7 +25,7 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 		return getPluginHandler ( LobbyMapSetupGUI.class );
 	}
 	
-	protected final ItemMenu handle;
+	private final ItemMenu handle;
 	
 	/**
 	 * Constructs the plugin handler.
@@ -86,8 +86,8 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 		// damage
 		this.handle.setItem ( 11 , new ActionItem (
 				EnumLobbyConfiguration.WORLD_DISABLE_DAMAGE.getAsBoolean ( ) ?
-						ChatColor.GREEN + "Damage disabled" :
-						ChatColor.YELLOW + "Damage enabled" ,
+						ChatColor.GREEN + "Damage (Disabled)" :
+						ChatColor.YELLOW + "Damage (Enabled)" ,
 				
 				EnumLobbyConfiguration.WORLD_DISABLE_DAMAGE.getAsBoolean ( ) ?
 						UniversalMaterial.CHAINMAIL_CHESTPLATE.getItemStack ( ) :
@@ -125,8 +125,8 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 		// hunger
 		this.handle.setItem ( 12 , new ActionItem (
 				EnumLobbyConfiguration.WORLD_DISABLE_HUNGER.getAsBoolean ( ) ?
-						ChatColor.GREEN + "Hunger disabled" :
-						ChatColor.YELLOW + "Hunger enabled" ,
+						ChatColor.GREEN + "Hunger (Disabled)" :
+						ChatColor.YELLOW + "Hunger (Enabled)" ,
 				
 				EnumLobbyConfiguration.WORLD_DISABLE_HUNGER.getAsBoolean ( ) ?
 						UniversalMaterial.BREAD.getItemStack ( ) :
@@ -164,8 +164,8 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 		// mob spawning
 		this.handle.setItem ( 13 , new ActionItem (
 				EnumLobbyConfiguration.WORLD_DISABLE_MOBS.getAsBoolean ( ) ?
-						ChatColor.GREEN + "Mobs disabled" :
-						ChatColor.YELLOW + "Mobs enabled" ,
+						ChatColor.GREEN + "Mobs (Disabled)" :
+						ChatColor.YELLOW + "Mobs (Enabled)" ,
 				
 				EnumLobbyConfiguration.WORLD_DISABLE_MOBS.getAsBoolean ( ) ?
 						UniversalMaterial.FEATHER.getItemStack ( ) :
@@ -205,8 +205,8 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 		// join
 		this.handle.setItem ( 14 , new ActionItem (
 				EnumLobbyConfiguration.SPAWN_JOIN.getAsBoolean ( ) ?
-						ChatColor.GREEN + "Send to spawn when joining enabled" :
-						ChatColor.YELLOW + "Send to spawn when joining disabled" ,
+						ChatColor.GREEN + "Redirect (Enabled)" :
+						ChatColor.YELLOW + "Redirect (Disabled)" ,
 				
 				EnumLobbyConfiguration.SPAWN_JOIN.getAsBoolean ( ) ?
 						UniversalMaterial.CHEST_MINECART.getItemStack ( ) :
@@ -248,8 +248,8 @@ public final class LobbyMapSetupGUI extends PluginHandler {
 		// void
 		this.handle.setItem ( 15 , new ActionItem (
 				EnumLobbyConfiguration.SPAWN_VOID.getAsBoolean ( ) ?
-						ChatColor.GREEN + "Send to spawn when falling into void enabled" :
-						ChatColor.YELLOW + "Send to spawn when falling into void disabled" ,
+						ChatColor.GREEN + "Void (Enabled)" :
+						ChatColor.YELLOW + "Void (Disabled)" ,
 				
 				EnumLobbyConfiguration.SPAWN_VOID.getAsBoolean ( ) ?
 						UniversalMaterial.STRING.getItemStack ( ) :

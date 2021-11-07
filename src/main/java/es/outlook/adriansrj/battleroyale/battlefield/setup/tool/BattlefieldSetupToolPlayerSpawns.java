@@ -6,6 +6,7 @@ import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.item.ActionItem;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
+import es.outlook.adriansrj.core.util.math.target.TargetUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -120,6 +121,15 @@ public class BattlefieldSetupToolPlayerSpawns extends BattlefieldSetupToolItem {
 	@Override
 	protected void onActionPerform ( org.bukkit.entity.Player player ,
 			ActionItem.EnumAction action , PlayerInteractEvent event ) {
+		event.setCancelled ( true );
+		
+		if ( !action.isRightClick ( )
+				|| TargetUtil.getTarget ( player , 8.0D , ArmorStand.class ) != null ) {
+			// making sure is right click.
+			// making sure is not clicking a manipulator
+			return;
+		}
+		
 		Vector location = player.getLocation ( ).toVector ( );
 		
 		if ( voidCheck ( location ) ) {

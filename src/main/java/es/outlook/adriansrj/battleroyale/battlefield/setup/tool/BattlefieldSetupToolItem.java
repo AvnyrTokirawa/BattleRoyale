@@ -36,7 +36,12 @@ public abstract class BattlefieldSetupToolItem extends BattlefieldSetupTool {
 		
 		description.addAll ( getItemDescription ( ) );
 		description.add ( "" );
-		description.add ( ChatColor.YELLOW + "Press the drop key to cancel." );
+		
+		if ( isCancellable ( ) ) {
+			description.add ( ChatColor.YELLOW + "Press the drop key to cancel." );
+		} else {
+			description.add ( ChatColor.YELLOW + "Press the drop key to finish." );
+		}
 		
 		this.item = new ActionItemBase ( getItemDisplayName ( ) , description , getItemMaterial ( ) ) {
 			

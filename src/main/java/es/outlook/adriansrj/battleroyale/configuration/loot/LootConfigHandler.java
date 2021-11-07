@@ -12,13 +12,11 @@ import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.core.util.file.FilenameUtil;
 import es.outlook.adriansrj.core.util.file.filter.YamlFileFilter;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
+import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author AdrianSR / 12/09/2021 / 12:56 p. m.
@@ -40,20 +38,36 @@ public final class LootConfigHandler extends ConfigurationHandler {
 		// chest
 		Map < String, LootConfigurationEntry > chest = new HashMap <> ( );
 		
-		chest.put ( "sandstone" , new LootConfigurationEntry ( UniversalMaterial.SANDSTONE , 10 ) );
-		chest.put ( "diamond-sword" , new LootConfigurationEntry ( UniversalMaterial.DIAMOND_SWORD , 1 ) );
-		chest.put ( "stone-sword" , new LootConfigurationEntry ( UniversalMaterial.STONE_SWORD , 1 ) );
-		chest.put ( "iron-sword" , new LootConfigurationEntry ( UniversalMaterial.IRON_SWORD , 1 ) );
+		chest.put ( "sandstone" , new LootConfigurationEntry (
+				UniversalMaterial.SANDSTONE , 0 , 10 , 20.0D ) );
+		chest.put ( "diamond-sword" , new LootConfigurationEntry (
+				UniversalMaterial.DIAMOND_SWORD , 0 , 1 , 8.0D ) );
+		chest.put ( "stone-sword" , new LootConfigurationEntry (
+				UniversalMaterial.STONE_SWORD , 0 , 1 , 12.0D ) );
+		chest.put ( "iron-sword" , new LootConfigurationEntry (
+				UniversalMaterial.IRON_SWORD , 0 , 1 , 10.0D ) );
+		chest.put ( "ender-pearl" , new LootConfigurationEntry (
+				UniversalMaterial.ENDER_PEARL , 0 , 1 , 5.0D ) );
+		chest.put ( "first-aid" , new LootConfigurationEntry (
+				ChatColor.DARK_GREEN + "First Aid" ,
+				UniversalMaterial.POTION_HEALING_2 , 1 , 0 , 10.0D ,
+				Collections.emptyList ( ) ) );
 		
 		containers.put ( EnumLootContainer.CHEST , new LootConfigurationContainer ( chest ) );
 		
 		// air supply
 		Map < String, LootConfigurationEntry > air_supply = new HashMap <> ( );
 		
-		air_supply.put ( "sandstone" , new LootConfigurationEntry ( UniversalMaterial.SANDSTONE , 128 ) );
-		air_supply.put ( "diamond-sword" , new LootConfigurationEntry ( UniversalMaterial.DIAMOND_SWORD , 1 ) );
-		air_supply.put ( "bow" , new LootConfigurationEntry ( UniversalMaterial.BOW , 1 ) );
-		air_supply.put ( "arrow" , new LootConfigurationEntry ( UniversalMaterial.ARROW , 30 ) );
+		air_supply.put ( "sandstone" , new LootConfigurationEntry (
+				UniversalMaterial.SANDSTONE , 0 , 128 , 30.0D ) );
+		air_supply.put ( "diamond-sword" , new LootConfigurationEntry (
+				UniversalMaterial.DIAMOND_SWORD , 0 , 1 , 20.0D ) );
+		air_supply.put ( "bow" , new LootConfigurationEntry (
+				UniversalMaterial.BOW , 0 , 1 , 17.0D ) );
+		air_supply.put ( "arrow" , new LootConfigurationEntry (
+				UniversalMaterial.ARROW , 0 , 30 , 15.0D ) );
+		air_supply.put ( "gold-apple" , new LootConfigurationEntry (
+				UniversalMaterial.GOLDEN_APPLE , 0 , 3 , 8.0D ) );
 		
 		containers.put ( EnumLootContainer.AIR_SUPPLY , new LootConfigurationContainer ( air_supply ) );
 		

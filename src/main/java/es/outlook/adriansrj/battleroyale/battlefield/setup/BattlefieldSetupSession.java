@@ -73,7 +73,7 @@ public class BattlefieldSetupSession {
 		Minimap                  minimap       = battlefield.getMinimap ( );
 		BattlefieldShape         shape         = battlefield.getShape ( );
 		
-		if ( shape != null && shape.getSizeInBlocks ( ) > 0 ) {
+		if ( shape != null && shape.getSize ( ) > 0 ) {
 			EXECUTOR_SERVICE.execute ( ( ) -> {
 				/* world generation */
 				ArenaWorldGenerator generator = createGenerator ( world_folder );
@@ -82,7 +82,7 @@ public class BattlefieldSetupSession {
 				// the shape will be inserted in the 0,0,0
 				// coordinates, so we can save unit-locations
 				// that allows us to relocate them later.
-				int size_half = shape.getSizeInBlocks ( ) / 2;
+				int size_half = shape.getSize ( ) / 2;
 				int index     = 0;
 				
 				for ( BattlefieldShapePart part : shape.getParts ( ).values ( ) ) {

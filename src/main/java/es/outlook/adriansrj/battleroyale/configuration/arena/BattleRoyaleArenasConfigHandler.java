@@ -5,9 +5,12 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
 import es.outlook.adriansrj.battleroyale.battlefield.Battlefield;
 import es.outlook.adriansrj.battleroyale.configuration.ConfigurationHandler;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
+import es.outlook.adriansrj.battleroyale.enums.EnumMode;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
+import es.outlook.adriansrj.battleroyale.game.mode.complex.ComplexBattleRoyaleMode;
 import es.outlook.adriansrj.battleroyale.game.mode.simple.SimpleBattleRoyaleMode;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.mode.RunModeHandler;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
@@ -48,7 +51,9 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 				5 ,
 				Duration.ofSeconds ( 15 ) ,
 				// restart
-				Duration.ofSeconds ( 15 )
+				Duration.ofSeconds ( 15 ) ,
+				false ,
+				"stop"
 		);
 	}
 	
@@ -131,10 +136,19 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 	
 	@Override
 	public void loadConfiguration ( ) {
-		File folder = EnumDirectory.ARENA_DIRECTORY.getDirectoryMkdirs ( );
+		RunModeHandler run_mode_handler = RunModeHandler.getInstance ( );
+		EnumMode       run_mode         = run_mode_handler.getMode ( );
+		File           folder           = EnumDirectory.ARENA_DIRECTORY.getDirectoryMkdirs ( );
 		
 		for ( File file : Objects.requireNonNull ( folder.listFiles ( new YamlFileFilter ( ) ) ) ) {
-			String                         name          = FilenameUtil.getBaseName ( file ).trim ( );
+			String name = FilenameUtil.getBaseName ( file ).trim ( );
+			
+			// only one arena is going to be loaded in bungee mode
+			if ( run_mode == EnumMode.BUNGEE && !Objects.equals (
+					name.toLowerCase ( ) , run_mode.getArenaName ( ).toLowerCase ( ) ) ) {
+				continue;
+			}
+			
 			BattleRoyaleArenaConfiguration configuration = BattleRoyaleArenaConfiguration.of ( file );
 			Battlefield                    battlefield   = configuration.getBattlefield ( );
 			BattleRoyaleMode               mode;
@@ -178,7 +192,8 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 			// kill limit, the arena will not end, so let's
 			// print a warning message.
 			if ( mode.isRespawnEnabled ( )
-					&& !BattleRoyaleModeUtil.isDeterminedByKills ( mode ) ) {
+					&& !BattleRoyaleModeUtil.isDeterminedByKills ( mode )
+					&& !( mode instanceof ComplexBattleRoyaleMode ) ) {
 				ConsoleUtil.sendPluginMessage ( ChatColor.RED , "It seems that the arena '" + name
 						+ "' will never end: respawning is enabled, but there is not a kill limit." , plugin );
 			}

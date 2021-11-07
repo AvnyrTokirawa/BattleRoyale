@@ -30,7 +30,7 @@ public abstract class MinimapRenderer extends MapRenderer {
 	/**
 	 * Distance between border cursors measured in pixels.
 	 */
-	protected static final int DISTANCE_BETWEEN_BORDER_CURSORS = 10;
+	protected static final int DISTANCE_BETWEEN_BORDER_CURSORS = 13;
 	
 	/**
 	 * Represents a location within a map.

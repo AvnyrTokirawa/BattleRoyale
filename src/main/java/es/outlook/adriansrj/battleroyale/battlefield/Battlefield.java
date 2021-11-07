@@ -64,12 +64,8 @@ public class Battlefield {
 		return shape;
 	}
 	
-	public int getSizeExact ( ) {
-		return shape.getData ( ).getSizeExact ( );
-	}
-	
 	public int getSize ( ) {
-		return shape.getSizeInBlocks ( );
+		return shape.getSize ( );
 	}
 	
 	public BattlefieldConfiguration getConfiguration ( ) {

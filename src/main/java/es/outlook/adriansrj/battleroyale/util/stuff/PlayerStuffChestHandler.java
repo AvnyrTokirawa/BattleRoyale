@@ -50,6 +50,7 @@ public final class PlayerStuffChestHandler extends PluginHandler {
 		super ( plugin ); register ( );
 	}
 	
+	@SuppressWarnings ( "deprecation" )
 	public void spawnStuffChest ( Collection < ItemStack > stuff , Location location ) {
 		Block block = location.getBlock ( );
 		
@@ -70,8 +71,13 @@ public final class PlayerStuffChestHandler extends PluginHandler {
 						location , UniversalMaterial.CHEST.getMaterial ( ).createBlockData ( ) );
 			} else {
 				// legacy versions
-				falling_block = location.getWorld ( ).spawnFallingBlock ( location , new org.bukkit.material.Chest (
-						RandomUtil.getRandomElement ( DirectionUtil.FACES_90 ) ) );
+				if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_12_R1 ) ) {
+					falling_block = location.getWorld ( ).spawnFallingBlock ( location , new org.bukkit.material.Chest (
+							RandomUtil.getRandomElement ( DirectionUtil.FACES_90 ) ) );
+				} else {
+					falling_block = location.getWorld ( ).spawnFallingBlock (
+							location , UniversalMaterial.CHEST.getMaterial ( ) , ( byte ) 0 );
+				}
 			}
 			
 			falling_block.setDropItem ( false );

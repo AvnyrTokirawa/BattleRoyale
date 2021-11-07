@@ -3,8 +3,8 @@ package es.outlook.adriansrj.battleroyale.bus;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
+import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
 import es.outlook.adriansrj.core.util.math.DirectionUtil;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
@@ -19,7 +19,7 @@ public abstract class BusInstanceBase < C extends Bus > extends BusInstance < C 
 	/**
 	 * @author AdrianSR / 08/09/2021 / 02:05 p. m.
 	 */
-	protected static class BusDisplacementTask extends BukkitRunnable {
+	protected static class BusDisplacementTask extends BukkitRunnableWrapper {
 		
 		protected final BusInstanceBase < ? > bus;
 		protected final Vector                direction;

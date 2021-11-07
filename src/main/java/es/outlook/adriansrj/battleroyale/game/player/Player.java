@@ -146,7 +146,7 @@ public final class Player extends PlayerWrapper {
 	}
 	
 	public synchronized boolean isPlaying ( ) {
-		return hasTeam ( ) && !isSpectator ( ) && isOnline ( );
+		return isInArena ( ) && hasTeam ( ) && !isSpectator ( ) && isOnline ( );
 	}
 	
 	//	@Override

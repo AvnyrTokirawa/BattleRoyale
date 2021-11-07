@@ -96,6 +96,7 @@ public abstract class MinimapRendererBase extends MinimapRenderer {
 		}
 		
 		int count = ( int ) distance / DISTANCE_BETWEEN_BORDER_CURSORS;
+		
 		for ( int i = 0 ; i <= count ; i++ ) {
 			Vector point = new Vector ( x_min , 0.0D , y_min )
 					.add ( direction.clone ( ).multiply ( i * DISTANCE_BETWEEN_BORDER_CURSORS ) );

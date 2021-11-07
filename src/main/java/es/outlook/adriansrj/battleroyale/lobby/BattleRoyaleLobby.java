@@ -1,15 +1,18 @@
 package es.outlook.adriansrj.battleroyale.lobby;
 
+import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.compass.CompassBar;
+import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumItem;
 import es.outlook.adriansrj.battleroyale.enums.EnumLobbyConfiguration;
+import es.outlook.adriansrj.battleroyale.enums.EnumMode;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.mode.RunModeHandler;
+import es.outlook.adriansrj.core.util.console.ConsoleUtil;
 import es.outlook.adriansrj.core.util.entity.EntityUtil;
 import es.outlook.adriansrj.core.util.world.GameRuleType;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -68,7 +71,9 @@ public class BattleRoyaleLobby implements Listener {
 	}
 	
 	public void introduce ( org.bukkit.entity.Player player ) {
-		introduce0 ( Player.getPlayer ( player ) );
+		Player br_player = Player.getPlayer ( player );
+		
+		introduce0 ( br_player );
 		
 		player.setGameMode ( GameMode.ADVENTURE );
 		player.setFlying ( false );
@@ -86,7 +91,27 @@ public class BattleRoyaleLobby implements Listener {
 		player.getInventory ( ).clear ( );
 		player.getInventory ( ).setArmorContents ( null );
 		
-		EnumItem.ARENA_SELECTOR.give ( player );
+		if ( RunModeHandler.getInstance ( ).getMode ( ) == EnumMode.BUNGEE ) {
+			BattleRoyaleArena arena = EnumMode.BUNGEE.getArena ( );
+			
+			if ( arena != null ) {
+				if ( arena.getState ( ) != EnumArenaState.RUNNING
+						&& arena.getState ( ) != EnumArenaState.STOPPED ) {
+					br_player.setArena ( arena );
+					
+					if ( arena.getMode ( ).isTeamSelectionEnabled ( ) ) {
+						EnumItem.TEAM_SELECTOR.give ( player );
+					}
+				}
+			} else {
+				ConsoleUtil.sendPluginMessage (
+						ChatColor.RED , "Bungee mode is enabled, but the arena is invalid" ,
+						BattleRoyale.getInstance ( ) );
+			}
+		} else {
+			EnumItem.ARENA_SELECTOR.give ( player );
+		}
+		
 		EnumItem.SETTINGS.give ( player );
 		EnumItem.LEAVE_ARENA.give ( player );
 		

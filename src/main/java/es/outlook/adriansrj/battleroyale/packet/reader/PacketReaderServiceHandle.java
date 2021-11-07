@@ -1,5 +1,7 @@
 package es.outlook.adriansrj.battleroyale.packet.reader;
 
+import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityRelativeMove;
+import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityRelativeMoveLook;
 import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityTeleport;
 import es.outlook.adriansrj.core.util.server.Version;
 
@@ -21,6 +23,10 @@ public interface PacketReaderServiceHandle {
 			throw new IllegalStateException ( e );
 		}
 	}
+	
+	PacketOutEntityRelativeMove readEntityRelativeMovePacket ( Object packet );
+	
+	PacketOutEntityRelativeMoveLook readEntityRelativeMoveLookPacket ( Object packet );
 	
 	PacketOutEntityTeleport readEntityTeleportPacket ( Object packet );
 }

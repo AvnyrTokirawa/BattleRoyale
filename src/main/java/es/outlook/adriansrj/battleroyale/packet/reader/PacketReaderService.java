@@ -1,6 +1,8 @@
 package es.outlook.adriansrj.battleroyale.packet.reader;
 
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityRelativeMove;
+import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityRelativeMoveLook;
 import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityTeleport;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 
@@ -23,6 +25,16 @@ public final class PacketReaderService extends PluginHandler implements PacketRe
 	public PacketReaderService ( BattleRoyale plugin ) {
 		super ( plugin );
 		this.handle = PacketReaderServiceHandle.getNewHandle ( );
+	}
+	
+	@Override
+	public PacketOutEntityRelativeMove readEntityRelativeMovePacket ( Object packet ) {
+		return handle.readEntityRelativeMovePacket ( packet );
+	}
+	
+	@Override
+	public PacketOutEntityRelativeMoveLook readEntityRelativeMoveLookPacket ( Object packet ) {
+		return handle.readEntityRelativeMoveLookPacket ( packet );
 	}
 	
 	@Override

@@ -1,6 +1,8 @@
 package es.outlook.adriansrj.battleroyale.game.loot;
 
+import es.outlook.adriansrj.battleroyale.enums.EnumItem;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.battleroyale.util.crackshot.CrackShotPlusUtil;
 import es.outlook.adriansrj.battleroyale.util.crackshot.CrackShotUtil;
@@ -8,9 +10,11 @@ import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.battleroyale.util.qualityarmory.QualityArmoryUtil;
 import es.outlook.adriansrj.core.util.configurable.Configurable;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
+import es.outlook.adriansrj.core.util.loadable.LoadableEntry;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import es.outlook.adriansrj.core.util.saveable.SavableCollectionEntry;
 import es.outlook.adriansrj.core.util.server.Version;
+import es.outlook.adriansrj.core.util.yaml.YamlUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.Inventory;
@@ -32,7 +36,7 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 		return new LootConfigurationEntry ( ).load ( section );
 	}
 	
-	@ConfigurableEntry ( key = "name" )
+	@LoadableEntry ( key = Constants.NAME_KEY )
 	protected String            display_name;
 	@ConfigurableEntry ( key = "material" )
 	protected UniversalMaterial material;
@@ -59,7 +63,7 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 		this.data          = data;
 		this.plugin_object = plugin_object;
 		this.chance        = chance;
-		this.lore          = lore;
+		this.lore          = lore != null ? new ArrayList <> ( lore ) : lore;
 		
 		if ( required != null ) {
 			for ( LootConfigurationEntry entry : required ) {
@@ -192,6 +196,13 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 		// copying plugin object
 		// order is important
 		if ( StringUtil.isNotBlank ( plugin_object ) ) {
+			// battle royale object
+			for ( EnumItem br_item : EnumItem.values ( ) ) {
+				if ( br_item.name ( ).equalsIgnoreCase ( plugin_object ) ) {
+					return br_item.toItemStack ( amount );
+				}
+			}
+			
 			// quality armory object
 			if ( Bukkit.getPluginManager ( ).isPluginEnabled ( "QualityArmory" ) ) {
 				ItemStack result = QualityArmoryUtil.getCustomItemAsItemStackByName ( plugin_object );
@@ -374,7 +385,15 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 	
 	@Override
 	public int save ( ConfigurationSection section ) {
-		return saveEntries ( section );
+		int save = saveEntries ( section );
+		
+		// saving display name
+		if ( display_name != null ) {
+			save += YamlUtil.setNotEqual ( section , Constants.NAME_KEY ,
+										   StringUtil.untranslateAlternateColorCodes ( display_name ) ) ? 1 : 0;
+		}
+		
+		return save;
 	}
 	
 	@Override

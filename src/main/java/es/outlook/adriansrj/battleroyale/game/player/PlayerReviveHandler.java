@@ -3,6 +3,7 @@ package es.outlook.adriansrj.battleroyale.game.player;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.actionbar.ActionBarUtil;
@@ -13,7 +14,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
 import java.util.Objects;
@@ -33,7 +33,7 @@ public final class PlayerReviveHandler extends PluginHandler {
 	/**
 	 * @author AdrianSR / 16/09/2021 / 01:31 p. m.
 	 */
-	private static class ReviveTask extends BukkitRunnable {
+	private static class ReviveTask extends BukkitRunnableWrapper {
 		
 		protected final BattleRoyaleArena arena;
 		protected final Player            br_reviver;

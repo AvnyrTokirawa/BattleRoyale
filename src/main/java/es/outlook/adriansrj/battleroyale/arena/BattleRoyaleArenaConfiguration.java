@@ -45,6 +45,8 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	protected static final String AUTO_START_COUNTDOWN_DISPLAY_KEY  = "auto-start.countdown.display";
 	protected static final String AUTO_START_COUNTDOWN_DURATION_KEY = "auto-start.countdown.duration";
 	protected static final String RESTART_COUNTDOWN_DURATION_KEY    = "restart.countdown.duration";
+	protected static final String RESTART_SERVER_ENABLE_KEY         = "restart.restart-server.enable";
+	protected static final String RESTART_SERVER_COMMAND_KEY        = "restart.restart-server.command";
 	
 	protected static final BattleRoyaleModeManager MODE_MANAGER = new BattleRoyaleModeManager ( );
 	
@@ -57,57 +59,71 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	}
 	
 	// battlefield
-	@ConfigurableEntry ( key = BATTLEFIELD_KEY, comment = "battlefield on which this arena will take place." )
+	@ConfigurableEntry ( key = BATTLEFIELD_KEY,
+						 comment = "battlefield on which this arena will take place." )
 	protected String      battlefield_name;
 	protected Battlefield battlefield;
 	
 	// world
-	@ConfigurableEntry ( key = WORLD_KEY, comment = "the actual world on which the battlefield will be inserted." )
+	@ConfigurableEntry ( key = WORLD_KEY,
+						 comment = "the actual world on which the battlefield will be inserted." )
 	protected String world_name;
 	protected World  world;
 	
 	// mode
-	@ConfigurableEntry ( key = MODE_KEY, comment = "file name of the mode to be played in this arena" )
+	@ConfigurableEntry ( key = MODE_KEY,
+						 comment = "file name of the mode to be played in this arena" )
 	protected String           mode_filename;
 	protected BattleRoyaleMode mode;
 	
 	// scoreboard
-	@ConfigurableEntry ( key = SCOREBOARD_KEY, comment = "file name of the scoreboard to be displayed in this arena." )
+	@ConfigurableEntry ( key = SCOREBOARD_KEY,
+						 comment = "file name of the scoreboard to be displayed in this arena." )
 	protected String               scoreboard;
 	protected EnumScoreboardPlugin scoreboard_plugin;
 	
 	// auto-start
-	@ConfigurableEntry ( key = AUTO_START_ENABLE_KEY, comment =
-			"if enabled, the arena will start automatically when the\n" +
-					"minimum number of players/teams is reached." )
+	@ConfigurableEntry ( key = AUTO_START_ENABLE_KEY,
+						 comment = "if enabled, the arena will start automatically when the\n" +
+								 "minimum number of players/teams is reached." )
 	protected boolean autostart_enable;
 	
-	@ConfigurableEntry ( key = AUTO_START_REQUIRED_PLAYERS_KEY, comment =
-			"the required number of players to start arena." )
+	@ConfigurableEntry ( key = AUTO_START_REQUIRED_PLAYERS_KEY,
+						 comment = "the required number of players to start arena." )
 	protected int autostart_required_players;
 	
-	@ConfigurableEntry ( key = AUTO_START_REQUIRED_TEAMS_KEY, comment =
-			"the required number of teams to start arena." )
+	@ConfigurableEntry ( key = AUTO_START_REQUIRED_TEAMS_KEY,
+						 comment = "the required number of teams to start arena." )
 	protected int autostart_required_teams;
 	
-	@ConfigurableEntry ( key = AUTO_START_COUNTDOWN_DISPLAY_KEY, comment =
-			"the count from which titles start to show." )
+	@ConfigurableEntry ( key = AUTO_START_COUNTDOWN_DISPLAY_KEY,
+						 comment = "the count from which titles start to show." )
 	protected int autostart_countdown_display;
 	
-	@ConfigurableEntry ( key = AUTO_START_COUNTDOWN_DURATION_KEY, comment =
-			"the duration of the countdown when automatically starting." )
+	@ConfigurableEntry ( key = AUTO_START_COUNTDOWN_DURATION_KEY,
+						 comment = "the duration of the countdown when automatically starting." )
 	protected ConfigurableDuration autostart_countdown_duration;
 	
 	// restart
-	@ConfigurableEntry ( key = RESTART_COUNTDOWN_DURATION_KEY, comment =
-			"the duration of the countdown when restarting this arena." )
+	@ConfigurableEntry ( key = RESTART_COUNTDOWN_DURATION_KEY,
+						 comment = "the duration of the countdown when restarting this arena." )
 	protected ConfigurableDuration restart_countdown_duration;
+	
+	@ConfigurableEntry ( key = RESTART_SERVER_ENABLE_KEY,
+						 comment = "if true, the server will be restarted when this arena ends.\n" +
+								 "this option is useful if you only want one\n" +
+								 "arena in the server (bungeemode)" )
+	protected boolean restart_server;
+	
+	@ConfigurableEntry ( key = RESTART_SERVER_COMMAND_KEY,
+						 comment = "the command to restart the server" )
+	protected String restart_server_command;
 	
 	public BattleRoyaleArenaConfiguration ( String battlefield_name , String world_name , String mode_filename ,
 			String scoreboard , EnumScoreboardPlugin scoreboard_plugin , boolean autostart_enable ,
 			int autostart_required_players , int autostart_required_teams ,
 			int autostart_countdown_display , Duration autostart_countdown_duration ,
-			Duration restart_countdown_duration ) {
+			Duration restart_countdown_duration , boolean restart_server , String restart_server_command ) {
 		this.battlefield_name             = battlefield_name;
 		this.world_name                   = world_name;
 		this.mode_filename                = mode_filename;
@@ -119,6 +135,8 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		this.autostart_countdown_display  = autostart_countdown_display;
 		this.autostart_countdown_duration = new ConfigurableDuration ( autostart_countdown_duration );
 		this.restart_countdown_duration   = new ConfigurableDuration ( restart_countdown_duration );
+		this.restart_server               = restart_server;
+		this.restart_server_command       = restart_server_command;
 	}
 	
 	public BattleRoyaleArenaConfiguration ( BattleRoyaleArenaConfiguration copy ) {
@@ -136,6 +154,8 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		this.autostart_countdown_display  = copy.autostart_countdown_display;
 		this.autostart_countdown_duration = copy.autostart_countdown_duration;
 		this.restart_countdown_duration   = copy.restart_countdown_duration;
+		this.restart_server               = copy.restart_server;
+		this.restart_server_command       = copy.restart_server_command;
 	}
 	
 	public BattleRoyaleArenaConfiguration ( ) {
@@ -146,6 +166,13 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	
 	public String getBattlefieldName ( ) {
 		return battlefield != null ? battlefield.getName ( ) : battlefield_name;
+	}
+	
+	public Battlefield getBattlefield ( ) {
+		if ( battlefield == null && StringUtil.isNotBlank ( battlefield_name ) ) {
+			this.battlefield = BattlefieldRegistry.getInstance ( ).getBattlefield ( battlefield_name );
+		}
+		return battlefield;
 	}
 	
 	public void setBattlefield ( String battlefield_name ) {
@@ -159,32 +186,10 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		this.battlefield_name = null;
 	}
 	
-	public Battlefield getBattlefield ( ) {
-		if ( battlefield == null && StringUtil.isNotBlank ( battlefield_name ) ) {
-			this.battlefield = BattlefieldRegistry.getInstance ( ).getBattlefield ( battlefield_name );
-		}
-		return battlefield;
-	}
-	
 	// -------- world configuration
 	
 	public String getWorldName ( ) {
 		return world != null ? world.getName ( ) : world_name;
-	}
-	
-	public void setWorld ( World world ) {
-		this.world      = world;
-		this.world_name = null;
-	}
-	
-	public void setWorld ( String world_name ) {
-		if ( world_name != null ) {
-			this.world_name = StringUtil.replaceFileCharacters ( world_name , "-" );
-		} else {
-			this.world_name = null;
-		}
-		
-		this.world = null;
 	}
 	
 	/**
@@ -204,6 +209,21 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		return world;
 	}
 	
+	public void setWorld ( World world ) {
+		this.world      = world;
+		this.world_name = null;
+	}
+	
+	public void setWorld ( String world_name ) {
+		if ( world_name != null ) {
+			this.world_name = StringUtil.replaceFileCharacters ( world_name , "-" );
+		} else {
+			this.world_name = null;
+		}
+		
+		this.world = null;
+	}
+	
 	// -------- mode configuration
 	
 	/**
@@ -218,16 +238,6 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		return mode != null ? null : mode_filename;
 	}
 	
-	public void setMode ( BattleRoyaleMode mode ) {
-		this.mode          = mode;
-		this.mode_filename = null;
-	}
-	
-	public void setMode ( String mode_filename ) {
-		this.mode_filename = mode_filename;
-		this.mode          = null;
-	}
-	
 	/**
 	 * Gets the mode to be played in the arena.
 	 *
@@ -239,6 +249,16 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 					EnumDirectory.MODE_DIRECTORY.getDirectory ( ) , mode_filename ) );
 		}
 		return mode;
+	}
+	
+	public void setMode ( BattleRoyaleMode mode ) {
+		this.mode          = mode;
+		this.mode_filename = null;
+	}
+	
+	public void setMode ( String mode_filename ) {
+		this.mode_filename = mode_filename;
+		this.mode          = null;
 	}
 	
 	// -------- scoreboard configuration
@@ -255,10 +275,6 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	 */
 	public String getScoreboard ( ) {
 		return scoreboard;
-	}
-	
-	public void setScoreboard ( String scoreboard ) {
-		this.scoreboard = scoreboard;
 	}
 	
 	/**
@@ -285,6 +301,10 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		return configuration;
 	}
 	
+	public void setScoreboard ( String scoreboard ) {
+		this.scoreboard = scoreboard;
+	}
+	
 	/**
 	 * Gets the scoreboard plugin to enable compatibility
 	 * with.
@@ -298,10 +318,18 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		return scoreboard_plugin;
 	}
 	
+	public void setScoreboardPlugin ( EnumScoreboardPlugin scoreboard_plugin ) {
+		this.scoreboard_plugin = scoreboard_plugin;
+	}
+	
 	// -------- auto-start configuration
 	
 	public boolean isAutostartEnabled ( ) {
 		return autostart_enable;
+	}
+	
+	public void setAutostart ( boolean autostart ) {
+		this.autostart_enable = autostart;
 	}
 	
 	/**
@@ -314,6 +342,10 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		return autostart_required_players;
 	}
 	
+	public void setAutostartRequiredPlayers ( int required_players ) {
+		this.autostart_required_players = required_players;
+	}
+	
 	/**
 	 * Gets the required number of teams
 	 * to start the arena.
@@ -322,6 +354,10 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	 */
 	public int getAutostartRequiredTeams ( ) {
 		return autostart_required_teams;
+	}
+	
+	public void setAutostartRequiredTeams ( int required_teams ) {
+		this.autostart_required_teams = required_teams;
 	}
 	
 	/**
@@ -336,10 +372,18 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		return autostart_countdown_display;
 	}
 	
+	public void setAutostartCountdownDisplay ( int countdown_display ) {
+		this.autostart_countdown_display = countdown_display;
+	}
+	
 	public ConfigurableDuration getAutostartCountdownDuration ( ) {
 		return autostart_countdown_duration != null
 				? new ConfigurableDuration ( autostart_countdown_duration )
 				: new ConfigurableDuration ( Duration.ZERO );
+	}
+	
+	public void setAutostartCountdownDuration ( ConfigurableDuration countdown_duration ) {
+		this.autostart_countdown_duration = countdown_duration;
 	}
 	
 	// -------- restart configuration
@@ -348,6 +392,26 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		return restart_countdown_duration != null
 				? new ConfigurableDuration ( restart_countdown_duration )
 				: new ConfigurableDuration ( Duration.ZERO );
+	}
+	
+	public void setRestartCountdownDuration ( ConfigurableDuration countdown_duration ) {
+		this.restart_countdown_duration = countdown_duration;
+	}
+	
+	public boolean isRestartServer ( ) {
+		return restart_server;
+	}
+	
+	public void setRestartServer ( boolean restart_server ) {
+		this.restart_server = restart_server;
+	}
+	
+	public String getRestartServerCommand ( ) {
+		return restart_server_command;
+	}
+	
+	public void setRestartServerCommand ( String restart_command ) {
+		this.restart_server_command = restart_command;
 	}
 	
 	@Override

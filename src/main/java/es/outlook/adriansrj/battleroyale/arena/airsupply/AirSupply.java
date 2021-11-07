@@ -14,6 +14,7 @@ import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.reflection.bukkit.EntityReflection;
+import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
 import es.outlook.adriansrj.core.player.PlayerWrapper;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import es.outlook.adriansrj.core.util.math.DirectionUtil;
@@ -35,7 +36,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import xyz.xenondevs.particle.ParticleEffect;
 
@@ -63,7 +63,7 @@ public class AirSupply {
 	/**
 	 * @author AdrianSR / 13/10/2021 / 06:19 p. m.
 	 */
-	protected static class AirSupplyFallTask extends BukkitRunnable {
+	protected static class AirSupplyFallTask extends BukkitRunnableWrapper {
 		
 		protected final AirSupply airsupply;
 		

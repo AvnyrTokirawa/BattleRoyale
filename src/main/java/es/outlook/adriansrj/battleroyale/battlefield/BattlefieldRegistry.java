@@ -46,9 +46,12 @@ public final class BattlefieldRegistry extends PluginHandler {
 			try {
 				Battlefield battlefield = new Battlefield ( folder );
 				
+				// we will register the battlefield event if
+				// it has an invalid configuration, as, server
+				// owners must be able to edit it.
+				battlefields.put ( battlefield.getName ( ).trim ( ).toLowerCase ( ) , battlefield );
+				
 				if ( battlefield.getConfiguration ( ).isValid ( ) ) {
-					battlefields.put ( battlefield.getName ( ).trim ( ).toLowerCase ( ) , battlefield );
-					
 					ConsoleUtil.sendPluginMessage (
 							ChatColor.GREEN , "Battlefield '" + folder.getName ( )
 									+ "' successfully loaded." , BattleRoyale.getInstance ( ) );

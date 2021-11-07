@@ -1,6 +1,8 @@
 package es.outlook.adriansrj.battleroyale.packet.factory;
 
 import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityAttach;
+import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityRelativeMove;
+import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityRelativeMoveLook;
 import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityTeleport;
 import es.outlook.adriansrj.core.util.server.Version;
 import org.bukkit.util.Vector;
@@ -22,6 +24,31 @@ public interface PacketFactoryServiceHandle {
 				| InstantiationException | IllegalAccessException | NoSuchMethodException e ) {
 			throw new IllegalStateException ( e );
 		}
+	}
+	
+	// ------ entity relative move packet
+	
+	Object createEntityRelativeMovePacket ( int entity_id , int delta_x , int delta_y ,
+			int delta_z , boolean on_ground );
+	
+	default Object createEntityRelativeMovePacket ( PacketOutEntityRelativeMove wrapper ) {
+		return createEntityRelativeMovePacket (
+				wrapper.getEntityId ( ) ,
+				wrapper.getDeltaX ( ) , wrapper.getDeltaY ( ) , wrapper.getDeltaZ ( ) ,
+				wrapper.isOnGround ( ) );
+	}
+	
+	// ------ entity relative move and look packet
+	
+	Object createEntityRelativeMoveLookPacket ( int entity_id ,
+			int delta_x , int delta_y , int delta_z ,
+			byte yaw , byte pitch , boolean on_ground );
+	
+	default Object createEntityRelativeMoveLookPacket ( PacketOutEntityRelativeMoveLook wrapper ) {
+		return createEntityRelativeMoveLookPacket (
+				wrapper.getEntityId ( ) ,
+				wrapper.getDeltaX ( ) , wrapper.getDeltaY ( ) , wrapper.getDeltaZ ( ) ,
+				wrapper.getYaw ( ) , wrapper.getPitch ( ) , wrapper.isOnGround ( ) );
 	}
 	
 	// ------ entity teleport packet
