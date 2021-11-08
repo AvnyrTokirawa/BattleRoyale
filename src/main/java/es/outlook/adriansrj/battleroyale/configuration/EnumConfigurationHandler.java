@@ -24,10 +24,9 @@ public abstract class EnumConfigurationHandler < E extends Enum < ? extends Conf
 	
 	@Override
 	public void initialize ( ) {
-		File        file       = safeGetFile ( );
-		Class < E > enum_class = safeGetEnumClass ( );
+		File file = safeGetFile ( );
 		
-		if ( ! file.exists ( ) ) {
+		if ( !file.exists ( ) ) {
 			try {
 				file.getParentFile ( ).mkdirs ( );
 				file.createNewFile ( );

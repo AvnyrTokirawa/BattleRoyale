@@ -1,8 +1,8 @@
 package es.outlook.adriansrj.battleroyale.battlefield.setup.tool;
 
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.item.ActionItem;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;

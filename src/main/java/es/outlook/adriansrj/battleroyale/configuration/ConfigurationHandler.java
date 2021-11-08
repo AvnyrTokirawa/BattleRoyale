@@ -3,8 +3,6 @@ package es.outlook.adriansrj.battleroyale.configuration;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 
-import java.io.File;
-
 /**
  * @author AdrianSR / 22/08/2021 / Time: 09:05 p. m.
  */

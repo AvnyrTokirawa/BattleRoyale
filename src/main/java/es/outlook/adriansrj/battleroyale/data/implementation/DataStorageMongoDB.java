@@ -15,9 +15,9 @@ import es.outlook.adriansrj.battleroyale.data.DataStorage;
 import es.outlook.adriansrj.battleroyale.enums.EnumMainConfiguration;
 import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.enums.EnumStat;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.game.player.PlayerDataStorage;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.NamespacedKey;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.console.ConsoleUtil;
@@ -38,6 +38,7 @@ public class DataStorageMongoDB implements DataStorage {
 	protected static final String ID_FIELD_NAME        = "_id";
 	protected static final String NAME_FIELD_NAME      = "name";
 	protected static final String COSMETICS_FIELD_NAME = "cosmetics";
+	protected static final String BALANCE_FIELD_NAME   = "balance";
 	
 	protected final BattleRoyale  plugin;
 	protected       MongoClient   connection;
@@ -295,7 +296,66 @@ public class DataStorageMongoDB implements DataStorage {
 				COSMETICS_FIELD_NAME , cosmetic.getKey ( ).toString ( ) );
 	}
 	
-	// ----- util methods
+	// ------ money
+	
+	@Override
+	public Map < UUID, Integer > getStoredBalances ( ) throws Exception {
+		Map < UUID, Integer > result = new HashMap <> ( );
+		
+		for ( Document document : getCollection ( ).find ( ) ) {
+			if ( document.containsKey ( ID_FIELD_NAME ) ) {
+				result.put ( document.get ( ID_FIELD_NAME , UUID.class ) , extractBalance ( document ) );
+			}
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public int getBalance ( UUID uuid ) {
+		Document result = getCollection ( ).find ( Filters.eq ( ID_FIELD_NAME , uuid ) ).first ( );
+		
+		return result != null ? extractBalance ( result ) : 0;
+	}
+	
+	@Override
+	public void loadBalance ( PlayerDataStorage storage_player ) throws Exception {
+		storage_player.setBalance ( getBalance ( storage_player.getUniqueId ( ) ) );
+	}
+	
+	@Override
+	public void setBalance ( Player br_player , int balance ) throws Exception {
+		set0 ( getCollection ( ) , br_player.getUniqueId ( ) , br_player.getName ( ) ,
+			   BALANCE_FIELD_NAME , Math.max ( balance , 0 ) );
+	}
+	
+	@Override
+	public void setBalance ( PlayerDataStorage storage_player , int balance ) throws Exception {
+		set0 ( getCollection ( ) , storage_player.getUniqueId ( ) , storage_player.getName ( ) ,
+			   BALANCE_FIELD_NAME , Math.max ( balance , 0 ) );
+	}
+	
+	@Override
+	public void balanceDeposit ( Player br_player , int value ) throws Exception {
+		setBalance ( br_player , getBalance ( br_player.getUniqueId ( ) ) + value );
+	}
+	
+	@Override
+	public void balanceDeposit ( PlayerDataStorage storage_player , int value ) throws Exception {
+		setBalance ( storage_player , getBalance ( storage_player.getUniqueId ( ) ) + value );
+	}
+	
+	@Override
+	public void balanceWithdraw ( Player br_player , int value ) throws Exception {
+		setBalance ( br_player , getBalance ( br_player.getUniqueId ( ) ) - value );
+	}
+	
+	@Override
+	public void balanceWithdraw ( PlayerDataStorage storage_player , int value ) throws Exception {
+		setBalance ( storage_player , getBalance ( storage_player.getUniqueId ( ) ) - value );
+	}
+	
+	// ------ util methods
 	
 	protected Map < EnumStat, Integer > extractStatValues ( Document document ) {
 		Map < EnumStat, Integer > values = new EnumMap <> ( EnumStat.class );
@@ -342,6 +402,14 @@ public class DataStorageMongoDB implements DataStorage {
 		}
 		
 		return result;
+	}
+	
+	protected int extractBalance ( Document document ) {
+		if ( document.containsKey ( BALANCE_FIELD_NAME ) ) {
+			return document.getInteger ( BALANCE_FIELD_NAME );
+		} else {
+			return 0;
+		}
 	}
 	
 	protected void addToSet0 ( MongoCollection < Document > collection , UUID uuid , String name ,

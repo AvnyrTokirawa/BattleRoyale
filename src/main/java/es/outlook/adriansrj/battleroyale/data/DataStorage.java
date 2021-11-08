@@ -83,5 +83,35 @@ public interface DataStorage {
 	
 	void removeCosmetic ( PlayerDataStorage storage_player , Cosmetic < ? > cosmetic ) throws Exception;
 	
+	// ------ money
+	
+	Map < UUID, Integer > getStoredBalances ( ) throws Exception;
+	
+	int getBalance ( UUID uuid ) throws Exception;
+	
+	void loadBalance ( PlayerDataStorage storage_player ) throws Exception;
+	
+	void setBalance ( Player br_player , int balance ) throws Exception;
+	
+	void setBalance ( PlayerDataStorage storage_player , int balance ) throws Exception;
+	
+	void balanceDeposit ( Player br_player , int value ) throws Exception;
+	
+	void balanceDeposit ( PlayerDataStorage storage_player , int value ) throws Exception;
+	
+	void balanceWithdraw ( Player br_player , int value ) throws Exception;
+	
+	void balanceWithdraw ( PlayerDataStorage storage_player , int value ) throws Exception;
+	
+	default void clearBalance ( Player br_player ) throws Exception {
+		setBalance ( br_player , 0 );
+	}
+	
+	default void clearBalance ( PlayerDataStorage storage_player ) throws Exception {
+		setBalance ( storage_player , 0 );
+	}
+	
+	// ------
+	
 	void dispose ( );
 }

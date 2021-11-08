@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.util.math;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.Arrays;
 
 /**

@@ -1,6 +1,5 @@
 package es.outlook.adriansrj.battleroyale.parachute.custom;
 
-import es.outlook.adriansrj.battleroyale.parachute.custom.ParachuteCustomPartPosition;
 import es.outlook.adriansrj.core.util.math.Vector2D;
 
 /**

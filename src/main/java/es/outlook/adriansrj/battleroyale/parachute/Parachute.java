@@ -1,13 +1,14 @@
 package es.outlook.adriansrj.battleroyale.parachute;
 
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.parachute.custom.ParachuteCustom;
 import es.outlook.adriansrj.battleroyale.parachute.plugin.ParachuteQAV;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.NamespacedKey;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.configurable.Configurable;
+import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
 import es.outlook.adriansrj.core.util.itemstack.banner.BannerColor;
 import es.outlook.adriansrj.core.util.itemstack.wool.WoolColor;
 import es.outlook.adriansrj.core.util.permission.Permissions;
@@ -48,7 +49,7 @@ public abstract class Parachute implements Configurable, Cloneable {
 	/**
 	 * @author AdrianSR / 10/09/2021 / 08:15 p. m.
 	 */
-	public enum Color {
+	public enum Color implements Configurable {
 		
 		PLAYER ( null , null , null ),
 		WHITE ( ),
@@ -69,6 +70,8 @@ public abstract class Parachute implements Configurable, Cloneable {
 		BLACK ( ),
 		;
 		
+		private static final int DEFAULT_PRICE = 1000;
+		
 		public static Color of ( NamespacedKey key ) {
 			return valueOf ( Validate.namespace ( Constants.PARACHUTE_COLOR_NAMESPACE , key )
 									 .getKey ( ).toUpperCase ( Locale.ROOT ) );
@@ -79,23 +82,28 @@ public abstract class Parachute implements Configurable, Cloneable {
 		private final ChatColor     chat_color;
 		private       NamespacedKey key;
 		private       Permission    permission;
+		@ConfigurableEntry ( key = "price", comment = "price of this color" )
+		private       int           price;
 		
 		Color ( WoolColor wool , BannerColor banner , ChatColor chat_color ) {
 			this.wool       = wool;
 			this.banner     = banner;
 			this.chat_color = chat_color;
+			this.price      = DEFAULT_PRICE;
 		}
 		
 		Color ( ChatColor chat_color ) {
 			this.wool       = WoolColor.valueOf ( name ( ) );
 			this.banner     = BannerColor.valueOf ( name ( ) );
 			this.chat_color = chat_color;
+			this.price      = DEFAULT_PRICE;
 		}
 		
 		Color ( ) {
 			this.wool       = WoolColor.valueOf ( name ( ) );
 			this.banner     = BannerColor.valueOf ( name ( ) );
 			this.chat_color = ChatColor.valueOf ( name ( ) );
+			this.price      = DEFAULT_PRICE;
 		}
 		
 		public Permission getPermission ( ) {
@@ -118,11 +126,31 @@ public abstract class Parachute implements Configurable, Cloneable {
 			return chat_color;
 		}
 		
+		public int getPrice ( ) {
+			return this == PLAYER ? -1 : price;
+		}
+		
 		public NamespacedKey getKey ( ) {
 			if ( key == null ) {
 				key = new NamespacedKey ( Constants.PARACHUTE_COLOR_NAMESPACE , name ( ) );
 			}
 			return key;
+		}
+		
+		@Override
+		public Parachute.Color load ( ConfigurationSection section ) {
+			loadEntries ( section );
+			return this;
+		}
+		
+		@Override
+		public int save ( ConfigurationSection section ) {
+			return saveEntries ( section );
+		}
+		
+		@Override
+		public boolean isValid ( ) {
+			return true;
 		}
 	}
 	

@@ -1,7 +1,6 @@
 package es.outlook.adriansrj.battleroyale.battlefield.setup;
 
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldConfiguration;
-import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderSuccession;
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.Minimap;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 

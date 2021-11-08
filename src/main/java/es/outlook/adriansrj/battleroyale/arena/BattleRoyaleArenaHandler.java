@@ -249,6 +249,7 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 				}
 				
 				EnumItem.SETTINGS.give ( player );
+				EnumItem.SHOP.give ( player );
 				EnumItem.LEAVE_ARENA.give ( player );
 				
 				player.updateInventory ( );

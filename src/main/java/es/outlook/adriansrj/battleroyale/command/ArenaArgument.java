@@ -2,7 +2,9 @@ package es.outlook.adriansrj.battleroyale.command;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
+import es.outlook.adriansrj.battleroyale.enums.EnumMode;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.mode.RunModeHandler;
 import es.outlook.adriansrj.core.util.StringUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -41,14 +43,22 @@ abstract class ArenaArgument extends BaseArgument {
 				
 				sender.sendMessage ( ChatColor.RED + getUsage ( ) );
 			}
+		} else if ( RunModeHandler.getInstance ( ).getMode ( ) == EnumMode.BUNGEE ) {
+			arena      = EnumMode.BUNGEE.getArena ( );
+			arena_name = null;
 		} else {
 			sender.sendMessage ( ChatColor.RED + getUsage ( ) );
 			return null;
 		}
 		
 		if ( arena == null ) {
-			sender.sendMessage (
-					ChatColor.RED + "Couldn't find any arena with name '" + arena_name + "'!" );
+			if ( arena_name != null ) {
+				sender.sendMessage (
+						ChatColor.RED + "Couldn't find any arena with name '" + arena_name + "'!" );
+			} else {
+				sender.sendMessage (
+						ChatColor.RED + "Couldn't determine the arena that is to be started!" );
+			}
 		}
 		
 		return arena;

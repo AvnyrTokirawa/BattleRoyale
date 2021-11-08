@@ -23,6 +23,7 @@ import es.outlook.adriansrj.battleroyale.configuration.bus.BusesConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.compass.CompassBarConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.gui.arenaselector.ArenaSelectorGUIConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.gui.settings.SettingsGUIsConfigHandler;
+import es.outlook.adriansrj.battleroyale.configuration.gui.shop.ShopGUIsConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.gui.teamselector.TeamGUIsLanguageConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.lang.BattleRoyaleLanguageConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.lobby.BattleRoyaleLobbyConfigHandler;
@@ -30,6 +31,7 @@ import es.outlook.adriansrj.battleroyale.configuration.loot.LootConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.main.MainConfigurationHandler;
 import es.outlook.adriansrj.battleroyale.configuration.parachute.ParachuteConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.parachute.ParachutesConfigHandler;
+import es.outlook.adriansrj.battleroyale.configuration.parachute.color.ParachuteColorConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.scoreboard.ScoreboardConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.vehicle.BattleRoyaleVehiclesConfigHandler;
 import es.outlook.adriansrj.battleroyale.data.DataStorageHandler;
@@ -46,6 +48,11 @@ import es.outlook.adriansrj.battleroyale.gui.setup.SetupGUI;
 import es.outlook.adriansrj.battleroyale.gui.setup.battlefield.BattlefieldSetupGUI;
 import es.outlook.adriansrj.battleroyale.gui.setup.battlefield.session.BattlefieldSetupSessionGUI;
 import es.outlook.adriansrj.battleroyale.gui.setup.lobby.LobbyMapSetupGUI;
+import es.outlook.adriansrj.battleroyale.gui.shop.ShopConfirmationGUIHandler;
+import es.outlook.adriansrj.battleroyale.gui.shop.ShopGUIHandler;
+import es.outlook.adriansrj.battleroyale.gui.shop.bus.BusShopGUIHandler;
+import es.outlook.adriansrj.battleroyale.gui.shop.parachute.ParachuteShopGUIHandler;
+import es.outlook.adriansrj.battleroyale.gui.shop.parachute.color.ParachuteColorShopGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.spectator.SpectatorGUI;
 import es.outlook.adriansrj.battleroyale.gui.team.TeamGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.team.TeamSelectorGUIHandler;
@@ -99,7 +106,13 @@ public enum EnumPluginHandler {
 	REANIMATION_HANDLER ( PlayerReviveHandler.class ),
 	
 	ITEM_HANDLER ( BattleRoyaleItemHandler.class ),
+	SHOP_GUIS_CONFIGURATION_HANDLER ( ShopGUIsConfigHandler.class ),
 	SETTINGS_GUIS_CONFIGURATION_HANDLER ( SettingsGUIsConfigHandler.class ),
+	SHOP_GUI ( ShopGUIHandler.class ),
+	SHOP_CONFIRMATION_GUI ( ShopConfirmationGUIHandler.class ),
+	BUS_SHOP_GUI ( BusShopGUIHandler.class ),
+	PARACHUTE_SHOP_GUI ( ParachuteShopGUIHandler.class ),
+	PARACHUTE_COLOR_SHOP_GUI ( ParachuteColorShopGUIHandler.class ),
 	SETTINGS_GUI ( SettingsGUIHandler.class ),
 	BUS_SETTINGS_GUI ( BusSettingsGUIHandler.class ),
 	PARACHUTE_SETTINGS_MAIN_GUI ( ParachuteSettingsMainGUIHandler.class ),
@@ -146,6 +159,7 @@ public enum EnumPluginHandler {
 	PARACHUTE_HANDLER ( ParachuteHandler.class ),
 	PARACHUTE_REGISTRY ( ParachuteRegistry.class ),
 	PARACHUTE_CONFIGURATION_HANDLER ( ParachuteConfigHandler.class ),
+	PARACHUTE_COLOR_CONFIGURATION_HANDLER ( ParachuteColorConfigHandler.class ),
 	PARACHUTES_CONFIGURATION_HANDLER ( ParachutesConfigHandler.class ),
 	
 	COMPASS_HANDLER ( CompassBarHandler.class ),

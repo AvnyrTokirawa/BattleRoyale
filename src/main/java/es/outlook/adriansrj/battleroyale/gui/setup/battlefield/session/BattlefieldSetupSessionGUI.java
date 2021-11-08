@@ -5,9 +5,13 @@ import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSessi
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.handler.PluginHandler;
+import es.outlook.adriansrj.core.menu.Item;
 import es.outlook.adriansrj.core.menu.ItemMenu;
 import es.outlook.adriansrj.core.menu.size.ItemMenuSize;
 import org.bukkit.ChatColor;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author AdrianSR / 28/08/2021 / 03:50 p. m.
@@ -18,7 +22,8 @@ public final class BattlefieldSetupSessionGUI extends PluginHandler {
 		return getPluginHandler ( BattlefieldSetupSessionGUI.class );
 	}
 	
-	private final ItemMenu handle;
+	private final ItemMenu              handle;
+	private final Map < Integer, Item > extras;
 	
 	/**
 	 * Constructs the plugin handler.
@@ -29,20 +34,30 @@ public final class BattlefieldSetupSessionGUI extends PluginHandler {
 		super ( plugin );
 		
 		this.handle = new ItemMenu ( ChatColor.BLACK + "Battlefield Setup" , ItemMenuSize.FIVE_LINE );
+		this.extras = new ConcurrentHashMap <> ( );
+		
 		this.handle.registerListener ( plugin );
 	}
 	
-	public void open ( org.bukkit.entity.Player player ) {
+	public synchronized void open ( org.bukkit.entity.Player player ) {
 		this.build ( Player.getPlayer ( player ) );
 		this.handle.open ( player );
 	}
 	
-	public void refresh ( org.bukkit.entity.Player player ) {
+	public synchronized void refresh ( org.bukkit.entity.Player player ) {
 		this.build ( Player.getPlayer ( player ) );
 		this.handle.update ( player );
 	}
 	
-	private void build ( Player player ) {
+	public void registerTool ( int index , Item item ) {
+		extras.put ( index , item );
+	}
+	
+	public Item unregisterTool ( int index ) {
+		return extras.remove ( index );
+	}
+	
+	private synchronized void build ( Player player ) {
 		this.handle.clear ( );
 		
 		BattlefieldSetupHandler handler = BattlefieldSetupHandler.getInstance ( );
@@ -78,6 +93,17 @@ public final class BattlefieldSetupSessionGUI extends PluginHandler {
 				if ( loot_configuration.available ( ) ) {
 					this.handle.setItem ( 32 , loot_configuration );
 				}
+				
+				// extra tools
+				this.extras.forEach ( ( index , item ) -> {
+					ItemMenuSize size = ItemMenuSize.fitOf ( index );
+					
+					if ( size.getSize ( ) > this.handle.getSize ( ).getSize ( ) ) {
+						this.handle.setSize ( size );
+					}
+					
+					this.handle.setItem ( index , item );
+				} );
 			}
 		}
 	}

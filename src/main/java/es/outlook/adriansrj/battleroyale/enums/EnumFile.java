@@ -56,6 +56,11 @@ public enum EnumFile {
 	PARACHUTE_CONFIGURATION ( "BattleRoyaleParachute.yml" ),
 	
 	/**
+	 * Parachute colors configuration file.
+	 */
+	PARACHUTE_COLOR_CONFIGURATION ( "BattleRoyaleParachuteColor.yml" ),
+	
+	/**
 	 * Battle royale item configuration file.
 	 */
 	ITEM_CONFIGURATION ( "BattleRoyaleItems.yml" ) ,
@@ -74,6 +79,11 @@ public enum EnumFile {
 	 * Settings GUIs configuration file.
 	 */
 	SETTINGS_GUIS_CONFIGURATION ( "BattleRoyaleSettingsGUIs.yml" ),
+	
+	/**
+	 * Shop GUIs configuration file.
+	 */
+	SHOP_GUIS_CONFIGURATION ( "BattleRoyaleShopGUIs.yml" ),
 	
 	;
 	

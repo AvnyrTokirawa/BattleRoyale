@@ -17,10 +17,9 @@ public class PluginUtil {
 		return isPluginEnabled ( Constants.PLACEHOLDER_API_PLUGIN_NAME );
 	}
 	
-	public static boolean isMVdWPlaceholderAPIEnabled ( ) {
-		return isPluginEnabled ( Constants.MVDW_PLACEHOLDER_API_PLUGIN_NAME );
+	public static boolean isVaultEnabled ( ) {
+		return isPluginEnabled ( Constants.VAULT_PLUGIN_NAME );
 	}
-	
 	public static boolean isQualityArmoryEnabled ( ) {
 		return isPluginEnabled ( Constants.QUALITY_ARMORY_PLUGIN_NAME );
 	}

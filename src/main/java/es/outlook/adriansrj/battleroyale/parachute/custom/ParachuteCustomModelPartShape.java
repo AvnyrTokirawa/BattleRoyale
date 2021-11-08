@@ -1,8 +1,8 @@
 package es.outlook.adriansrj.battleroyale.parachute.custom;
 
 import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
-import es.outlook.adriansrj.battleroyale.parachute.Parachute;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.parachute.Parachute;
 import es.outlook.adriansrj.battleroyale.util.material.MaterialUtil;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.configurable.Configurable;

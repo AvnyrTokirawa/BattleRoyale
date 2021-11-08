@@ -1,7 +1,7 @@
 package es.outlook.adriansrj.battleroyale.parachute.custom;
 
-import es.outlook.adriansrj.battleroyale.parachute.Parachute;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.parachute.Parachute;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;

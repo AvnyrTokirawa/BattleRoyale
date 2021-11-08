@@ -1,8 +1,8 @@
 package es.outlook.adriansrj.battleroyale.world.arena;
 
+import es.outlook.adriansrj.battleroyale.enums.EnumWorldGenerator;
 import es.outlook.adriansrj.battleroyale.world.arena.v12.ArenaWorldGenerator12;
 import es.outlook.adriansrj.battleroyale.world.data.v12.WorldData12;
-import es.outlook.adriansrj.battleroyale.enums.EnumWorldGenerator;
 
 import java.io.File;
 

@@ -3,16 +3,19 @@ package es.outlook.adriansrj.battleroyale.gui.setting.parachute;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.enums.EnumSettingsGUIsConfiguration;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.gui.shop.parachute.ParachuteShopGUIHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.parachute.Parachute;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteRegistry;
 import es.outlook.adriansrj.battleroyale.parachute.plugin.ParachuteQAV;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.util.CosmeticUtil;
 import es.outlook.adriansrj.battleroyale.util.NamespacedKey;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.menu.Item;
 import es.outlook.adriansrj.core.menu.ItemMenu;
+import es.outlook.adriansrj.core.menu.action.ItemClickAction;
 import es.outlook.adriansrj.core.menu.custom.book.BookItemMenu;
 import es.outlook.adriansrj.core.menu.custom.book.item.AlternateBookPageActionItem;
 import es.outlook.adriansrj.core.menu.item.action.ActionItem;
@@ -97,6 +100,19 @@ public final class ParachuteSettingsGUIHandler extends PluginHandler {
 			handle.addItem ( buildParachuteItem ( player , parachute ) );
 		}
 		
+		// shop button
+		if ( ParachuteRegistry.getInstance ( ).getRegisteredParachutes ( ).stream ( )
+				.anyMatch ( parachute -> !CosmeticUtil.isUnlocked ( parachute , player ) ) ) {
+			handle.setBarButton ( 0 , new Item (
+					ChatColor.DARK_GREEN + EnumLanguage.SHOP_WORD.getAsString ( ) ,
+					UniversalMaterial.EMERALD.getItemStack ( ) ) {
+				@Override
+				public void onClick ( ItemClickAction action ) {
+					ParachuteShopGUIHandler.getInstance ( ).open ( action.getPlayer ( ) );
+				}
+			} );
+		}
+		
 		// back button
 		handle.setBarButton ( 3 , new AlternateBookPageActionItem (
 				ChatColor.GREEN + EnumLanguage.BACK_WORD.getAsStringStripColors ( ) ,
@@ -121,7 +137,7 @@ public final class ParachuteSettingsGUIHandler extends PluginHandler {
 	private synchronized Item buildParachuteItem ( org.bukkit.entity.Player player , Parachute parachute ) {
 		NamespacedKey     key      = ParachuteRegistry.getInstance ( ).getRegistrationKey ( parachute );
 		UniversalMaterial material = UniversalMaterial.SADDLE;
-		final boolean     unlocked = parachute.getPermission ( ) == null || player.hasPermission ( parachute.getPermission ( ) );
+		boolean           unlocked = CosmeticUtil.isUnlocked ( parachute , player );
 		
 		if ( parachute instanceof ParachuteQAV ) {
 			material = UniversalMaterial.LEATHER;

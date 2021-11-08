@@ -1,12 +1,11 @@
 package es.outlook.adriansrj.battleroyale.gui.setup;
 
+import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupHandler;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.gui.setup.battlefield.BattlefieldSetupGUI;
 import es.outlook.adriansrj.battleroyale.gui.setup.battlefield.session.BattlefieldSetupSessionGUI;
 import es.outlook.adriansrj.battleroyale.gui.setup.lobby.LobbyMapSetupGUI;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupHandler;
-import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.menu.ItemMenu;
 import es.outlook.adriansrj.core.menu.action.ItemClickAction;
@@ -36,7 +35,7 @@ public final class SetupGUI extends PluginHandler {
 	public SetupGUI ( BattleRoyale plugin ) {
 		super ( plugin );
 		
-		this.handle = new ItemMenu ( ChatColor.BLACK + "Battlefield Setup" , ItemMenuSize.THREE_LINE );
+		this.handle = new ItemMenu ( ChatColor.BLACK + "Battle Royale Setup" , ItemMenuSize.THREE_LINE );
 		this.handle.registerListener ( plugin );
 		
 		// lobby map setup
@@ -77,7 +76,7 @@ public final class SetupGUI extends PluginHandler {
 		}
 	}
 	
-	protected boolean openBattlefieldSetupSessionGUI ( org.bukkit.entity.Player player ) {
+	private boolean openBattlefieldSetupSessionGUI ( org.bukkit.entity.Player player ) {
 		if ( isInActiveBattlefieldSetupSession ( player ) ) {
 			BattlefieldSetupSessionGUI.getInstance ( ).open ( player );
 			return true;
@@ -92,7 +91,7 @@ public final class SetupGUI extends PluginHandler {
 		}
 	}
 	
-	protected boolean refreshBattlefieldSetupSessionGUI ( org.bukkit.entity.Player player ) {
+	private boolean refreshBattlefieldSetupSessionGUI ( org.bukkit.entity.Player player ) {
 		if ( isInActiveBattlefieldSetupSession ( player ) ) {
 			BattlefieldSetupSessionGUI.getInstance ( ).refresh ( player );
 			return true;
@@ -101,19 +100,18 @@ public final class SetupGUI extends PluginHandler {
 		}
 	}
 	
-	protected boolean isInActiveBattlefieldSetupSession ( org.bukkit.entity.Player player ) {
+	private boolean isInActiveBattlefieldSetupSession ( org.bukkit.entity.Player player ) {
 		return BattlefieldSetupHandler.getInstance ( ).isInActiveSession ( Player.getPlayer ( player ) );
 	}
 	
-	protected BattlefieldSetupSession getBattlefieldSetupSession ( org.bukkit.entity.Player player ) {
-		Player                  configurator              = Player.getPlayer ( player );
-		BattlefieldSetupHandler battlefield_setup_handler = BattlefieldSetupHandler.getInstance ( );
-		BattlefieldSetupSession session = battlefield_setup_handler.getSession ( configurator )
-				.orElse ( battlefield_setup_handler.getSessionFromInvited (
-						configurator ).orElse ( null ) );
-		
-		return session;
-	}
+//	private BattlefieldSetupSession getBattlefieldSetupSession ( org.bukkit.entity.Player player ) {
+	//		Player                  configurator              = Player.getPlayer ( player );
+	//		BattlefieldSetupHandler battlefield_setup_handler = BattlefieldSetupHandler.getInstance ( );
+	//
+	//		return battlefield_setup_handler.getSession ( configurator )
+	//				.orElse ( battlefield_setup_handler.getSessionFromInvited (
+	//						configurator ).orElse ( null ) );
+	//	}
 	
 	@Override
 	protected boolean isAllowMultipleInstances ( ) {

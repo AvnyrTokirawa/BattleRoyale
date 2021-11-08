@@ -8,6 +8,7 @@ import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.enums.EnumStat;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerStatSetEvent;
 import es.outlook.adriansrj.battleroyale.util.NamespacedKey;
+import es.outlook.adriansrj.battleroyale.util.PluginUtil;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 
 import java.util.*;
@@ -30,6 +31,10 @@ public final class PlayerDataStorage {
 	private final Map < EnumPlayerSetting, NamespacedKey > setting_values   = new EnumMap <> ( EnumPlayerSetting.class );
 	// purchased cosmetics
 	private final Set < Cosmetic < ? > >                   cosmetics        = new HashSet <> ( );
+	// balance
+	private       int                                      balance;
+	// vault balance
+	private final PlayerVaultBalance                       vault_balance;
 	
 	// flag that determines whether something has changed and
 	// an update might be required.
@@ -44,6 +49,19 @@ public final class PlayerDataStorage {
 		for ( EnumStat stat_type : EnumStat.values ( ) ) {
 			stat_values.put ( stat_type , 0 );
 			temp_stat_values.put ( stat_type , 0 );
+		}
+		
+		// vault
+		if ( EnumMainConfiguration.VAULT_ENABLE.getAsBoolean ( ) && PluginUtil.isVaultEnabled ( ) ) {
+			PlayerVaultBalance vault_balance = new PlayerVaultBalance ( this );
+			
+			if ( vault_balance.isHooked ( ) ) {
+				this.vault_balance = vault_balance;
+			} else {
+				this.vault_balance = null;
+			}
+		} else {
+			this.vault_balance = null;
 		}
 	}
 	
@@ -312,6 +330,57 @@ public final class PlayerDataStorage {
 	public void removeCosmetic ( Cosmetic < ? > cosmetic ) {
 		removeCosmetic ( cosmetic , false );
 	}
+	
+	// ------- balance
+	
+	public int getBalance ( ) {
+		return vault_balance != null ? vault_balance.getBalance ( ) : balance;
+	}
+	
+	public void setBalance ( int balance , boolean upload ) {
+		if ( vault_balance != null ) {
+			vault_balance.setBalance ( balance );
+		} else {
+			this.balance = Math.max ( 0 , balance );
+			
+			// then uploading
+			DataStorage data_storage = DataStorageHandler.getInstance ( ).getDataStorage ( );
+			
+			if ( upload && data_storage != null ) {
+				try {
+					data_storage.setBalance ( this , this.balance );
+				} catch ( Exception e ) {
+					e.printStackTrace ( );
+				}
+			}
+		}
+	}
+	
+	public void setBalance ( int balance ) {
+		setBalance ( balance , false );
+	}
+	
+	public void balanceDeposit ( int value , boolean upload ) {
+		setBalance ( balance + value , upload );
+	}
+	
+	public void balanceDeposit ( int value ) {
+		balanceDeposit ( value , false );
+	}
+	
+	public void balanceWithdraw ( int value , boolean upload ) {
+		setBalance ( balance - value , upload );
+	}
+	
+	public void balanceWithdraw ( int value ) {
+		balanceWithdraw ( value , false );
+	}
+	
+	public void clearBalance ( ) {
+		setBalance ( 0 );
+	}
+	
+	// -------
 	
 	/**
 	 * Fetches the values from the database.

@@ -69,7 +69,7 @@ public class Constants {
 	
 	public static final String PROTOCOL_LIB_PLUGIN_NAME            = "ProtocolLib";
 	public static final String PLACEHOLDER_API_PLUGIN_NAME         = "PlaceholderAPI";
-	public static final String MVDW_PLACEHOLDER_API_PLUGIN_NAME    = "MVdWPlaceholderAPI";
+	public static final String VAULT_PLUGIN_NAME                   = "Vault";
 	public static final String QUALITY_ARMORY_PLUGIN_NAME          = "QualityArmory";
 	public static final String QUALITY_ARMORY_VEHICLES_PLUGIN_NAME = "QualityArmoryVehicles2";
 	

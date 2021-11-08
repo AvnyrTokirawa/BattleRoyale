@@ -27,6 +27,8 @@ public enum EnumLanguage implements ConfigurationEntry {
 	
 	METERS_WORD ( "common.meters-word" , "'Meters' word. colors will be ignored" , "m" ),
 	
+	SHOP_WORD ( "common.shop-word" , "'Shop' word. colors will be ignored" , "Shop" ),
+	
 	TIME_FORMAT_HOURS_MINUTES_SECONDS ( "time.format-hours-minutes-seconds" ,
 										"time format that includes hours, minutes and seconds" ,
 										"hh'h' mm'm' ss's'" ),

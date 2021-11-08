@@ -1,9 +1,9 @@
 package es.outlook.adriansrj.battleroyale.gui.arena.icon;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.gui.GUIIconInstance;
 import es.outlook.adriansrj.battleroyale.gui.GUIInstance;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.menu.action.ItemClickAction;
 import org.bukkit.inventory.ItemStack;
 

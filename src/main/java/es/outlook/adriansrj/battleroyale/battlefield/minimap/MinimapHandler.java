@@ -1,8 +1,8 @@
 package es.outlook.adriansrj.battleroyale.battlefield.minimap;
 
 import es.outlook.adriansrj.battleroyale.battlefield.minimap.renderer.MinimapRenderer;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import org.bukkit.event.EventHandler;

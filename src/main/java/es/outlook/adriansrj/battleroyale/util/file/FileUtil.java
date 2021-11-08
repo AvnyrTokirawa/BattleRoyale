@@ -3,8 +3,6 @@ package es.outlook.adriansrj.battleroyale.util.file;
 import es.outlook.adriansrj.core.util.file.filter.FileExtensionFilter;
 import es.outlook.adriansrj.core.util.server.Version;
 
-import java.io.FileFilter;
-
 /**
  * Useful class for dealing with files.
  *

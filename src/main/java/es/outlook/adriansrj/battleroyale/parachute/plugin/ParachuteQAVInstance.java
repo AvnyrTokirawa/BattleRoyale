@@ -1,7 +1,7 @@
 package es.outlook.adriansrj.battleroyale.parachute.plugin;
 
-import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
 import org.apache.commons.lang.Validate;
 
 /**

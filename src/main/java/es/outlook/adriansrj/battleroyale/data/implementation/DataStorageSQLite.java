@@ -6,9 +6,9 @@ import es.outlook.adriansrj.battleroyale.enums.EnumDependency;
 import es.outlook.adriansrj.battleroyale.enums.EnumMainConfiguration;
 import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.enums.EnumStat;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.game.player.PlayerDataStorage;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.NamespacedKey;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.battleroyale.util.Validate;
@@ -35,6 +35,7 @@ public class DataStorageSQLite implements DataStorage {
 	protected static final String STATS_TABLE_NAME           = "br_player_stats";
 	protected static final String SETTINGS_TABLE_NAME_FORMAT = "br_player_settings";
 	protected static final String COSMETICS_TABLE_NAME       = "br_player_cosmetics";
+	protected static final String BALANCES_TABLE_NAME        = "br_player_balances";
 	protected static final String UID_COLUMN                 = "UUID";
 	protected static final String NAME_COLUMN                = "NAME";
 	protected static final String KEY_COLUMN                 = "_KEY";
@@ -381,6 +382,71 @@ public class DataStorageSQLite implements DataStorage {
 		delete1 ( COSMETICS_TABLE_NAME , storage_player.getUniqueId ( ) , cosmetic.getKey ( ).toString ( ) );
 	}
 	
+	// ------------ money
+	
+	@Override
+	public Map < UUID, Integer > getStoredBalances ( ) throws Exception {
+		Map < UUID, Integer > result = new HashMap <> ( );
+		
+		for ( UUID uuid : queryIds ( ) ) {
+			try ( PreparedStatement statement = connection.prepareStatement ( String.format (
+					"SELECT %s FROM %s WHERE %s = ?" ,
+					VALUE_COLUMN , BALANCES_TABLE_NAME , UID_COLUMN ) ) ) {
+				statement.setString ( 1 , uuid.toString ( ) );
+				
+				try ( ResultSet result_set = statement.executeQuery ( ) ) {
+					if ( result_set.next ( ) ) {
+						result.put ( uuid , Math.max ( result_set.getInt ( VALUE_COLUMN ) , 0 ) );
+					}
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public int getBalance ( UUID uuid ) throws Exception {
+		Validate.notNull ( uuid , "uuid cannot be null" );
+		
+		return ( int ) query1 ( BALANCES_TABLE_NAME , uuid , 0 );
+	}
+	
+	@Override
+	public void loadBalance ( PlayerDataStorage storage_player ) throws Exception {
+		storage_player.setBalance ( getBalance ( storage_player.getUniqueId ( ) ) , false );
+	}
+	
+	@Override
+	public void setBalance ( Player br_player , int balance ) throws Exception {
+		set1 ( BALANCES_TABLE_NAME , br_player.getUniqueId ( ) , br_player.getName ( ) , Math.max ( balance , 0 ) );
+	}
+	
+	@Override
+	public void setBalance ( PlayerDataStorage storage_player , int balance ) throws Exception {
+		set1 ( BALANCES_TABLE_NAME , storage_player.getUniqueId ( ) , storage_player.getName ( ) , Math.max ( balance , 0 ) );
+	}
+	
+	@Override
+	public void balanceDeposit ( Player br_player , int value ) throws Exception {
+		setBalance ( br_player , getBalance ( br_player.getUniqueId ( ) ) + value );
+	}
+	
+	@Override
+	public void balanceDeposit ( PlayerDataStorage storage_player , int value ) throws Exception {
+		setBalance ( storage_player , getBalance ( storage_player.getUniqueId ( ) ) + value );
+	}
+	
+	@Override
+	public void balanceWithdraw ( Player br_player , int value ) throws Exception {
+		setBalance ( br_player , getBalance ( br_player.getUniqueId ( ) ) - value );
+	}
+	
+	@Override
+	public void balanceWithdraw ( PlayerDataStorage storage_player , int value ) throws Exception {
+		setBalance ( storage_player , getBalance ( storage_player.getUniqueId ( ) ) - value );
+	}
+	
 	// --------- utils
 	
 	protected void tableStructureCheck ( String name , String... structure ) throws SQLException {
@@ -439,6 +505,30 @@ public class DataStorageSQLite implements DataStorage {
 		List < Object > result = querySeveral0 ( table_name , uuid , key );
 		
 		return result.isEmpty ( ) ? default_value : result.get ( 0 );
+	}
+	
+	// query for tables with structure: [ UID_COLUMN | VALUE_COLUMN ]
+	protected Object query1 ( String table_name , UUID uuid , Object default_value ) throws Exception {
+		Validate.notNull ( uuid , "uuid cannot be null" );
+		Validate.notBlank ( table_name , "table_name cannot be null/blank" );
+		
+		try ( PreparedStatement statement = connection.prepareStatement ( String.format (
+				"SELECT %s FROM %s WHERE %s = ?" ,
+				VALUE_COLUMN , table_name , UID_COLUMN ) ) ) {
+			statement.setString ( 1 , uuid.toString ( ) );
+			
+			try ( ResultSet result_set = statement.executeQuery ( ) ) {
+				Object value;
+				
+				if ( result_set.next ( ) ) {
+					value = result_set.getObject ( VALUE_COLUMN );
+				} else {
+					value = default_value;
+				}
+				
+				return value != null ? value : default_value;
+			}
+		}
 	}
 	
 	// query for tables with structure: [ UID_COLUMN | KEY_COLUMN | VALUE_COLUMN ]
@@ -523,6 +613,26 @@ public class DataStorageSQLite implements DataStorage {
 			statement.setString ( 2 , key );
 			statement.setObject ( 3 , value );
 			statement.setObject ( 4 , value );
+			
+			statement.executeUpdate ( );
+		}
+	}
+	
+	// set for tables with structure: [ UID_COLUMN (PRIMARY) | VALUE_COLUMN ]
+	protected void set1 ( String table_name , UUID uuid , String name , Object value ) throws SQLException {
+		Validate.notNull ( value , "value cannot be null" );
+		
+		// registering player id
+		idCheck ( uuid , name );
+		
+		// then inserting
+		try ( PreparedStatement statement = connection.prepareStatement ( String.format (
+				"INSERT INTO %s (%s, %s) VALUES (?, ?) ON CONFLICT (%s) DO UPDATE SET %s = ?" ,
+				table_name , UID_COLUMN , VALUE_COLUMN , UID_COLUMN , VALUE_COLUMN ) ) ) {
+			
+			statement.setString ( 1 , uuid.toString ( ) );
+			statement.setObject ( 2 , value );
+			statement.setObject ( 3 , value );
 			
 			statement.executeUpdate ( );
 		}

@@ -1,7 +1,7 @@
 package es.outlook.adriansrj.battleroyale.gui;
 
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.core.menu.ItemMenu;
 import es.outlook.adriansrj.core.util.StringUtil;

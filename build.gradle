@@ -60,6 +60,9 @@ dependencies {
                     'CrackShotPlus.jar',
             ])
 
+    // Vault
+    implementation 'com.github.MilkBowl:VaultAPI:1.7'
+
     // ParticleLib
     implementation 'xyz.xenondevs:particle:1.6.4'
 

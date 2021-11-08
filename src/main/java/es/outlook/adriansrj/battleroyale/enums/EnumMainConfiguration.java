@@ -25,17 +25,17 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 								"played in this server." , "example" ),
 	
 	MODE_BUNGEE_RESTART_COMMAND ( "mode.bungee.restart-command" ,
-						"the command to restart the server\n" +
-								"after the arena ends." , "restart" ),
+								  "the command to restart the server\n" +
+										  "after the arena ends." , "restart" ),
 	
 	// shared mode
 	MODE_SHARED_COMMAND ( "mode.shared.command" ,
-						"the name for the command that wen\n" +
-								"executed sends the player to the\n" +
-								"battle royale lobby.\n" +
-								"you can use this command with gui\n" +
-								"plugins, or players can manually\n" +
-								"execute this command to join the battle royale." , "bttrl" ),
+						  "the name for the command that wen\n" +
+								  "executed sends the player to the\n" +
+								  "battle royale lobby.\n" +
+								  "you can use this command with gui\n" +
+								  "plugins, or players can manually\n" +
+								  "execute this command to join the battle royale." , "bttrl" ),
 	
 	// database enable
 	ENABLE_DATABASE ( "database.enable" , "enable/disable database" , true ),
@@ -63,6 +63,12 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 							"MongoDB database port." , 27017 ),
 	DATABASE_MONGODB_DATABASE ( "database.mongodb.database" ,
 								"MongoDB database name (Required)." , "database name" ),
+	
+	// vault
+	VAULT_ENABLE ( "vault.enable" , "whether to enable vault compatibility.\n" +
+			"note that if this option is enabled, the\n" +
+			"vault balance will be used instead of the\b" +
+			"battle royale balance." , false ),
 	
 	// game
 	GAME_ENHANCED_DROPS_ENABLE ( "game.enhanced-drops.enable" , "if enabled, drops will be enhanced. " +

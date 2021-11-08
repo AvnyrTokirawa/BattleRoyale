@@ -4,6 +4,7 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.gui.arena.ArenaSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setting.SettingsGUIHandler;
+import es.outlook.adriansrj.battleroyale.gui.shop.ShopGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.team.TeamSelectorGUIHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.Constants;
@@ -91,6 +92,19 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 		}
 	},
 	
+	SHOP ( true , 6 , ChatColor.DARK_GREEN + "Shop" ,
+		   UniversalMaterial.EMERALD , ( byte ) 0 ,
+		   false , EventPriority.HIGH , null ) {
+		@Override
+		public void accept ( PlayerInteractEvent event ) {
+			if ( EventUtil.isRightClick ( event.getAction ( ) ) ) {
+				event.setCancelled ( true );
+				
+				ShopGUIHandler.getInstance ( ).open ( event.getPlayer ( ) );
+			}
+		}
+	},
+	
 	BRIDGE_EGG ( true , -1 , ChatColor.DARK_GREEN + "Bridge Egg" ,
 				 UniversalMaterial.EGG , ( byte ) 0 , true , null , null ,
 				 // limit
@@ -126,13 +140,13 @@ public enum EnumItem implements Consumer < PlayerInteractEvent >, Configurable {
 					   "\nto use this item again" , Duration.ofMilliseconds ( 2000 ) ) ),
 	
 	TNT ( true , -1 , ChatColor.RED + "TNT" ,
-			   UniversalMaterial.TNT , ( byte ) 0 , true , null , null ,
-			   // limit
-			   new Entry ( Constants.STRENGTH_KEY , "explosion strength" ,
-						   double.class , 1.8D ) ,
-			   // delay
-			   new DurationEntry ( Constants.DELAY_KEY , "how long will players have to wait" +
-					   "\nto use this item again" , Duration.ofMilliseconds ( 2000 ) ) ),
+		  UniversalMaterial.TNT , ( byte ) 0 , true , null , null ,
+		  // limit
+		  new Entry ( Constants.STRENGTH_KEY , "explosion strength" ,
+					  double.class , 1.8D ) ,
+		  // delay
+		  new DurationEntry ( Constants.DELAY_KEY , "how long will players have to wait" +
+				  "\nto use this item again" , Duration.ofMilliseconds ( 2000 ) ) ),
 	
 	;
 	

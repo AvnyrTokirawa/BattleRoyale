@@ -2,10 +2,10 @@ package es.outlook.adriansrj.battleroyale.gui.arena;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
+import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.gui.*;
 import es.outlook.adriansrj.battleroyale.gui.arena.icon.ArenaSelectorGUIButtonArenaInstance;
 import es.outlook.adriansrj.battleroyale.gui.arena.icon.ArenaSelectorGUIButtonLeaveArenaInstance;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.menu.ItemMenu;
 
 import java.util.ArrayList;

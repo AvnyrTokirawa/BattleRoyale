@@ -113,6 +113,7 @@ public class BattleRoyaleLobby implements Listener {
 		}
 		
 		EnumItem.SETTINGS.give ( player );
+		EnumItem.SHOP.give ( player );
 		EnumItem.LEAVE_ARENA.give ( player );
 		
 		player.updateInventory ( );

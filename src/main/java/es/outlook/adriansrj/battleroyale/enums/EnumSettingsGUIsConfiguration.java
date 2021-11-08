@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Compass configuration entries in an enumeration.
+ * Settings GUIs configuration entries in an enum.
  *
  * @author AdrianSR / 09/09/2021 / 05:04 p. m.
  */
@@ -101,32 +101,44 @@ public enum EnumSettingsGUIsConfiguration implements ConfigurationEntry {
 			"" ,
 			ChatColor.GREEN + "Click to use" ),
 	
+	BUS_GUI_ITEM_SELECTED_MESSAGE (
+			"bus-settings.bus-item.selected-message" ,
+			"bus settings gui: message players will receive when" +
+					"\nselecting a bus" ,
+			ChatColor.GREEN + "Bus settings saved!" ),
+	
 	BUS_GUI_ITEM_LOCKED_TEXT_FORMAT (
-			"bus-settings.bus-item.unlocked-display-text-format" ,
+			"bus-settings.bus-item.locked-display-text-format" ,
 			"bus settings gui: bus items display text format when locked" +
 					"\n%s will be replaced by the name of the bus" ,
 			ChatColor.DARK_GRAY + "%s" ),
 	
 	BUS_GUI_ITEM_LOCKED_DESCRIPTION_FORMAT (
 			"bus-settings.bus-item.locked-description-format" ,
-			"bus settings gui: bus items description format when unlocked" ,
+			"bus settings gui: bus items description format when locked" ,
+			"" ,
+			ChatColor.DARK_RED + "Locked" ),
+	
+	BUS_GUI_ITEM_LOCKED_PURCHASABLE_DESCRIPTION_FORMAT (
+			"bus-settings.bus-item.locked-purchasable-description-format" ,
+			"bus settings gui: purchasable-bus items description format when locked" ,
 			"" ,
 			ChatColor.DARK_RED + "Locked" ,
 			"" ,
 			ChatColor.DARK_GRAY + "You can buy this bus" ,
 			ChatColor.DARK_GRAY + "in the cosmetics shop" ),
 	
-	BUS_GUI_ITEM_SELECTED_MESSAGE (
-			"bus-settings.bus-item.selected-message" ,
-			"bus settings gui: message players will receive when" +
-					"\nselecting to use a bus" ,
-			ChatColor.GREEN + "Bus settings saved!" ),
-	
 	BUS_GUI_ITEM_LOCKED_MESSAGE (
 			"bus-settings.bus-item.locked-message" ,
 			"bus settings gui: message players will receive when" +
 					"\ntrying to use a locked bus" ,
 			ChatColor.DARK_RED + "You don't have permissions to use this bus!" ),
+	
+	BUS_GUI_ITEM_LOCKED_PURCHASABLE_MESSAGE (
+			"bus-settings.bus-item.locked-purchasable-message" ,
+			"bus settings gui: message players will receive when" +
+					"\ntrying to use a locked bus that can be purchased" ,
+			ChatColor.DARK_RED + "You don't have permissions to use this bus! Go to the shop to get it." ),
 	
 	// -------- parachute settings main gui
 	PARACHUTE_MAIN_GUI_TITLE ( "parachute-settings-main.title" ,

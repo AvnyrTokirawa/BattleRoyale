@@ -6,8 +6,8 @@ import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.world.arena.v12.ArenaWorldGenerator12;
 import es.outlook.adriansrj.battleroyale.world.arena.v13.ArenaWorldGenerator13;
-import es.outlook.adriansrj.battleroyale.world.data.WorldData;
 import es.outlook.adriansrj.battleroyale.world.chunk.Chunk;
+import es.outlook.adriansrj.battleroyale.world.data.WorldData;
 import es.outlook.adriansrj.battleroyale.world.region.Region;
 import org.bukkit.util.Vector;
 

@@ -7,13 +7,16 @@ import es.outlook.adriansrj.battleroyale.bus.pet.BusPet;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.enums.EnumSettingsGUIsConfiguration;
-import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
+import es.outlook.adriansrj.battleroyale.gui.shop.bus.BusShopGUIHandler;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.util.CosmeticUtil;
 import es.outlook.adriansrj.battleroyale.util.NamespacedKey;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.menu.Item;
 import es.outlook.adriansrj.core.menu.ItemMenu;
+import es.outlook.adriansrj.core.menu.action.ItemClickAction;
 import es.outlook.adriansrj.core.menu.custom.book.BookItemMenu;
 import es.outlook.adriansrj.core.menu.custom.book.item.AlternateBookPageActionItem;
 import es.outlook.adriansrj.core.menu.item.action.ActionItem;
@@ -71,9 +74,22 @@ public final class BusSettingsGUIHandler extends PluginHandler {
 		
 		handle.clear ( );
 		
-		// bus items
+		// buses
 		for ( Bus bus : BusRegistry.getInstance ( ).getRegisteredBuses ( ) ) {
 			handle.addItem ( buildBusItem ( player , bus ) );
+		}
+		
+		// shop button
+		if ( BusRegistry.getInstance ( ).getRegisteredBuses ( ).stream ( )
+				.anyMatch ( bus -> !CosmeticUtil.isUnlocked ( bus , player ) ) ) {
+			handle.setBarButton ( 0 , new Item (
+					ChatColor.DARK_GREEN + EnumLanguage.SHOP_WORD.getAsString ( ) ,
+					UniversalMaterial.EMERALD.getItemStack ( ) ) {
+				@Override
+				public void onClick ( ItemClickAction action ) {
+					BusShopGUIHandler.getInstance ( ).open ( action.getPlayer ( ) );
+				}
+			} );
 		}
 		
 		// back button
@@ -98,9 +114,10 @@ public final class BusSettingsGUIHandler extends PluginHandler {
 	}
 	
 	private synchronized Item buildBusItem ( org.bukkit.entity.Player player , Bus bus ) {
-		NamespacedKey     key      = BusRegistry.getInstance ( ).getRegistrationKey ( bus );
-		UniversalMaterial material = UniversalMaterial.MINECART;
-		final boolean     unlocked = bus.getPermission ( ) == null || player.hasPermission ( bus.getPermission ( ) );
+		NamespacedKey     key         = BusRegistry.getInstance ( ).getRegistrationKey ( bus );
+		UniversalMaterial material    = UniversalMaterial.MINECART;
+		final boolean     unlocked    = CosmeticUtil.isUnlocked ( bus , player );
+		final boolean     purchasable = bus.getPrice ( ) > 0;
 		
 		if ( bus instanceof BusDragon ) {
 			throw new UnsupportedOperationException ( BusDragon.class.getSimpleName ( ) + " not supported" );
@@ -110,15 +127,27 @@ public final class BusSettingsGUIHandler extends PluginHandler {
 		
 		// bus must be in the registry
 		if ( key != null ) {
+			// display text
 			String display_text = String.format ( ( unlocked
 					? EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_UNLOCKED_TEXT_FORMAT
 					: EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_LOCKED_TEXT_FORMAT )
 														  .getAsString ( ) , StringUtil.capitalize (
 					key.getKey ( ).replace ( "_" , "" ).replace ( "-" , "" ) ) );
 			
-			List < String > display_description = ( unlocked
-					? EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_UNLOCKED_DESCRIPTION_FORMAT
-					: EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_LOCKED_DESCRIPTION_FORMAT ).getAsStringList ( );
+			// display description
+			List < String > display_description;
+			
+			if ( unlocked ) {
+				display_description = EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_UNLOCKED_DESCRIPTION_FORMAT.getAsStringList ( );
+			} else {
+				if ( purchasable ) {
+					display_description =
+							EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_LOCKED_PURCHASABLE_DESCRIPTION_FORMAT.getAsStringList ( );
+				} else {
+					display_description =
+							EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_LOCKED_DESCRIPTION_FORMAT.getAsStringList ( );
+				}
+			}
 			
 			return new ActionItem ( display_text , material.getItemStack ( ) , display_description ).addAction ( action -> {
 				action.setClose ( true );
@@ -132,8 +161,13 @@ public final class BusSettingsGUIHandler extends PluginHandler {
 					action.getPlayer ( ).sendMessage (
 							EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_SELECTED_MESSAGE.getAsString ( ) );
 				} else {
-					action.getPlayer ( ).sendMessage (
-							EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_LOCKED_MESSAGE.getAsString ( ) );
+					if ( purchasable ) {
+						action.getPlayer ( ).sendMessage (
+								EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_LOCKED_PURCHASABLE_MESSAGE.getAsString ( ) );
+					} else {
+						action.getPlayer ( ).sendMessage (
+								EnumSettingsGUIsConfiguration.BUS_GUI_ITEM_LOCKED_MESSAGE.getAsString ( ) );
+					}
 				}
 			} );
 		} else {
