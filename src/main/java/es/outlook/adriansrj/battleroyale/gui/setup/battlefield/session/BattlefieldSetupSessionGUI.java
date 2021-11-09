@@ -65,20 +65,20 @@ public final class BattlefieldSetupSessionGUI extends PluginHandler {
 				.orElse ( handler.getSessionFromInvited ( player ).orElse ( null ) );
 		
 		if ( session != null ) {
-			this.handle.setItem ( 10 , new SetNameButton ( ) );
+			this.handle.setItem ( 10 , new SetNameButton ( session ) );
 			
 			if ( session.isNameSet ( ) ) {
-				this.handle.setItem ( 12 , new SetBoundsButton ( ) );
+				this.handle.setItem ( 12 , new SetBoundsButton ( session ) );
 			}
 			
-			if ( session.getResult ( ) != null && session.getResult ( ).getBounds ( ) != null ) {
-				this.handle.setItem ( 14 , new SetBorderButton ( ) );
-				this.handle.setItem ( 16 , new SetBusSpawnsButton ( ) );
-				this.handle.setItem ( 19 , new SetPlayerSpawnsButton ( ) );
-				this.handle.setItem ( 21 , new SetLootChestsButton ( ) );
-				this.handle.setItem ( 23 , new SetAirSupplyButton ( ) );
-				this.handle.setItem ( 25 , new SetBombingZoneButton ( ) );
-				this.handle.setItem ( 28 , new SetVehicleSpawnsButton ( ) );
+			if ( session.isNameSet ( ) && session.isBoundsSet ( ) ) {
+				this.handle.setItem ( 14 , new SetBorderButton ( session ) );
+				this.handle.setItem ( 16 , new SetBusSpawnsButton ( session ) );
+				this.handle.setItem ( 19 , new SetPlayerSpawnsButton ( session ) );
+				this.handle.setItem ( 21 , new SetLootChestsButton ( session ) );
+				this.handle.setItem ( 23 , new SetAirSupplyButton ( session ) );
+				this.handle.setItem ( 25 , new SetBombingZoneButton ( session ) );
+				this.handle.setItem ( 28 , new SetVehicleSpawnsButton ( session ) );
 				
 				// vehicles configuration
 				SetVehiclesConfigurationButton vehicles_configuration = new SetVehiclesConfigurationButton ( );

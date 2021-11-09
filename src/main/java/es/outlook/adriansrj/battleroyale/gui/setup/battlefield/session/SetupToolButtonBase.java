@@ -3,7 +3,6 @@ package es.outlook.adriansrj.battleroyale.gui.setup.battlefield.session;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupHandler;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupSession;
 import es.outlook.adriansrj.battleroyale.battlefield.setup.BattlefieldSetupTool;
-import es.outlook.adriansrj.battleroyale.enums.EnumBattleMapSetupTool;
 import es.outlook.adriansrj.battleroyale.enums.EnumInternalLanguage;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.menu.item.action.ActionItem;
@@ -16,7 +15,7 @@ import java.util.Objects;
 /**
  * @author AdrianSR / 04/09/2021 / 11:45 p. m.
  */
-abstract class SetupToolButtonBase extends ActionItem {
+public abstract class SetupToolButtonBase extends ActionItem {
 	
 	/** default action */
 	protected final ItemActionAdapter default_action = action -> {
@@ -29,9 +28,9 @@ abstract class SetupToolButtonBase extends ActionItem {
 		if ( session != null ) {
 			BattlefieldSetupTool tool = session.getCurrentTool ( player );
 			
-			if ( tool == null || ! tool.isModal ( ) ) {
+			if ( tool == null || !tool.isModal ( ) ) {
 				session.populateTool ( player , Objects.requireNonNull (
-						tool ( ) , "tool() returned null" ) );
+						tool ( br_player ) , "tool() returned null" ) );
 			} else {
 				player.sendMessage ( EnumInternalLanguage.TOOL_BUSY.toString ( ) );
 			}
@@ -42,20 +41,28 @@ abstract class SetupToolButtonBase extends ActionItem {
 		action.setClose ( true );
 	};
 	
-	public SetupToolButtonBase ( String name , ItemStack icon , String... lore ) {
+	protected final BattlefieldSetupSession session;
+	
+	public SetupToolButtonBase ( BattlefieldSetupSession session , String name , ItemStack icon , String... lore ) {
 		super ( name , icon , lore );
+		this.session = session;
+		
 		addAction ( default_action );
 	}
 	
-	public SetupToolButtonBase ( String name , ItemStack icon , List < String > lore ) {
+	public SetupToolButtonBase ( BattlefieldSetupSession session , String name , ItemStack icon , List < String > lore ) {
 		super ( name , icon , lore );
+		this.session = session;
+		
 		addAction ( default_action );
 	}
 	
-	public SetupToolButtonBase ( ItemStack icon ) {
+	public SetupToolButtonBase ( BattlefieldSetupSession session , ItemStack icon ) {
 		super ( icon );
+		this.session = session;
+		
 		addAction ( default_action );
 	}
 	
-	protected abstract EnumBattleMapSetupTool tool ( );
+	protected abstract BattlefieldSetupTool tool ( Player configuration );
 }

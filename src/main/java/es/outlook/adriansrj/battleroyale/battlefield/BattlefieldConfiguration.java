@@ -358,9 +358,9 @@ public class BattlefieldConfiguration implements Configurable {
 		loadEntries ( section );
 		
 		// border resize
-		if ( section.isConfigurationSection ( BORDER_RESIZE_KEY ) ) {
-			ConfigurationSection border_resize_section = section.getConfigurationSection ( BORDER_RESIZE_KEY );
-			
+		ConfigurationSection border_resize_section = section.getConfigurationSection ( BORDER_RESIZE_KEY );
+		
+		if ( border_resize_section != null ) {
 			if ( ( border_resize = new BattlefieldBorderSuccessionRandom ( border_resize_section ) ).isInvalid ( ) ) {
 				this.border_resize = new BattlefieldBorderSuccession ( ).load ( border_resize_section );
 			}

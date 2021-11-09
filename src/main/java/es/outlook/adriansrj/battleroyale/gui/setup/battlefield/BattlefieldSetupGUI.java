@@ -16,7 +16,7 @@ public final class BattlefieldSetupGUI extends PluginHandler {
 		return getPluginHandler ( BattlefieldSetupGUI.class );
 	}
 	
-	protected final ItemMenu handle;
+	private final ItemMenu handle;
 	
 	/**
 	 * Constructs the plugin handler.

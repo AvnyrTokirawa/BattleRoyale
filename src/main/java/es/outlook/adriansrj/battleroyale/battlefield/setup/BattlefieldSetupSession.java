@@ -301,18 +301,93 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
+	/**
+	 * Gets the world on which the setup takes place.
+	 * <br>
+	 * This is a mock world; it is created with the goal
+	 * of simulating the actual battlefield.
+	 *
+	 * @return the world on which the setup takes place.
+	 */
 	public World getWorld ( ) {
 		return world;
 	}
 	
+	/**
+	 * Gets the user who started this session.
+	 *
+	 * @return the user who started this session.
+	 */
 	public Player getOwner ( ) {
 		return owner;
 	}
 	
+	/**
+	 * Gets the guest user list.
+	 *
+	 * @return the guest user list.
+	 */
 	public Set < Player > getGuestList ( ) {
 		return guest_list;
 	}
 	
+	/**
+	 * Gets the name of the battlefield.
+	 * <br>
+	 * Note that <b>null</b> will be returned
+	 * if the name has not been set yet.
+	 *
+	 * @return the name of the battlefield or <b>null</b>
+	 * if not set.
+	 */
+	public String getName ( ) {
+		return name;
+	}
+	
+	/**
+	 * Gets the bounds of the battlefield.
+	 * <br>
+	 * Note that <b>null</b> will be returned
+	 * if the bounds has not been set yet.
+	 *
+	 * @return the bounds of the battlefield or <b>null</b>
+	 * if not set.
+	 */
+	public ZoneBounds getBounds ( ) {
+		return bounds;
+	}
+	
+	/**
+	 * Gets the minimap of the battlefield.
+	 * <br>
+	 * Note that <b>null</b> will be returned
+	 * if the bounds has not been set yet.
+	 *
+	 * @return the minimap of the battlefield or <b>null</b>
+	 * if bounds are not set.
+	 */
+	public Minimap getMinimap ( ) {
+		return minimap;
+	}
+	
+	/**
+	 * Gets the configuration of the battlefield.
+	 * <br>
+	 * Note that <b>null</b> will be returned if there
+	 * is nothing set that must be saved.
+	 *
+	 * @return the configuration of the battlefield or
+	 * <b>null</b> if nothing needs to be saved.
+	 */
+	public BattlefieldConfiguration getConfiguration ( ) {
+		return configuration;
+	}
+	
+	/**
+	 * Gets the folder that holds the battlefield.
+	 *
+	 * @return the folder that holds the battlefield.
+	 */
 	public File getFolder ( ) {
 		if ( StringUtil.isNotBlank ( name ) ) {
 			return new File ( EnumDirectory.BATTLEFIELD_DIRECTORY.getDirectory ( ) ,
@@ -322,6 +397,14 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
+	/**
+	 * Gets the result of this session.
+	 * <br>
+	 * Note that <b>null</b> will be returned
+	 * if the <b>name</b>, <b>bounds</b>, or <b>minimap</b> are not set.
+	 *
+	 * @return the result of this session, or <b>null</b> if incomplete.
+	 */
 	public synchronized BattlefieldSetupResult getResult ( ) {
 		if ( result == null &&
 				( name != null && bounds != null && minimap != null ) ) {
@@ -331,20 +414,40 @@ public class BattlefieldSetupSession {
 		return result;
 	}
 	
+	/**
+	 * Gets whether this session is still active.
+	 *
+	 * @return whether this session is still active.
+	 */
 	public boolean isActive ( ) {
 		return world != null && !closed;
 	}
 	
+	/**
+	 * Gets whether the <b>name</b> of the battlefield
+	 * has already been set.
+	 *
+	 * @return whether the <b>name</b> of the battlefield is set.
+	 */
 	public synchronized boolean isNameSet ( ) {
 		return StringUtil.isNotBlank ( name );
 	}
 	
+	/**
+	 * Gets whether the <b>bounds</b> of the battlefield
+	 * has already been set.
+	 *
+	 * @return whether the <b>bounds</b> of the battlefield is set.
+	 */
 	public synchronized boolean isBoundsSet ( ) {
 		return bounds != null && minimap != null;
 	}
 	
 	/**
 	 * Sets the name of the battlefield.
+	 * <br>
+	 * Note that a new folder matching the new
+	 * name will be created.
 	 *
 	 * @param name the name of the battlefield.
 	 */
@@ -366,25 +469,24 @@ public class BattlefieldSetupSession {
 			if ( folder != null && ( folder.exists ( ) || folder.mkdirs ( ) ) ) {
 				moveFileToDirectory ( shape_file , folder );
 				moveFileToDirectory ( minimap_file , folder );
+				
+				// we don't need to move the configuration file
+				// as it will get removed later; and then all we have
+				// to do is call the save configuration method.
+				saveConfiguration ( );
 			}
 			
-			// finally disposing
-			if ( !old_folder.delete ( ) ) {
+			// finally disposing old folder
+			try {
+				FileUtil.deleteDirectory ( old_folder );
+			} catch ( IOException ex ) {
+				ex.printStackTrace ( );
+				
 				try {
 					FileDeleteStrategy.FORCE.delete ( old_folder );
-				} catch ( IOException e ) {
+				} catch ( IOException ex_b ) {
 					// ignoring
 				}
-			}
-		}
-	}
-	
-	protected void moveFileToDirectory ( File file , File directory ) {
-		if ( file.exists ( ) ) {
-			try {
-				FileUtil.moveFileToDirectory ( file , directory , true );
-			} catch ( IOException e ) {
-				e.printStackTrace ( );
 			}
 		}
 	}
@@ -392,12 +494,14 @@ public class BattlefieldSetupSession {
 	// ----- bus spawns
 	
 	/**
+	 * Adds a new bus spawn.
 	 *
-	 * @param location
-	 * @param yaw
-	 * @param door_point_distance
-	 * @param make_relocatable whether to make the provided vector a relocatable vector.
-	 * @return
+	 * @param location the location.
+	 * @param yaw the horizontal rotation (yaw).
+	 * @param door_point_distance the door point distance.
+	 * @param speed the speed.
+	 * @param make_relocatable whether to make relocatable the provided location.
+	 * @return whether the bus was added or not.
 	 */
 	public boolean addBusSpawn ( Vector location , float yaw , double door_point_distance , double speed ,
 			boolean make_relocatable ) {
@@ -405,10 +509,25 @@ public class BattlefieldSetupSession {
 											yaw , door_point_distance , speed ) );
 	}
 	
+	/**
+	 * Adds a new bus spawn.
+	 *
+	 * @param location the location.
+	 * @param yaw the horizontal rotation (yaw).
+	 * @param door_point_distance the door point distance.
+	 * @param speed the speed.
+	 * @return whether the bus was added or not.
+	 */
 	public boolean addBusSpawn ( Vector location , float yaw , double door_point_distance , double speed ) {
 		return addBusSpawn ( location , yaw , door_point_distance , speed , false );
 	}
 	
+	/**
+	 * Adds a new bus spawn.
+	 *
+	 * @param spawn the spawn.
+	 * @return whether the bus was added or not.
+	 */
 	public boolean addBusSpawn ( BusSpawn spawn ) {
 		this.configurationCheck ( );
 		
@@ -420,6 +539,12 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
+	/**
+	 * Removes the provided spawn.
+	 *
+	 * @param spawn the spawn to remove.
+	 * @return whether the bus spawn was removed or no.t
+	 */
 	public boolean removeBusSpawn ( BusSpawn spawn ) {
 		if ( configuration != null && configuration.removeBusSpawn ( spawn ) ) {
 			saveConfiguration ( );
@@ -429,6 +554,9 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
+	/**
+	 * Clear bus spawns.
+	 */
 	public void clearBusSpawns ( ) {
 		if ( configuration != null ) {
 			configuration.getBusSpawns ( ).clear ( );
@@ -439,6 +567,12 @@ public class BattlefieldSetupSession {
 	
 	// ----- player spawns
 	
+	/**
+	 * Adds a new player spawn at the specified location.
+	 *
+	 * @param location the location of the spawn.
+	 * @return whether the spawn was added.
+	 */
 	public boolean addPlayerSpawn ( Vector location ) {
 		this.configurationCheck ( );
 		
@@ -450,6 +584,12 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
+	/**
+	 * Removes the player spawn at the specified location.
+	 *
+	 * @param location the location of the spawn to remove.
+	 * @return whether the spawn was removed.
+	 */
 	public boolean removePlayerSpawn ( Vector location ) {
 		if ( configuration != null && configuration.removePlayerSpawn ( bounds.unproject ( location ) ) ) {
 			saveConfiguration ( );
@@ -459,6 +599,9 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
+	/**
+	 * Clear player spawns.
+	 */
 	public void clearPlayerSpawns ( ) {
 		if ( configuration != null ) {
 			configuration.getPlayerSpawns ( ).clear ( );
@@ -468,6 +611,12 @@ public class BattlefieldSetupSession {
 	
 	// ----- vehicle spawns
 	
+	/**
+	 * Adds a new vehicle spawn at the specified location.
+	 *
+	 * @param location the location of the spawn.
+	 * @return whether the spawn was added.
+	 */
 	public boolean addVehicleSpawn ( Vector location ) {
 		this.configurationCheck ( );
 		
@@ -479,6 +628,12 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
+	/**
+	 * Removes the player spawn at the specified location.
+	 *
+	 * @param location the location of the spawn to remove.
+	 * @return whether the spawn was removed.
+	 */
 	public boolean removeVehicleSpawn ( Vector location ) {
 		if ( configuration != null && configuration.removeVehicleSpawn ( bounds.unproject ( location ) ) ) {
 			saveConfiguration ( );
@@ -488,6 +643,9 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
+	/**
+	 * Clear player spawns.
+	 */
 	public void clearVehicleSpawns ( ) {
 		if ( configuration != null ) {
 			configuration.getVehicleSpawns ( ).clear ( );
@@ -497,6 +655,12 @@ public class BattlefieldSetupSession {
 	
 	// ----- loot chests
 	
+	/**
+	 * Adds a new loot chest spawn at the specified location.
+	 *
+	 * @param location the location of the spawn.
+	 * @return whether the spawn was added.
+	 */
 	public boolean addLootChest ( Vector location ) {
 		this.configurationCheck ( );
 		
@@ -508,6 +672,12 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
+	/**
+	 * Removes the loot chest spawn at the specified location.
+	 *
+	 * @param location the location of the spawn to remove.
+	 * @return whether the spawn was removed.
+	 */
 	public boolean removeLootChest ( Vector location ) {
 		if ( configuration != null && configuration.removeLootChest ( bounds.unproject ( location ) ) ) {
 			saveConfiguration ( );
@@ -517,6 +687,9 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
+	/**
+	 * Clear loot chest spawns.
+	 */
 	public void clearLootChests ( ) {
 		if ( configuration != null ) {
 			configuration.getLootChests ( ).forEach (
@@ -574,7 +747,7 @@ public class BattlefieldSetupSession {
 		
 		// exporting schematic for the battlefield
 		if ( export_schematic ) {
-			exportSchematic ( schematic_callback );
+			exportShape ( schematic_callback );
 		}
 	}
 	
@@ -636,6 +809,7 @@ public class BattlefieldSetupSession {
 	}
 	
 	/**
+	 * Recalculates the minimap.
 	 *
 	 * @param callback a callback which returns the resulting {@link Minimap}, or <b>null</b> if something went
 	 *                       wrong.
@@ -684,16 +858,22 @@ public class BattlefieldSetupSession {
 		} );
 	}
 	
+	/**
+	 * Recalculates the minimap.
+	 * <br>
+	 * @see #recalculateMinimap(Consumer)
+	 */
 	public synchronized void recalculateMinimap ( ) {
 		recalculateMinimap ( null );
 	}
 	
 	/**
+	 * Exports the shape.
 	 *
 	 * @param callback a callback which returns <b>true</b> if the schematic was successfully generated and
 	 *                       exported.
 	 */
-	public void exportSchematic ( Consumer < Boolean > callback ) {
+	public void exportShape ( Consumer < Boolean > callback ) {
 		Validate.isTrue ( StringUtil.isNotBlank ( name ) , "name never set or invalid" );
 		Validate.notNull ( bounds , "bounds never set" );
 		
@@ -730,12 +910,22 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
-	public void exportSchematic ( ) {
-		exportSchematic ( null );
+	/**
+	 * Exports the shape.
+	 *
+	 * @see #exportShape(Consumer)
+	 */
+	public void exportShape ( ) {
+		exportShape ( null );
 	}
 	
 	// ----- border resize succession
 	
+	/**
+	 * Sets the border resize succession.
+	 *
+	 * @param resize_succession the border resize succession.
+	 */
 	public void setBorderResizeSuccession ( BattlefieldBorderSuccession resize_succession ) {
 		this.configurationCheck ( );
 		this.configuration.setBorderResizeSuccession ( resize_succession );
@@ -744,12 +934,24 @@ public class BattlefieldSetupSession {
 	
 	// ----- air supply
 	
+	/**
+	 * Sets the maximum number of air supplies that
+	 * can be dropped during the arena.
+	 *
+	 * @param air_supply_max maximum number of air supplies that can be dropped.
+	 */
 	public void setAirSupplyMax ( int air_supply_max ) {
 		this.configurationCheck ( );
 		this.configuration.setAirSupplyMax ( air_supply_max );
 		this.saveConfiguration ( );
 	}
 	
+	/**
+	 * Sets the minimum number of air supplies that
+	 * can be dropped during the arena.
+	 *
+	 * @param air_supply_min minimum number of air supplies that can be dropped.
+	 */
 	public void setAirSupplyMin ( int air_supply_min ) {
 		this.configurationCheck ( );
 		this.configuration.setAirSupplyMin ( air_supply_min );
@@ -758,12 +960,28 @@ public class BattlefieldSetupSession {
 	
 	// ----- bombing zone
 	
+	/**
+	 * Sets the maximum number of bombing zones that
+	 * can be generated each border resize-point.
+	 *
+	 * @param bombing_zone_max
+	 * maximum number of bombing zones that can be generated
+	 * each border resize-point.
+	 */
 	public void setBombingZoneMax ( int bombing_zone_max ) {
 		this.configurationCheck ( );
 		this.configuration.setBombingZoneMax ( bombing_zone_max );
 		this.saveConfiguration ( );
 	}
 	
+	/**
+	 * Sets the minimum number of bombing zones that
+	 * can be generated each border resize-point.
+	 *
+	 * @param bombing_zone_min
+	 * minimum number of bombing zones that can be generated
+	 * each border resize-point.
+	 */
 	public void setBombingZoneMin ( int bombing_zone_min ) {
 		this.configurationCheck ( );
 		this.configuration.setBombingZoneMin ( bombing_zone_min );
@@ -804,6 +1022,14 @@ public class BattlefieldSetupSession {
 		this.saveConfiguration ( );
 	}
 	
+	/**
+	 * Introduces the provided player/user into the session.
+	 * <br>
+	 * Note that only players with the permission can be introduced.
+	 *
+	 * @param player the player to introduce.
+	 * @return whether the player was introduced or not.
+	 */
 	public boolean introduce ( org.bukkit.entity.Player player ) {
 		if ( !permissionCheck ( player ) ) {
 			return false;
@@ -825,10 +1051,22 @@ public class BattlefieldSetupSession {
 		return true;
 	}
 	
+	/**
+	 * Gets whether the provided player/user is busy using a tool.
+	 *
+	 * @param player the player to check.
+	 * @return whether the provided player/user is busy using a tool.
+	 */
 	public boolean isBusy ( org.bukkit.entity.Player player ) {
 		return getCurrentTool ( player ) != null;
 	}
 	
+	/**
+	 * Gets the tool the provided player/user is currently using.
+	 *
+	 * @param player the player to get.
+	 * @return the tool the provided player/user is currently using.
+	 */
 	public BattlefieldSetupTool getCurrentTool ( org.bukkit.entity.Player player ) {
 		BattlefieldSetupTool tool = tool_map.get ( player.getUniqueId ( ) );
 		
@@ -840,7 +1078,31 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
-	public boolean populateTool ( org.bukkit.entity.Player player , EnumBattleMapSetupTool tool ) {
+	/**
+	 * Populates the tool for use.
+	 *
+	 * @param player the player that will use the tool.
+	 * @param tool the tool to populate.
+	 * @return whether the tool was populated or not.
+	 * @throws IllegalStateException if the provided player is currently using a tool that is <b>modal</b>.
+	 */
+	public boolean populateTool ( org.bukkit.entity.Player player , EnumBattleMapSetupTool tool )
+			throws IllegalStateException {
+		return populateTool ( player , tool.getNewInstance ( this , Player.getPlayer ( player ) ) );
+	}
+	
+	/**
+	 * Populates the tool for use.
+	 *
+	 * @param player the player that will use the tool.
+	 * @param tool the tool to populate.
+	 * @return whether the tool was populated or not.
+	 * @throws IllegalStateException if the provided player is currently using a tool that is <b>modal</b>.
+	 */
+	public boolean populateTool ( org.bukkit.entity.Player player , BattlefieldSetupTool tool ) {
+		Validate.notNull ( tool , "tool cannot be null" );
+		
+		// disposing current if possible.
 		BattlefieldSetupTool current = getCurrentTool ( player );
 		
 		if ( current != null ) {
@@ -852,19 +1114,21 @@ public class BattlefieldSetupSession {
 			}
 		}
 		
+		// then populating
 		if ( permissionCheck ( player ) ) {
-			populateTool ( player , tool.getNewInstance ( this , Player.getPlayer ( player ) ) );
+			tool.initialize ( );
+			tool_map.put ( player.getUniqueId ( ) , tool );
 			return true;
 		} else {
 			return false;
 		}
 	}
 	
-	protected void populateTool ( org.bukkit.entity.Player player , BattlefieldSetupTool tool ) {
-		tool.initialize ( );
-		tool_map.put ( player.getUniqueId ( ) , tool );
-	}
-	
+	/**
+	 * Disposes the tool the provided player is currently using.
+	 *
+	 * @param player the player that is using the tool to dispose.
+	 */
 	public void disposeTool ( org.bukkit.entity.Player player ) {
 		BattlefieldSetupTool tool = getCurrentTool ( player );
 		
@@ -875,11 +1139,9 @@ public class BattlefieldSetupSession {
 		}
 	}
 	
-	protected boolean permissionCheck ( org.bukkit.entity.Player player ) {
-		return Objects.equals ( player.getUniqueId ( ) , owner.getUniqueId ( ) )
-				|| BattlefieldSetupHandler.getInstance ( ).invite ( Player.getPlayer ( player ) , this );
-	}
-	
+	/**
+	 * Closes this session.
+	 */
 	protected void close ( ) {
 		closed = true;
 		
@@ -893,6 +1155,23 @@ public class BattlefieldSetupSession {
 				.forEach ( BattlefieldSetupTool :: dispose );
 	}
 	
+	// ----- utils
+	
+	protected void moveFileToDirectory ( File file , File directory ) {
+		if ( file.exists ( ) ) {
+			try {
+				FileUtil.moveFileToDirectory ( file , directory , true );
+			} catch ( IOException e ) {
+				e.printStackTrace ( );
+			}
+		}
+	}
+	
+	protected boolean permissionCheck ( org.bukkit.entity.Player player ) {
+		return Objects.equals ( player.getUniqueId ( ) , owner.getUniqueId ( ) )
+				|| BattlefieldSetupHandler.getInstance ( ).invite ( Player.getPlayer ( player ) , this );
+	}
+	
 	protected void configurationCheck ( ) {
 		if ( configuration == null ) {
 			this.configuration = new BattlefieldConfiguration ( );
@@ -904,8 +1183,8 @@ public class BattlefieldSetupSession {
 		
 		if ( folder != null && configuration != null ) {
 			try {
-				configuration.save ( new File ( folder ,
-												Constants.BATTLEFIELD_CONFIGURATION_FILE_NAME ) );
+				configuration.save ( new File (
+						folder , Constants.BATTLEFIELD_CONFIGURATION_FILE_NAME ) );
 			} catch ( IOException e ) {
 				e.printStackTrace ( );
 			}

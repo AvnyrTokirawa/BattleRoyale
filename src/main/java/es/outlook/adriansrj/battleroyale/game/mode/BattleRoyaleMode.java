@@ -1,5 +1,6 @@
 package es.outlook.adriansrj.battleroyale.game.mode;
 
+import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.Validable;
@@ -14,6 +15,7 @@ public abstract class BattleRoyaleMode implements Validable {
 	/**
 	 * Ask for the initialization of this battle mode.
 	 * <br>
+	 * @param arena the arena.
 	 * @return true if successfully initialized.
 	 */
 	protected abstract boolean initialize ( );
