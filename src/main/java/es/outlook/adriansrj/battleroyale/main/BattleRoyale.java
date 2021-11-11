@@ -5,9 +5,11 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
 import es.outlook.adriansrj.battleroyale.configuration.ConfigurationHandler;
 import es.outlook.adriansrj.battleroyale.data.DataStorageHandler;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
+import es.outlook.adriansrj.battleroyale.enums.EnumMainConfiguration;
 import es.outlook.adriansrj.battleroyale.enums.EnumPluginHandler;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
+import es.outlook.adriansrj.battleroyale.metrics.Metrics;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.world.chunk.EmptyChunkGenerator;
 import es.outlook.adriansrj.core.dependency.MavenDependency;
@@ -21,7 +23,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.io.File;
@@ -32,7 +33,7 @@ import java.util.Objects;
  *
  * @author AdrianSR / 22/08/2021 / Time: 05:53 p. m.
  */
-public final class BattleRoyale extends PluginAdapter implements Listener {
+public final class BattleRoyale extends PluginAdapter {
 	
 	public static BattleRoyale getInstance ( ) {
 		return Plugin.getPlugin ( BattleRoyale.class );
@@ -74,7 +75,11 @@ public final class BattleRoyale extends PluginAdapter implements Listener {
 			}
 		}
 		
-		Bukkit.getPluginManager ( ).registerEvents ( this , this );
+		// metrics
+		if ( EnumMainConfiguration.METRICS_ENABLE.getAsBoolean ( ) ) {
+			new Metrics ( this , 4054 );
+		}
+		
 		return true;
 	}
 	

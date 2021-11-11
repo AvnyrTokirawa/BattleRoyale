@@ -94,6 +94,8 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 													  "\na loot container (loot chest, air supply, etc...)" +
 													  "\nwill be affected. (recommended)" , true ),
 	
+	METRICS_ENABLE ( "metrics.enable " , "whether to enable metrics" , true ),
+	
 	;
 	
 	private final String      key;

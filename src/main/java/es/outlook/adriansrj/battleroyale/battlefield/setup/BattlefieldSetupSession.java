@@ -463,20 +463,19 @@ public class BattlefieldSetupSession {
 		File folder = getFolder ( );
 		
 		if ( !Objects.equals ( old_folder , folder ) && old_folder != null && old_folder.exists ( ) ) {
-			File shape_file   = new File ( old_folder , Constants.BATTLEFIELD_SCHEMATIC_FILE_NAME );
-			File minimap_file = new File ( old_folder , Constants.BATTLEFIELD_MINIMAP_FILE_NAME );
-			
 			if ( folder != null && ( folder.exists ( ) || folder.mkdirs ( ) ) ) {
-				moveFileToDirectory ( shape_file , folder );
-				moveFileToDirectory ( minimap_file , folder );
-				
-				// we don't need to move the configuration file
-				// as it will get removed later; and then all we have
-				// to do is call the save configuration method.
-				saveConfiguration ( );
+				// we must move everything in the old folder, otherwise
+				// some files will be lost, for example, the configuration
+				// files of a complex mode. we can avoid that by simply
+				// moving everything.
+				try {
+					FileUtil.copyDirectory ( old_folder , folder );
+				} catch ( IOException e ) {
+					e.printStackTrace ( );
+				}
 			}
 			
-			// finally disposing old folder
+			// finally disposing
 			try {
 				FileUtil.deleteDirectory ( old_folder );
 			} catch ( IOException ex ) {

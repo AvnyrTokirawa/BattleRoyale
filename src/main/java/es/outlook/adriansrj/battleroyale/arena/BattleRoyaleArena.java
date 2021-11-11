@@ -15,6 +15,7 @@ import es.outlook.adriansrj.battleroyale.enums.EnumLootContainer;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaEndEvent;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaPreparedEvent;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
+import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaIntroducedEvent;
 import es.outlook.adriansrj.battleroyale.exception.WorldRegionLimitReached;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfiguration;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationContainer;
@@ -331,6 +332,10 @@ public class BattleRoyaleArena {
 		if ( Bukkit.isPrimaryThread ( ) ) {
 			if ( spectator || !mode.introduce ( br_player ) ) {
 				br_player.setSpectator ( true );
+				
+				// firing event
+				new PlayerArenaIntroducedEvent (
+						br_player , this , true ).callSafe ( );
 			} else {
 				player.setGameMode ( GameMode.SURVIVAL );
 				player.setTotalExperience ( 0 );
@@ -378,12 +383,24 @@ public class BattleRoyaleArena {
 					}
 					
 					if ( spawn != null ) {
-						player.teleport ( region.bounds.project ( spawn ).toLocation ( world ) );
+						Location spawn_location = region.bounds.project ( spawn ).toLocation ( world );
+						
+						// firing event
+						PlayerArenaIntroducedEvent event = new PlayerArenaIntroducedEvent (
+								br_player , this , spawn_location , false );
+						event.callSafe ( );
+						
+						// teleporting
+						player.teleport ( event.getSpawn ( ) );
 					} else {
 						ConsoleUtil.sendPluginMessage (
 								ChatColor.RED , "Couldn't find a valid spawn for the player '"
 										+ player.getName ( ) + "'" , BattleRoyale.getInstance ( ) );
 					}
+				} else {
+					// firing event
+					new PlayerArenaIntroducedEvent (
+							br_player , this , false ).callSafe ( );
 				}
 			}
 			

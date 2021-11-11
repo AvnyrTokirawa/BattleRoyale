@@ -13,7 +13,7 @@ public abstract class PluginCompatibilityHandler extends PluginHandler {
 	 *
 	 * @param plugin the plugin to handle.
 	 */
-	public PluginCompatibilityHandler ( BattleRoyale plugin ) {
+	protected PluginCompatibilityHandler ( BattleRoyale plugin ) {
 		super ( plugin );
 	}
 	
