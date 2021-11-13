@@ -74,7 +74,7 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 	GAME_ENHANCED_DROPS_ENABLE ( "game.enhanced-drops.enable" , "if enabled, drops will be enhanced. " +
 			"\ndropped items will have a better looking, " +
 			"\nmaking it really easy for players to know " +
-			"\nwhat they are grabbing from ground. " +
+			"\nwhat they are grabbing from ground." +
 			"\nnote that if this option is enabled, the loot chests " +
 			"\nwill be replaced by items directly spawned on the ground." +
 			"\nWARNING:" +
@@ -94,7 +94,7 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 													  "\na loot container (loot chest, air supply, etc...)" +
 													  "\nwill be affected. (recommended)" , true ),
 	
-	METRICS_ENABLE ( "metrics.enable " , "whether to enable metrics" , true ),
+	METRICS_ENABLE ( "metrics.enable" , "whether to enable metrics" , true ),
 	
 	;
 	
@@ -105,7 +105,7 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 	private       Object      value;
 	
 	EnumMainConfiguration ( String key , String comment , Object default_value , Class < ? > type ) {
-		this.key           = key;
+		this.key           = key.trim ( );
 		this.comment       = comment;
 		this.default_value = default_value;
 		this.value         = default_value;

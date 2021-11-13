@@ -72,6 +72,9 @@ public class Constants {
 	public static final String VAULT_PLUGIN_NAME                   = "Vault";
 	public static final String QUALITY_ARMORY_PLUGIN_NAME          = "QualityArmory";
 	public static final String QUALITY_ARMORY_VEHICLES_PLUGIN_NAME = "QualityArmoryVehicles2";
+	public static final String CRACK_SHOT_PLUGIN_NAME              = "CrackShot";
+	public static final String CRACK_SHOT_PLUS_PLUGIN_NAME         = "CrackShotPlus";
+	public static final String MMO_ITEMS_PLUGIN_NAME               = "MMOItems";
 	
 	// ---------- metadata
 	

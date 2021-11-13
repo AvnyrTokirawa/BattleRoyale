@@ -3,10 +3,13 @@ package es.outlook.adriansrj.battleroyale.game.loot;
 import es.outlook.adriansrj.battleroyale.enums.EnumItem;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.Constants;
+import es.outlook.adriansrj.battleroyale.util.PluginUtil;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.battleroyale.util.crackshot.CrackShotPlusUtil;
 import es.outlook.adriansrj.battleroyale.util.crackshot.CrackShotUtil;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
+import es.outlook.adriansrj.battleroyale.util.mmoitems.LegacyMMOItemsUtil;
+import es.outlook.adriansrj.battleroyale.util.mmoitems.MMOItemsUtil;
 import es.outlook.adriansrj.battleroyale.util.qualityarmory.QualityArmoryUtil;
 import es.outlook.adriansrj.core.util.configurable.Configurable;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
@@ -15,7 +18,6 @@ import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import es.outlook.adriansrj.core.util.saveable.SavableCollectionEntry;
 import es.outlook.adriansrj.core.util.server.Version;
 import es.outlook.adriansrj.core.util.yaml.YamlUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -204,7 +206,7 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 			}
 			
 			// quality armory object
-			if ( Bukkit.getPluginManager ( ).isPluginEnabled ( "QualityArmory" ) ) {
+			if ( PluginUtil.isQualityArmoryEnabled ( ) ) {
 				ItemStack result = QualityArmoryUtil.getCustomItemAsItemStackByName ( plugin_object );
 				
 				if ( result != null ) {
@@ -214,7 +216,7 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 			}
 			
 			// crack shot plus object
-			if ( Bukkit.getPluginManager ( ).isPluginEnabled ( "CrackShotPlus" ) ) {
+			if ( PluginUtil.isCrackShotPlusEnabled ( ) ) {
 				ItemStack result = player != null
 						? CrackShotPlusUtil.updateItemStackFeatures ( player , plugin_object )
 						: CrackShotPlusUtil.updateItemStackFeaturesNonPlayer ( plugin_object );
@@ -226,12 +228,32 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 			}
 			
 			// crack shot object
-			if ( Bukkit.getPluginManager ( ).isPluginEnabled ( "CrackShot" ) ) {
+			if ( PluginUtil.isCrackShotEnabled ( ) ) {
 				ItemStack result = CrackShotUtil.generateWeapon ( plugin_object );
 				
 				if ( result != null ) {
 					result.setAmount ( amount );
 					return result;
+				}
+			}
+			
+			// MMOItems | format: [type:id]
+			if ( PluginUtil.isMMOItemsEnabled ( ) ) {
+				String[] split = plugin_object.split ( ":" );
+				
+				if ( split.length == 2 ) {
+					ItemStack result;
+					
+					if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_13_R1 ) ) {
+						result = MMOItemsUtil.getItemInstance ( split[ 0 ] , split[ 1 ] );
+					} else { // legacy
+						result = LegacyMMOItemsUtil.getItemInstance ( split[ 0 ] , split[ 1 ] );
+					}
+					
+					if ( result != null ) {
+						result.setAmount ( amount );
+						return result;
+					}
 				}
 			}
 		}

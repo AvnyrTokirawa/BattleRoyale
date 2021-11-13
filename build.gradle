@@ -58,6 +58,9 @@ dependencies {
                     'QualityArmory.jar',
                     'CrackShot.jar',
                     'CrackShotPlus.jar',
+                    'MythicLib-1.1.5.jar',
+                    'MMOItems-6.6.3.jar',
+//                    'MMOItems-4.7.3/MMOItems Legacy.jar',
             ])
 
     // Vault

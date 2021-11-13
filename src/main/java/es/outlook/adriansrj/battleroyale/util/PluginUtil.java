@@ -20,12 +20,25 @@ public class PluginUtil {
 	public static boolean isVaultEnabled ( ) {
 		return isPluginEnabled ( Constants.VAULT_PLUGIN_NAME );
 	}
+	
 	public static boolean isQualityArmoryEnabled ( ) {
 		return isPluginEnabled ( Constants.QUALITY_ARMORY_PLUGIN_NAME );
 	}
 	
 	public static boolean isQualityArmoryVehiclesEnabled ( ) {
 		return isPluginEnabled ( Constants.QUALITY_ARMORY_VEHICLES_PLUGIN_NAME );
+	}
+	
+	public static boolean isCrackShotEnabled ( ) {
+		return isPluginEnabled ( Constants.CRACK_SHOT_PLUGIN_NAME );
+	}
+	
+	public static boolean isCrackShotPlusEnabled ( ) {
+		return isPluginEnabled ( Constants.CRACK_SHOT_PLUS_PLUGIN_NAME );
+	}
+	
+	public static boolean isMMOItemsEnabled ( ) {
+		return isPluginEnabled ( Constants.MMO_ITEMS_PLUGIN_NAME );
 	}
 	
 	public static boolean isPluginEnabled ( String plugin_name ) {
