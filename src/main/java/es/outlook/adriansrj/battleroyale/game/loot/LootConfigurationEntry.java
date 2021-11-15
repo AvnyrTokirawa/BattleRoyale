@@ -65,7 +65,7 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 		this.data          = data;
 		this.plugin_object = plugin_object;
 		this.chance        = chance;
-		this.lore          = lore != null ? new ArrayList <> ( lore ) : lore;
+		this.lore          = lore != null ? new ArrayList <> ( lore ) : null;
 		
 		if ( required != null ) {
 			for ( LootConfigurationEntry entry : required ) {

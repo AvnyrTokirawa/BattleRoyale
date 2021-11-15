@@ -179,12 +179,12 @@ public enum EnumPluginHandler {
 	private final Class < ? extends PluginHandler > clazz;
 	private final Callable < Boolean >              init_flag;
 	
-	private EnumPluginHandler ( Class < ? extends PluginHandler > clazz , Callable < Boolean > init_flag ) {
+	EnumPluginHandler ( Class < ? extends PluginHandler > clazz , Callable < Boolean > init_flag ) {
 		this.clazz     = clazz;
 		this.init_flag = init_flag;
 	}
 	
-	private EnumPluginHandler ( Class < ? extends PluginHandler > clazz ) {
+	EnumPluginHandler ( Class < ? extends PluginHandler > clazz ) {
 		this ( clazz , ( ) -> {
 			return Boolean.TRUE; // no special checks are required by default.
 		} );

@@ -18,8 +18,6 @@ import es.outlook.adriansrj.core.util.file.FilenameUtil;
 import es.outlook.adriansrj.core.util.reflection.general.EnumReflection;
 import es.outlook.adriansrj.core.util.yaml.YamlUtil;
 import es.outlook.adriansrj.core.util.yaml.comment.YamlConfigurationComments;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.io.File;
@@ -35,7 +33,6 @@ import java.util.Objects;
 public class BattleRoyaleArenaConfiguration implements Configurable {
 	
 	protected static final String BATTLEFIELD_KEY                   = "battlefield";
-	protected static final String WORLD_KEY                         = "world";
 	protected static final String MODE_KEY                          = "mode";
 	protected static final String SCOREBOARD_KEY                    = "scoreboard.name";
 	protected static final String SCOREBOARD_PLUGIN_KEY             = "scoreboard.plugin";
@@ -63,12 +60,6 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 						 comment = "battlefield on which this arena will take place." )
 	protected String      battlefield_name;
 	protected Battlefield battlefield;
-	
-	// world
-	@ConfigurableEntry ( key = WORLD_KEY,
-						 comment = "the actual world on which the battlefield will be inserted." )
-	protected String world_name;
-	protected World  world;
 	
 	// mode
 	@ConfigurableEntry ( key = MODE_KEY,
@@ -119,13 +110,12 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 						 comment = "the command to restart the server" )
 	protected String restart_server_command;
 	
-	public BattleRoyaleArenaConfiguration ( String battlefield_name , String world_name , String mode_filename ,
+	public BattleRoyaleArenaConfiguration ( String battlefield_name , String mode_filename ,
 			String scoreboard , EnumScoreboardPlugin scoreboard_plugin , boolean autostart_enable ,
 			int autostart_required_players , int autostart_required_teams ,
 			int autostart_countdown_display , Duration autostart_countdown_duration ,
 			Duration restart_countdown_duration , boolean restart_server , String restart_server_command ) {
 		this.battlefield_name             = battlefield_name;
-		this.world_name                   = world_name;
 		this.mode_filename                = mode_filename;
 		this.scoreboard                   = scoreboard;
 		this.scoreboard_plugin            = scoreboard_plugin;
@@ -142,8 +132,6 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	public BattleRoyaleArenaConfiguration ( BattleRoyaleArenaConfiguration copy ) {
 		this.battlefield_name             = copy.battlefield_name;
 		this.battlefield                  = copy.battlefield;
-		this.world_name                   = copy.world_name;
-		this.world                        = copy.world;
 		this.mode_filename                = copy.mode_filename;
 		this.mode                         = copy.mode;
 		this.scoreboard                   = copy.scoreboard;
@@ -184,44 +172,6 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	public void setBattlefield ( Battlefield battlefield ) {
 		this.battlefield      = battlefield;
 		this.battlefield_name = null;
-	}
-	
-	// -------- world configuration
-	
-	public String getWorldName ( ) {
-		return world != null ? world.getName ( ) : world_name;
-	}
-	
-	/**
-	 * Gets the world on which the battlefield is to
-	 * be inserted.
-	 * <br>
-	 * Note that <b>null</b> will be returned if the world
-	 * has not been loaded yet by the  class responsible
-	 * for handling the arenas.
-	 *
-	 * @return the world on which the battlefield is to be inserted.
-	 */
-	public World getWorld ( ) {
-		if ( world == null && StringUtil.isNotBlank ( world_name ) ) {
-			world = Bukkit.getWorld ( world_name );
-		}
-		return world;
-	}
-	
-	public void setWorld ( World world ) {
-		this.world      = world;
-		this.world_name = null;
-	}
-	
-	public void setWorld ( String world_name ) {
-		if ( world_name != null ) {
-			this.world_name = StringUtil.replaceFileCharacters ( world_name , "-" );
-		} else {
-			this.world_name = null;
-		}
-		
-		this.world = null;
 	}
 	
 	// -------- mode configuration
@@ -421,7 +371,6 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 		// we're using the setters to clear the instances so its
 		// respective getters will recalculate them.
 		setBattlefield ( battlefield_name );
-		setWorld ( world_name );
 		setMode ( mode_filename );
 		setScoreboard ( scoreboard );
 		
@@ -467,7 +416,6 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 			return false;
 		}
 		
-		return battlefield != null && mode != null && mode.isValid ( )
-				&& ( world != null || StringUtil.isNotBlank ( world_name ) );
+		return battlefield != null && mode != null && mode.isValid ( );
 	}
 }

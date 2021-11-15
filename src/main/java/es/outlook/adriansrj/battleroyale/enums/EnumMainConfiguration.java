@@ -67,7 +67,7 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 	// vault
 	VAULT_ENABLE ( "vault.enable" , "whether to enable vault compatibility.\n" +
 			"note that if this option is enabled, the\n" +
-			"vault balance will be used instead of the\b" +
+			"vault balance will be used instead of the\n" +
 			"battle royale balance." , false ),
 	
 	// game
@@ -81,6 +81,16 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 			"\nenabling this option could reduce the performance." +
 			"\nnote that dropping lots of items on the ground" +
 			"\nmight be stressful for the server." , false ),
+	
+	GAME_LAZY_LOOT_CHESTS ( "game.lazy-loot-chests" ,
+							"If enabled, any chest on the battlefield will be filled automatically.\n" +
+									"This option is useful when there is a lot of loot chests\n" +
+									"around your battlefield but you don't want to manually\n" +
+									"setup them. The plugin will automatically fill them when\n" +
+									"the player opens it.\n" +
+									"Note that if you don't setup the chests with the respective\n" +
+									"tool, the enhanced drops will not work as the plugin will not\n" +
+									"know where the loot chest is located until the player clicks it." , false ),
 	
 	GAME_ENHANCED_DROPS_VISIBLE_NAME ( "game.enhanced-drops.visible-name" ,
 									   "if enabled, the name if the item will be visible" , true ),

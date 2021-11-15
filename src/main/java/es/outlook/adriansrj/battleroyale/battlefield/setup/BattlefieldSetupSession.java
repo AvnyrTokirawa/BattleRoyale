@@ -29,6 +29,7 @@ import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
 import es.outlook.adriansrj.battleroyale.world.data.WorldData;
 import es.outlook.adriansrj.core.util.AsyncCatcherUtil;
 import es.outlook.adriansrj.core.util.console.ConsoleUtil;
+import es.outlook.adriansrj.core.util.file.filter.FileExtensionFilter;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import es.outlook.adriansrj.core.util.math.Vector3D;
 import es.outlook.adriansrj.core.util.math.collision.BoundingBox;
@@ -44,6 +45,7 @@ import org.bukkit.util.Vector;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
@@ -726,6 +728,11 @@ public class BattlefieldSetupSession {
 		this.bounds = bounds;
 		this.result = null;
 		
+		this.recalculateShapeChanges ( recalculate_minimap , minimap_callback , export_schematic , schematic_callback );
+	}
+	
+	public void recalculateShapeChanges ( boolean recalculate_minimap , Consumer < Minimap > minimap_callback ,
+			boolean export_schematic , Consumer < Boolean > schematic_callback ) {
 		// both minimap recalculation and schematic exporting
 		// requires the world to be saved.
 		if ( recalculate_minimap || export_schematic ) {
@@ -881,6 +888,22 @@ public class BattlefieldSetupSession {
 		if ( folder != null ) {
 			if ( !folder.exists ( ) ) {
 				folder.mkdirs ( );
+			}
+			
+			// removing old shape
+			for ( File file : Objects.requireNonNull (
+					folder.listFiles ( FileExtensionFilter.of ( BattlefieldShapePart.PART_FILE_EXTENSION ) ) ) ) {
+				try {
+					Files.delete ( file.toPath ( ) );
+				} catch ( IOException e ) {
+					e.printStackTrace ( );
+					
+					try {
+						FileUtil.forceDelete ( file );
+					} catch ( IOException ex_b ) {
+						ex_b.printStackTrace ( );
+					}
+				}
 			}
 			
 			// the export process might take a while,

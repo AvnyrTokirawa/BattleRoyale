@@ -16,7 +16,6 @@ import es.outlook.adriansrj.battleroyale.event.arena.ArenaEndEvent;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaPreparedEvent;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaIntroducedEvent;
-import es.outlook.adriansrj.battleroyale.exception.WorldRegionLimitReached;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfiguration;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationContainer;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
@@ -64,11 +63,10 @@ public class BattleRoyaleArena {
 	protected final UUID                           id;
 	protected final String                         name;
 	protected final BattleRoyaleArenaConfiguration configuration;
-	protected       World                          world;
 	protected final Battlefield                    battlefield;
 	protected final BattleRoyaleMode               mode;
-	protected final BattleRoyaleArenaRegion        region;
-	protected final BattleRoyaleArenaBorder        border;
+	protected final BattleRoyaleArenaWorld         world;
+	protected       BattleRoyaleArenaBorder        border;
 	protected final AutoStarter                    auto_starter;
 	protected final Restarter                      restarter;
 	protected final AirSupplyGenerator             air_supplies;
@@ -99,7 +97,6 @@ public class BattleRoyaleArena {
 		this.id            = UUID.randomUUID ( );
 		this.name          = Objects.requireNonNull ( name , "name cannot be null" );
 		this.configuration = new BattleRoyaleArenaConfiguration ( configuration );
-		this.world         = Validate.notNull ( configuration.getWorld ( ) , "world cannot be null" );
 		this.battlefield   = Validate.notNull ( configuration.getBattlefield ( ) , "battlefield cannot be null" );
 		
 		try {
@@ -108,8 +105,7 @@ public class BattleRoyaleArena {
 			throw new IllegalStateException ( "configuration couldn't resolve the mode: " , ex );
 		}
 		
-		this.region = new BattleRoyaleArenaRegion ( this );
-		this.border = new BattleRoyaleArenaBorder ( this );
+		this.world = new BattleRoyaleArenaWorld ( this );
 		
 		if ( configuration.isAutostartEnabled ( ) ) {
 			this.auto_starter = new AutoStarter ( this );
@@ -125,7 +121,12 @@ public class BattleRoyaleArena {
 		this.team_registry = new BattleRoyaleArenaTeamRegistry ( this );
 		this.prepared      = false;
 		
-		this.setState ( EnumArenaState.WAITING );
+		if ( Bukkit.isPrimaryThread ( ) ) {
+			this.setState ( EnumArenaState.WAITING );
+		} else {
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , ( ) -> this.setState ( EnumArenaState.WAITING ) );
+		}
 		
 		// bus registry
 		Set < BusSpawn > spawns = battlefield.getConfiguration ( ).getBusSpawns ( );
@@ -150,7 +151,8 @@ public class BattleRoyaleArena {
 	}
 	
 	public World getWorld ( ) {
-		return world;
+		Validate.isTrue ( prepared , "arena not prepared" );
+		return world.getWorld ( );
 	}
 	
 	public Battlefield getBattlefield ( ) {
@@ -162,7 +164,7 @@ public class BattleRoyaleArena {
 	}
 	
 	public ZoneBounds getFullBounds ( ) {
-		return region.bounds;
+		return world.bounds;
 	}
 	
 	public ZoneBounds getCurrentBounds ( ) {
@@ -174,6 +176,7 @@ public class BattleRoyaleArena {
 	}
 	
 	public BattleRoyaleArenaBorder getBorder ( ) {
+		Validate.isTrue ( prepared , "arena not prepared" );
 		return border;
 	}
 	
@@ -279,7 +282,7 @@ public class BattleRoyaleArena {
 	 * @return all the players in this arena.
 	 */
 	public Set < Player > getPlayers ( boolean world ) {
-		return ( world ? this.world.getPlayers ( ) : Bukkit.getOnlinePlayers ( ) )
+		return ( world ? this.world.getWorld ( ).getPlayers ( ) : Bukkit.getOnlinePlayers ( ) )
 				.stream ( ).map ( Player :: getPlayer )
 				.filter ( player -> Objects.equals ( player.getArena ( ) , this ) )
 				.collect ( Collectors.toSet ( ) );
@@ -316,6 +319,77 @@ public class BattleRoyaleArena {
 				.count ( ) >= mode.getMaxPlayers ( );
 	}
 	
+	public void prepare ( Runnable callback ) {
+		if ( Bukkit.isPrimaryThread ( ) ) {
+			switch ( state ) {
+				case WAITING:
+					break;
+				case RUNNING:
+					throw new IllegalStateException ( "arena is running" );
+				case RESTARTING:
+					throw new IllegalStateException ( "arena is restarting" );
+				case STOPPED:
+					throw new IllegalStateException ( "arena must be restarted" );
+			}
+			
+			if ( !prepared && !preparing ) {
+				prepare0 ( callback );
+			}
+		} else {
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , ( ) -> prepare ( callback ) );
+		}
+	}
+	
+	public void prepare ( ) {
+		prepare ( null );
+	}
+	
+	protected void prepare0 ( Runnable callback ) {
+		if ( Bukkit.isPrimaryThread ( ) ) {
+			this.preparing = true;
+			this.prepared  = false;
+			
+			if ( world.isPrepared ( ) ) {
+				this.prepare1 ( callback );
+			} else {
+				this.world.prepare ( ( ) -> prepare1 ( callback ) );
+			}
+		} else {
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , ( ) -> prepare0 ( callback ) );
+		}
+	}
+	
+	protected void prepare1 ( Runnable callback ) {
+		this.preparation ( );
+		
+		this.preparing = false;
+		this.prepared  = true;
+		
+		// border
+		this.border = new BattleRoyaleArenaBorder ( this );
+		
+		// callback
+		if ( callback != null ) {
+			callback.run ( );
+		}
+		
+		// firing event
+		new ArenaPreparedEvent ( this ).callSafe ( );
+	}
+	
+	/**
+	 * Introduces the provided player into the game.
+	 * <br>
+	 * <b>Note that the player must be online to be introduced.</b>
+	 * <br>
+	 * <b>Note that the player will be introduced as a spectator
+	 * if there are no non-full teams and the team limit is reached.</b>
+	 *
+	 * @param player the player to introduce.
+	 * @param spectator whether to introduce the player as spectator.
+	 */
 	public void introduce ( org.bukkit.entity.Player player , boolean spectator ) {
 		Validate.isTrue ( getState ( ) == EnumArenaState.RUNNING ,
 						  "must be running to introduce a player" );
@@ -352,7 +426,7 @@ public class BattleRoyaleArena {
 				
 				// minimap
 				player.getInventory ( ).addItem ( ItemStackUtil.createViewItemStack (
-						MiniMapUtil.createView ( new MinimapRendererArena ( this ) , world ) ) );
+						MiniMapUtil.createView ( new MinimapRendererArena ( this ) , world.getWorld ( ) ) ) );
 				
 				// initial loot
 				LootConfiguration loot_configuration = battlefield.getConfiguration ( ).getLootConfiguration ( );
@@ -383,7 +457,7 @@ public class BattleRoyaleArena {
 					}
 					
 					if ( spawn != null ) {
-						Location spawn_location = region.bounds.project ( spawn ).toLocation ( world );
+						Location spawn_location = world.bounds.project ( spawn ).toLocation ( world.getWorld ( ) );
 						
 						// firing event
 						PlayerArenaIntroducedEvent event = new PlayerArenaIntroducedEvent (
@@ -431,11 +505,15 @@ public class BattleRoyaleArena {
 	}
 	
 	/**
+	 * Introduces the provided player into the game.
 	 * <br>
 	 * <b>Note that the player must be online to be introduced.</b>
+	 * <br>
+	 * <b>Note that the player will be introduced as a spectator
+	 * if there are no non-full teams and the team limit is reached.</b>
 	 *
-	 * @param br_player
-	 * @param spectator
+	 * @param br_player the player to introduce.
+	 * @param spectator whether to introduce the player as spectator.
 	 */
 	public void introduce ( Player br_player , boolean spectator ) {
 		Validate.notNull ( br_player , "player cannot be null" );
@@ -456,7 +534,7 @@ public class BattleRoyaleArena {
 				case RESTARTING:
 					throw new IllegalStateException ( "arena is restarting" );
 				case STOPPED:
-					throw new IllegalStateException ( "arena requires the world to be restarted" );
+					throw new IllegalStateException ( "arena must be restarted" );
 			}
 			
 			if ( prepared ) {
@@ -546,12 +624,11 @@ public class BattleRoyaleArena {
 			switch ( state ) {
 				case RUNNING:
 				case WAITING:
+				case STOPPED:
 					break;
 				
 				case RESTARTING:
 					throw new IllegalStateException ( "arena is already restarting" );
-				case STOPPED:
-					throw new IllegalStateException ( "arena requires the world to be restarted" );
 			}
 			
 			this.prepared = false;
@@ -565,22 +642,7 @@ public class BattleRoyaleArena {
 					.filter ( player -> Objects.equals ( player.getArena ( ) , this ) )
 					.forEach ( lobby :: introduce );
 			
-			this.region.disposeCurrentRegion ( player -> {
-				lobby.introduce ( player );
-				return true;
-			} );
-			
 			// then restarting
-			try {
-				// must reassign the region before anything
-				// else, as the other modules will probably
-				// access the bounds or a location within this arena.
-				this.region.reassignRegion ( );
-			} catch ( WorldRegionLimitReached ex ) {
-				this.stop ( );
-				return;
-			}
-			
 			this.restartModules ( );
 			this.setState ( EnumArenaState.RESTARTING );
 			this.prepare0 ( ( ) -> Bukkit.getScheduler ( ).runTask (
@@ -602,8 +664,8 @@ public class BattleRoyaleArena {
 	}
 	
 	public synchronized void restart ( Duration countdown_duration ) {
-		restarter.start ( Objects.requireNonNull ( countdown_duration ,
-												   "countdown_duration cannot be null" ) );
+		restarter.start ( Objects.requireNonNull (
+				countdown_duration , "countdown_duration cannot be null" ) );
 	}
 	
 	public synchronized void stop ( ) {
@@ -624,42 +686,27 @@ public class BattleRoyaleArena {
 					.filter ( player -> Objects.equals ( player.getArena ( ) , this ) )
 					.forEach ( lobby :: introduce );
 			
-			this.region.disposeCurrentRegion ( player -> {
-				lobby.introduce ( player );
-				return true;
-			} );
+			// then stopping world
+			world.stop ( );
 		} else {
 			Bukkit.getScheduler ( ).runTask (
 					BattleRoyale.getInstance ( ) , this :: stop );
 		}
 	}
 	
-	public void prepare ( Runnable callback ) {
-		switch ( state ) {
-			case WAITING:
-				break;
-			case RUNNING:
-				throw new IllegalStateException ( "arena is running" );
-			case RESTARTING:
-				throw new IllegalStateException ( "arena is restarting" );
-			case STOPPED:
-				throw new IllegalStateException ( "arena requires the world to be restarted" );
-		}
-		
-		if ( !prepared && !preparing ) {
-			prepare0 ( callback );
-		}
-	}
-	
-	public void prepare ( ) {
-		prepare ( null );
-	}
-	
+	/**
+	 * Prepares the battlefield for the game.
+	 * <br>
+	 * The world of the arena should be already prepared
+	 * at this point; only things like loot chests are going
+	 * to be prepared by this method.
+	 */
 	protected void preparation ( ) {
 		if ( Bukkit.isPrimaryThread ( ) ) {
 			// preparing loot chests
 			battlefield.getConfiguration ( ).getLootChests ( ).forEach ( location -> {
-				Block block = world.getBlockAt ( region.bounds.project ( location ).toLocation ( world ) );
+				World world = this.world.getWorld ( );
+				Block block = world.getBlockAt ( this.world.bounds.project ( location ).toLocation ( world ) );
 				Chunk chunk = block.getChunk ( );
 				
 				if ( !chunk.isLoaded ( ) ) {
@@ -690,32 +737,10 @@ public class BattleRoyaleArena {
 		new ArenaStateChangeEvent ( this , old_state , state ).callSafe ( );
 	}
 	
-	protected void prepare0 ( Runnable callback ) {
-		if ( Bukkit.isPrimaryThread ( ) ) {
-			this.preparing = true;
-			this.region.shape ( ( ) -> {
-				this.preparation ( );
-				
-				this.preparing = false;
-				this.prepared  = true;
-				
-				// callback
-				if ( callback != null ) {
-					callback.run ( );
-				}
-				
-				// firing event
-				new ArenaPreparedEvent ( this ).callSafe ( );
-			} );
-		} else {
-			Bukkit.getScheduler ( ).runTask (
-					BattleRoyale.getInstance ( ) , ( ) -> prepare0 ( callback ) );
-		}
-	}
-	
 	protected synchronized void restartModules ( ) {
 		Validate.isTrue ( Bukkit.isPrimaryThread ( ) , "must run in server thread" );
 		
+		this.world.restart ( );
 		this.border.restart ( );
 		this.auto_starter.restart ( );
 		this.restarter.restart ( );

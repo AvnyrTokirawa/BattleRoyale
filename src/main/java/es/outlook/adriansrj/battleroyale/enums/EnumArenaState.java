@@ -23,7 +23,8 @@ public enum EnumArenaState {
 	RESTARTING ( EnumLanguage.ARENA_STATE_RESTARTING_WORD ),
 	
 	/**
-	 * The arena cannot be restarted until the world is reset.
+	 * The arena was stopped by an admin or by the plugin
+	 * as result of an error.
 	 */
 	STOPPED ( EnumLanguage.ARENA_STATE_STOPPED_WORD );
 	

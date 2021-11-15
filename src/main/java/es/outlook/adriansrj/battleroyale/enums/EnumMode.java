@@ -32,7 +32,14 @@ public enum EnumMode {
 			return EnumMainConfiguration.MODE_SHARED_COMMAND.getAsString ( )
 					.trim ( ).replace ( "/" , "" );
 		}
-	};
+	} ,
+	
+	/**
+	 * The plugin will only enable the required
+	 * modules to replace placeholders and to
+	 * hub-stuff.
+	 */
+	LOBBY ;
 	
 	// ----- bungee
 	

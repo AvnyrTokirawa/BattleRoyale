@@ -44,9 +44,10 @@ public class ParachuteCustomInstance extends ParachuteInstance {
 	
 	@Override
 	public void close ( ) {
-		if ( handle != null ) {
+		if ( handle != null && !handle.destroyed ) {
 			handle.destroy ( );
-			handle = null;
 		}
+		
+		handle = null;
 	}
 }

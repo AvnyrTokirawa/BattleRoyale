@@ -40,7 +40,6 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 		EXECUTOR_SERVICE            = ScheduledExecutorPool.getInstance ( ).getWorkStealingPool ( );
 		EXAMPLE_ARENA_CONFIGURATION = new BattleRoyaleArenaConfiguration (
 				"battlefield name here" ,
-				"world-1" ,
 				"Solo.yml" ,
 				Constants.DEFAULT_YAML_FILE_NAME ,
 				null ,
@@ -181,8 +180,6 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 						logInvalidConfiguration (
 								name , "Mode not specified" );
 					}
-				} else if ( StringUtil.isBlank ( configuration.getWorldName ( ) ) ) {
-					logInvalidConfiguration ( name , "World is invalid or not specified" );
 				}
 				
 				continue;
@@ -203,8 +200,8 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 			ConsoleUtil.sendPluginMessage ( ChatColor.YELLOW , "Loading arena '" + name
 					+ "' ..." , plugin );
 			
-			EXECUTOR_SERVICE.execute ( ( ) -> BattleRoyaleArenaHandler.getInstance ( ).createArena (
-					name , configuration , arena -> {
+			EXECUTOR_SERVICE.execute ( ( ) -> BattleRoyaleArenaHandler
+					.getInstance ( ).createArena ( name , configuration , arena -> {
 						ConsoleUtil.sendPluginMessage ( ChatColor.GREEN , "Arena '"
 								+ arena.getName ( ) + "' successfully loaded." , plugin );
 						
