@@ -92,8 +92,14 @@ public class Chunk13 implements Chunk {
 		// reading location
 		this.location = new ChunkLocation ( level.getNumber ( NBTConstants.Post13.CHUNK_X_POS_TAG ).intValue ( ) ,
 											level.getNumber ( NBTConstants.Post13.CHUNK_Z_POS_TAG ).intValue ( ) );
+		
 		// reading data version
-		this.data_version = level.getNumber ( NBTConstants.Post13.CHUNK_DATA_VERSION_TAG ).intValue ( );
+		Number raw_data_version = tag.getNumber ( NBTConstants.Post13.CHUNK_DATA_VERSION_TAG );
+		
+		if ( raw_data_version != null ) {
+			this.data_version = raw_data_version.intValue ( );
+		}
+		
 		// reading status
 		this.status = EnumReflection.getEnumConstant (
 				Chunk13Status.class , tag.getString ( NBTConstants.Post13.CHUNK_STATUS_TAG ) );
@@ -102,18 +108,23 @@ public class Chunk13 implements Chunk {
 		this.last_update = level.getLong ( NBTConstants.Post13.CHUNK_LAST_UPDATE_TAG );
 		
 		// reading sections
-		for ( CompoundTag section_tag : level.getListTag (
-				NBTConstants.Post13.CHUNK_SECTIONS_TAG ).asCompoundTagList ( ) ) {
-			ChunkSection13 section = new ChunkSection13 ( this , section_tag );
-			
-			// between 0 - 15
-			sections[ section.y & 0xF ] = section;
+		ListTag < ? > raw_sections = level.getListTag ( NBTConstants.Post13.CHUNK_SECTIONS_TAG );
+		
+		if ( raw_sections != null && raw_sections.size ( ) > 0
+				&& CompoundTag.class.isAssignableFrom ( raw_sections.getTypeClass ( ) ) ) {
+			for ( CompoundTag section_tag : raw_sections.asCompoundTagList ( ) ) {
+				ChunkSection13 section = new ChunkSection13 ( this , section_tag );
+				
+				// between 0 - 15
+				sections[ section.y & 0xF ] = section;
+			}
 		}
 		
 		// reading tile entities
 		ListTag < ? > raw_tile_entities = level.getListTag ( NBTConstants.Post13.CHUNK_TILE_ENTITIES_TAG );
 		
-		if ( raw_tile_entities != null ) {
+		if ( raw_tile_entities != null && raw_tile_entities.size ( ) > 0
+				&& CompoundTag.class.isAssignableFrom ( raw_tile_entities.getTypeClass ( ) ) ) {
 			for ( CompoundTag tile_entity_tag : raw_tile_entities.asCompoundTagList ( ) ) {
 				tile_entities.add ( new BlockTileEntity ( tile_entity_tag , EnumDataVersion.v1_13 ) );
 			}

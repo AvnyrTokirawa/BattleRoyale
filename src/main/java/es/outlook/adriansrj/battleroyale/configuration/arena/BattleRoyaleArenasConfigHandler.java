@@ -39,6 +39,7 @@ public final class BattleRoyaleArenasConfigHandler extends ConfigurationHandler 
 	static {
 		EXECUTOR_SERVICE            = ScheduledExecutorPool.getInstance ( ).getWorkStealingPool ( );
 		EXAMPLE_ARENA_CONFIGURATION = new BattleRoyaleArenaConfiguration (
+				"description here" ,
 				"battlefield name here" ,
 				"Solo.yml" ,
 				Constants.DEFAULT_YAML_FILE_NAME ,

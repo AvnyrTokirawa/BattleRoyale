@@ -61,4 +61,9 @@ class PacketFactoryServiceHandle_v1_17_R1 implements PacketFactoryServiceHandle 
 		
 		return new PacketPlayOutAttachEntity ( data );
 	}
+	
+	@Override
+	public Object createMountPacket ( int entity_id , int... passengers_ids ) {
+		return null;
+	}
 }

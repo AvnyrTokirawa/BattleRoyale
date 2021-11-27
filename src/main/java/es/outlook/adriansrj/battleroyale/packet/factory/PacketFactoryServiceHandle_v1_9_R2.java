@@ -75,4 +75,9 @@ class PacketFactoryServiceHandle_v1_9_R2 implements PacketFactoryServiceHandle {
 		
 		return packet;
 	}
+	
+	@Override
+	public Object createMountPacket ( int entity_id , int... passengers_ids ) {
+		return null;
+	}
 }

@@ -1,6 +1,7 @@
 package es.outlook.adriansrj.battleroyale.packet.sender;
 
 import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityAttach;
+import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutMount;
 import es.outlook.adriansrj.core.util.reflection.bukkit.EntityReflection;
 import es.outlook.adriansrj.core.util.server.Version;
 import org.bukkit.entity.Entity;
@@ -60,6 +61,14 @@ interface PacketSenderServiceHandle {
 	default void sendEntityAttachPacket ( Player player , Entity entity , Entity leash_holder ) {
 		sendEntityAttachPacket ( player , EntityReflection.getEntityID ( entity ) ,
 								 EntityReflection.getEntityID ( leash_holder ) );
+	}
+	
+	default void sendMountPacket ( Player player , int id , int... passengers_ids ) {
+		new PacketOutMount ( id , passengers_ids ).send ( player );
+	}
+	
+	default void sendMountPacket ( Player player , Entity entity , Entity... passengers ) {
+		new PacketOutMount ( entity , passengers ).send ( player );
 	}
 	
 	void sendUpdatePacket ( Player player , Entity entity );

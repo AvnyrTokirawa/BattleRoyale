@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'es.outlook.adriansrj'
-version '2.0.0'
+version '2.0.3'
 description 'A battle royale minigame plugin'
 
 repositories {
@@ -70,7 +70,8 @@ dependencies {
     implementation 'xyz.xenondevs:particle:1.6.4'
 
     // HikariCP
-    implementation 'com.zaxxer:HikariCP:4.0.3'
+    implementation 'com.zaxxer:HikariCP:5.0.0'
+//    implementation 'com.zaxxer:HikariCP:4.0.3'
     // MongoDB
     implementation 'org.mongodb:mongodb-driver-sync:4.2.1'
 

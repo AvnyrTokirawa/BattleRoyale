@@ -12,9 +12,11 @@ import java.time.format.DateTimeFormatter;
  */
 public class DatePlaceholderNode extends PlaceholderNode {
 	
+	public static final String IDENTIFIER = "date";
+	
 	@Override
 	public String getSubIdentifier ( ) {
-		return "date";
+		return IDENTIFIER;
 	}
 	
 	@Override

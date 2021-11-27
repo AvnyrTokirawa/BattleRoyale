@@ -54,6 +54,10 @@ public enum EnumInternalLanguage {
 	TOOL_BOUNDS_MINIMAP_SET ( ChatColor.GREEN + "Battlefield minimap generated successfully!" ),
 	TOOL_BOUNDS_SCHEMATIC_SET ( ChatColor.GREEN + "Battlefield schematic exported successfully!" ),
 	
+	PARACHUTE_CREATOR_PROMPT ( ChatColor.GOLD + "Please enter the name for the new parachute." ),
+	PARACHUTE_CREATOR_PROMPT_NAME_USED ( ChatColor.RED + "Another parachute with the same name already exists!" ),
+	PARACHUTE_CREATOR_PROMPT_MUST_BE_PLAYER ( ChatColor.RED + "Must be an online player." ),
+	
 	;
 	
 	private final String text;

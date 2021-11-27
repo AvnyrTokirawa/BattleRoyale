@@ -110,9 +110,9 @@ public class ChunkSurface {
 				
 				Color color = block_color.getColor ( );
 				ColorUtil.getRGBComponents ( ColorUtil.getArgb (
-						( float ) color.getRed ( ) / 255.F ,
-						( float ) color.getGreen ( ) / 255.F ,
-						( float ) color.getBlue ( ) / 255.F , 1.0F ) , rgb );
+						color.getRed ( ) / 255.F ,
+						color.getGreen ( ) / 255.F ,
+						color.getBlue ( ) / 255.F , 1.0F ) , rgb );
 				
 				float gradient = ( heightmap.getHeight ( cx + x , cz + z )
 						+ heightmap.getHeight ( cx + x + 1 , cz + z )

@@ -39,6 +39,7 @@ import es.outlook.adriansrj.battleroyale.game.item.BattleRoyaleItemHandler;
 import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationRegistry;
 import es.outlook.adriansrj.battleroyale.game.player.*;
 import es.outlook.adriansrj.battleroyale.gui.arena.ArenaSelectorGUIHandler;
+import es.outlook.adriansrj.battleroyale.gui.parachute.ParachuteCreatorGUI;
 import es.outlook.adriansrj.battleroyale.gui.setting.SettingsGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setting.bus.BusSettingsGUIHandler;
 import es.outlook.adriansrj.battleroyale.gui.setting.parachute.ParachuteSettingsGUIHandler;
@@ -63,6 +64,7 @@ import es.outlook.adriansrj.battleroyale.packet.reader.PacketReaderService;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteHandler;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteRegistry;
+import es.outlook.adriansrj.battleroyale.parachute.creator.ParachuteCreationStageHandler;
 import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
 import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderNodeRegistry;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
@@ -100,10 +102,10 @@ public enum EnumPluginHandler {
 	TEAM_SELECTOR_GUI_HANDLER ( TeamSelectorGUIHandler.class ),
 	TEAM_GUI_HANDLER ( TeamGUIHandler.class ),
 	
-	SPECTATOR_HANDLER ( PlayerSpectatorHandler.class ),
-	SPECTATOR_GUI ( SpectatorGUI.class ),
-	KNOCK_HANDLER ( PlayerKnockHandler.class ),
-	REANIMATION_HANDLER ( PlayerReviveHandler.class ),
+	SPECTATOR_HANDLER ( PlayerSpectatorHandler.class , false ),
+	SPECTATOR_GUI ( SpectatorGUI.class , false ),
+	KNOCK_HANDLER ( PlayerKnockHandler.class , false ),
+	REANIMATION_HANDLER ( PlayerReviveHandler.class , false ),
 	
 	ITEM_HANDLER ( BattleRoyaleItemHandler.class ),
 	SHOP_GUIS_CONFIGURATION_HANDLER ( ShopGUIsConfigHandler.class ),
@@ -118,76 +120,84 @@ public enum EnumPluginHandler {
 	PARACHUTE_SETTINGS_MAIN_GUI ( ParachuteSettingsMainGUIHandler.class ),
 	PARACHUTE_SETTINGS_GUI ( ParachuteSettingsGUIHandler.class ),
 	PARACHUTE_COLOR_SETTINGS_GUI ( ParachuteColorSettingsGUIHandler.class ),
+	PARACHUTE_CREATION_STAGE_HANDLER ( ParachuteCreationStageHandler.class ),
+	PARACHUTE_CREATOR_GUI ( ParachuteCreatorGUI.class ),
 	
-	SETUP_HANDLER ( BattlefieldSetupHandler.class ),
-	SETUP_GUI_HANDLER ( SetupGUI.class ),
-	LOBBY_MAP_SETUP_GUI ( LobbyMapSetupGUI.class ),
-	BATTLEFIELD_SETUP_GUI ( BattlefieldSetupGUI.class ),
-	BATTLEFIELD_SETUP_SESSION_GUI ( BattlefieldSetupSessionGUI.class ),
+	SETUP_HANDLER ( BattlefieldSetupHandler.class , false ),
+	SETUP_GUI_HANDLER ( SetupGUI.class , false ),
+	LOBBY_MAP_SETUP_GUI ( LobbyMapSetupGUI.class , false ),
+	BATTLEFIELD_SETUP_GUI ( BattlefieldSetupGUI.class , false ),
+	BATTLEFIELD_SETUP_SESSION_GUI ( BattlefieldSetupSessionGUI.class , false ),
 	
-	LOBBY_CONFIGURATION_HANDLER ( BattleRoyaleLobbyConfigHandler.class ),
-	LOBBY_HANDLER ( BattleRoyaleLobbyHandler.class ),
+	LOBBY_CONFIGURATION_HANDLER ( BattleRoyaleLobbyConfigHandler.class , false ),
+	LOBBY_HANDLER ( BattleRoyaleLobbyHandler.class , false ),
 	
-	LOOT_CONFIGURATION_REGISTRY ( LootConfigurationRegistry.class ),
-	LOOT_CONFIGURATION_HANDLER ( LootConfigHandler.class ),
+	LOOT_CONFIGURATION_REGISTRY ( LootConfigurationRegistry.class , false ),
+	LOOT_CONFIGURATION_HANDLER ( LootConfigHandler.class , false ),
 	
-	VEHICLES_CONFIGURATION_REGISTRY ( VehiclesConfigurationRegistry.class ),
-	VEHICLES_CONFIGURATION_HANDLER ( BattleRoyaleVehiclesConfigHandler.class ),
+	VEHICLES_CONFIGURATION_REGISTRY ( VehiclesConfigurationRegistry.class , false ),
+	VEHICLES_CONFIGURATION_HANDLER ( BattleRoyaleVehiclesConfigHandler.class , false ),
 	
-	BATTLEFIELD_HANDLER ( BattlefieldRegistry.class ),
+	BATTLEFIELD_HANDLER ( BattlefieldRegistry.class , false ),
 	
-	ARENA_HANDLER ( BattleRoyaleArenaHandler.class ),
-	ARENA_CONFIGURATION_HANDLER ( BattleRoyaleArenasConfigHandler.class ),
-	ARENA_GUI_HANDLER ( ArenaSelectorGUIHandler.class ),
-	ARENA_GUI_CONFIGURATION_HANDLER ( ArenaSelectorGUIConfigHandler.class ),
-	ARENA_SIGN_HANDLER ( BattleRoyaleArenaSignHandler.class ),
-	ARENA_SIGN_CONFIGURATION_HANDLER ( BattleRoyaleArenaSignConfigHandler.class ),
-	ARENA_SIGN_CONTAINER_HANDLER ( BattleRoyaleArenaSignContainerHandler.class ),
-	ARENA_BORDER_HANDLER ( BattleRoyaleArenaBorderHandler.class ),
-	ARENA_AUTO_STARTER_HANDLER ( AutoStarterHandler.class ),
-	ARENA_AIR_SUPPLY_HANDLER ( AirSupplyGeneratorHandler.class ),
-	ARENA_BOMBING_ZONE_HANDLER ( BombingZoneGeneratorHandler.class ),
-	ARENA_ITEM_DROP_HANDLER ( ItemDropHandler.class ),
+	ARENA_HANDLER ( BattleRoyaleArenaHandler.class , false ),
+	ARENA_CONFIGURATION_HANDLER ( BattleRoyaleArenasConfigHandler.class , false ),
+	ARENA_GUI_HANDLER ( ArenaSelectorGUIHandler.class , false ),
+	ARENA_GUI_CONFIGURATION_HANDLER ( ArenaSelectorGUIConfigHandler.class , false ),
+	ARENA_SIGN_HANDLER ( BattleRoyaleArenaSignHandler.class , false ),
+	ARENA_SIGN_CONFIGURATION_HANDLER ( BattleRoyaleArenaSignConfigHandler.class , false ),
+	ARENA_SIGN_CONTAINER_HANDLER ( BattleRoyaleArenaSignContainerHandler.class , false ),
+	ARENA_BORDER_HANDLER ( BattleRoyaleArenaBorderHandler.class , false ),
+	ARENA_AUTO_STARTER_HANDLER ( AutoStarterHandler.class , false ),
+	ARENA_AIR_SUPPLY_HANDLER ( AirSupplyGeneratorHandler.class , false ),
+	ARENA_BOMBING_ZONE_HANDLER ( BombingZoneGeneratorHandler.class , false ),
+	ARENA_ITEM_DROP_HANDLER ( ItemDropHandler.class , false ),
 	
-	MINIMAP_HANDLER ( MinimapHandler.class ),
+	MINIMAP_HANDLER ( MinimapHandler.class , false ),
 	
-	BUS_HANDLER ( BusHandler.class ),
-	BUS_REGISTRY ( BusRegistry.class ),
-	BUS_CONFIGURATION_HANDLER ( BusConfigHandler.class ),
-	BUSES_CONFIGURATION_HANDLER ( BusesConfigHandler.class ),
+	BUS_HANDLER ( BusHandler.class , false ),
+	BUS_REGISTRY ( BusRegistry.class , false ),
+	BUS_CONFIGURATION_HANDLER ( BusConfigHandler.class , false ),
+	BUSES_CONFIGURATION_HANDLER ( BusesConfigHandler.class , false ),
 	
-	PARACHUTE_HANDLER ( ParachuteHandler.class ),
-	PARACHUTE_REGISTRY ( ParachuteRegistry.class ),
-	PARACHUTE_CONFIGURATION_HANDLER ( ParachuteConfigHandler.class ),
-	PARACHUTE_COLOR_CONFIGURATION_HANDLER ( ParachuteColorConfigHandler.class ),
-	PARACHUTES_CONFIGURATION_HANDLER ( ParachutesConfigHandler.class ),
+	PARACHUTE_HANDLER ( ParachuteHandler.class , false ),
+	PARACHUTE_REGISTRY ( ParachuteRegistry.class , false ),
+	PARACHUTE_CONFIGURATION_HANDLER ( ParachuteConfigHandler.class , false ),
+	PARACHUTE_COLOR_CONFIGURATION_HANDLER ( ParachuteColorConfigHandler.class , false ),
+	PARACHUTES_CONFIGURATION_HANDLER ( ParachutesConfigHandler.class , false ),
 	
-	COMPASS_HANDLER ( CompassBarHandler.class ),
-	COMPASS_CONFIGURATION_HANDLER ( CompassBarConfigHandler.class ),
+	COMPASS_HANDLER ( CompassBarHandler.class , false ),
+	COMPASS_CONFIGURATION_HANDLER ( CompassBarConfigHandler.class , false ),
 	
-	SCOREBOARD_CONFIGURATION_REGISTRY ( ScoreboardConfigurationRegistry.class ),
-	SCOREBOARD_HANDLER ( ScoreboardHandler.class ),
-	SCOREBOARD_CONFIGURATION_HANDLER ( ScoreboardConfigHandler.class ),
+	SCOREBOARD_CONFIGURATION_REGISTRY ( ScoreboardConfigurationRegistry.class , false ),
+	SCOREBOARD_HANDLER ( ScoreboardHandler.class , false ),
+	SCOREBOARD_CONFIGURATION_HANDLER ( ScoreboardConfigHandler.class , false ),
 	
 	QUALITY_ARMORY_COMPATIBILITY_HANDLER (
-			QualityArmoryCompatibilityHandler.class , PluginUtil :: isQualityArmoryEnabled ),
+			QualityArmoryCompatibilityHandler.class , PluginUtil :: isQualityArmoryEnabled , false ),
 	
-	PLAYER_STUFF_CHEST_HANDLER ( PlayerStuffChestHandler.class ),
+	PLAYER_STUFF_CHEST_HANDLER ( PlayerStuffChestHandler.class , false ),
 	
 	;
 	
 	private final Class < ? extends PluginHandler > clazz;
 	private final Callable < Boolean >              init_flag;
+	private final boolean                           support_lobby;
 	
-	EnumPluginHandler ( Class < ? extends PluginHandler > clazz , Callable < Boolean > init_flag ) {
-		this.clazz     = clazz;
-		this.init_flag = init_flag;
+	EnumPluginHandler ( Class < ? extends PluginHandler > clazz , Callable < Boolean > init_flag , boolean support_lobby ) {
+		this.clazz         = clazz;
+		this.init_flag     = init_flag;
+		this.support_lobby = support_lobby;
+	}
+	
+	EnumPluginHandler ( Class < ? extends PluginHandler > clazz , boolean support_lobby ) {
+		this ( clazz , ( ) -> {
+			return Boolean.TRUE; // no special checks are required by default.
+		} , support_lobby );
 	}
 	
 	EnumPluginHandler ( Class < ? extends PluginHandler > clazz ) {
-		this ( clazz , ( ) -> {
-			return Boolean.TRUE; // no special checks are required by default.
-		} );
+		this ( clazz , true );
 	}
 	
 	public Class < ? extends PluginHandler > getHandlerClass ( ) {
@@ -195,8 +205,14 @@ public enum EnumPluginHandler {
 	}
 	
 	public boolean canInitialize ( ) {
+		RunModeHandler mode_handler = RunModeHandler.getInstance ( );
+		
 		try {
-			return init_flag.call ( );
+			if ( mode_handler == null ) {
+				return init_flag.call ( );
+			} else {
+				return mode_handler.getMode ( ) != EnumMode.LOBBY || ( support_lobby && init_flag.call ( ) );
+			}
 		} catch ( Exception ex ) {
 			ex.printStackTrace ( );
 			return false;

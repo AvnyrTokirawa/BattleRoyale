@@ -49,7 +49,7 @@ public final class BattleRoyale extends PluginAdapter {
 	@Override
 	public MavenDependency[] getLibraries ( ) {
 		return new MavenDependency[] {
-				new MavenDependency ( "com.zaxxer:HikariCP:3.4.5" ) ,
+				new MavenDependency ( "com.zaxxer:HikariCP:5.0.0" ) ,
 				new MavenDependency ( "org.mongodb:mongodb-driver-sync:4.2.1" ) ,
 				new MavenDependency ( "net.kyori:adventure-nbt:4.9.2" ) ,
 				new MavenDependency ( "com.github.Querz:NBT:6.1" ) ,

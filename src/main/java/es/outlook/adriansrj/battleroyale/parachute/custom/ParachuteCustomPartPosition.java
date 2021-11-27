@@ -82,17 +82,17 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	 * @param x     X component ( Left ).
 	 * @param y     Y component ( Up ).
 	 * @param z     Z component ( Forward ).
-	 * @param yaw   the Pitch, that is the rotation around the axis X.
-	 * @param pitch the Yaw, that is the rotation around the axis Y.
+	 * @param yaw   the Yaw, that is the rotation around the axis Y.
+	 * @param pitch the Pitch, that is the rotation around the axis X.
 	 * @param roll  the Roll, that is the rotation around the axis Z.
 	 */
-	public ParachuteCustomPartPosition ( float x , float y , float z , float pitch , float yaw , float roll ) {
+	public ParachuteCustomPartPosition ( float x , float y , float z , float yaw , float pitch , float roll ) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		
-		this.pitch = pitch;
 		this.yaw   = yaw;
+		this.pitch = pitch;
 		this.roll  = roll;
 	}
 	
@@ -117,8 +117,8 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	 * @param pitch the Yaw, that is the rotation around the axis Y.
 	 * @param roll the Roll, that is the rotation around the axis Z.
 	 */
-	public ParachuteCustomPartPosition ( int x , int y , int z , float pitch , float yaw , float roll ) {
-		this ( ( float ) x , ( float ) y , ( float ) z , pitch , yaw , roll );
+	public ParachuteCustomPartPosition ( int x , int y , int z , float yaw , float pitch , float roll ) {
+		this ( ( float ) x , ( float ) y , ( float ) z , yaw , pitch , roll );
 	}
 	
 	/**
@@ -142,8 +142,8 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	 * @param pitch the Yaw, that is the rotation around the axis Y.
 	 * @param roll the Roll, that is the rotation around the axis Z.
 	 */
-	public ParachuteCustomPartPosition ( double x , double y , double z , float pitch , float yaw , float roll ) {
-		this ( ( float ) x , ( float ) y , ( float ) z , pitch , yaw , roll );
+	public ParachuteCustomPartPosition ( double x , double y , double z , float yaw , float pitch , float roll ) {
+		this ( ( float ) x , ( float ) y , ( float ) z , yaw , pitch , roll );
 	}
 	
 	/**
@@ -222,21 +222,21 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	}
 	
 	/**
-	 * Gets the Pitch euler angle, which represents the rotation around the axis X.
-	 * <p>
-	 * @return the rotation measured in degrees.
-	 */
-	public float getPitch ( ) {
-		return pitch;
-	}
-	
-	/**
 	 * Gets the Yaw euler angle, which represents the rotation around the axis Y.
 	 * <p>
 	 * @return the rotation measured in degrees.
 	 */
 	public float getYaw ( ) {
 		return yaw;
+	}
+	
+	/**
+	 * Gets the Pitch euler angle, which represents the rotation around the axis X.
+	 * <p>
+	 * @return the rotation measured in degrees.
+	 */
+	public float getPitch ( ) {
+		return pitch;
 	}
 	
 	/**
@@ -256,7 +256,7 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	 */
 	public ParachuteCustomPartPosition add ( final ParachuteCustomPartPosition other ) {
 		return new ParachuteCustomPartPosition ( ( x + other.getX ( ) ) , ( y + other.getY ( ) ) , ( z + other.getZ ( ) ) ,
-												 pitch , yaw , roll );
+												 yaw , pitch , roll );
 	}
 	
 	/**
@@ -267,7 +267,7 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	 */
 	public ParachuteCustomPartPosition subtract ( final ParachuteCustomPartPosition other ) {
 		return new ParachuteCustomPartPosition ( ( x - other.getX ( ) ) , ( y - other.getY ( ) ) , ( z - other.getZ ( ) ) ,
-												 pitch , yaw , roll );
+												 yaw , pitch , roll );
 	}
 	
 	/**
@@ -278,7 +278,7 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	 */
 	public ParachuteCustomPartPosition multiply ( final ParachuteCustomPartPosition other ) {
 		return new ParachuteCustomPartPosition ( ( x * other.getX ( ) ) , ( y * other.getY ( ) ) , ( z * other.getZ ( ) ) ,
-												 pitch , yaw , roll );
+												 yaw , pitch , roll );
 	}
 	
 	/**
@@ -289,7 +289,7 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	 */
 	public ParachuteCustomPartPosition divide ( final ParachuteCustomPartPosition other ) {
 		return new ParachuteCustomPartPosition ( ( x / other.getX ( ) ) , ( y / other.getY ( ) ) , ( z / other.getZ ( ) ) ,
-												 pitch , yaw , roll );
+												 yaw , pitch , roll );
 	}
 	
 	/**
@@ -355,7 +355,7 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	 * @return a new position containing the result.
 	 */
 	public ParachuteCustomPartPosition multiply ( int factor ) {
-		return new ParachuteCustomPartPosition ( ( x * factor ) , ( y * factor ) , ( z * factor ) , pitch , yaw , roll );
+		return new ParachuteCustomPartPosition ( ( x * factor ) , ( y * factor ) , ( z * factor ) , yaw , pitch , roll );
 	}
 	
 	/**
@@ -366,7 +366,7 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	 * @return a new position containing the result.
 	 */
 	public ParachuteCustomPartPosition multiply ( double factor ) {
-		return new ParachuteCustomPartPosition ( ( x * factor ) , ( y * factor ) , ( z * factor ) , pitch , yaw , roll );
+		return new ParachuteCustomPartPosition ( ( x * factor ) , ( y * factor ) , ( z * factor ) , yaw , pitch , roll );
 	}
 	
 	/**
@@ -377,7 +377,7 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	 * @return a new position containing the result.
 	 */
 	public ParachuteCustomPartPosition multiply ( float factor ) {
-		return new ParachuteCustomPartPosition ( ( x * factor ) , ( y * factor ) , ( z * factor ) , pitch , yaw , roll );
+		return new ParachuteCustomPartPosition ( ( x * factor ) , ( y * factor ) , ( z * factor ) , yaw , pitch , roll );
 	}
 	
 	@Override
@@ -391,8 +391,8 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 				return this.x_bits == other.x_bits
 						&& this.y_bits == other.y_bits
 						&& this.z_bits == other.z_bits
-						&& this.pitch_bits == other.pitch_bits
 						&& this.yaw_bits == other.yaw_bits
+						&& this.pitch_bits == other.pitch_bits
 						&& this.roll_bits == other.roll_bits;
 			} else {
 				return false;
@@ -405,8 +405,8 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 			this.x_bits     = Float.floatToIntBits ( this.x );
 			this.y_bits     = Float.floatToIntBits ( this.y );
 			this.z_bits     = Float.floatToIntBits ( this.z );
-			this.pitch_bits = Float.floatToIntBits ( this.pitch );
 			this.yaw_bits   = Float.floatToIntBits ( this.yaw );
+			this.pitch_bits = Float.floatToIntBits ( this.pitch );
 			this.roll_bits  = Float.floatToIntBits ( this.roll );
 			
 			this.bitset = true;
@@ -425,8 +425,8 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 			this.hashcode = 19 * hashcode + ( int ) Float.floatToIntBits ( this.x );
 			this.hashcode = 19 * hashcode + ( int ) Float.floatToIntBits ( this.y );
 			this.hashcode = 19 * hashcode + ( int ) Float.floatToIntBits ( this.z );
-			this.hashcode = 19 * hashcode + ( int ) Float.floatToIntBits ( this.pitch );
 			this.hashcode = 19 * hashcode + ( int ) Float.floatToIntBits ( this.yaw );
+			this.hashcode = 19 * hashcode + ( int ) Float.floatToIntBits ( this.pitch );
 			this.hashcode = 19 * hashcode + ( int ) Float.floatToIntBits ( this.roll );
 			this.hashed   = true;
 		}
@@ -435,7 +435,7 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 	
 	@Override
 	public String toString ( ) {
-		return ( x + ", " + y + ", " + z + ", " + pitch + ", " + yaw + ", " + roll );
+		return ( x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ", " + roll );
 	}
 	
 	/**
@@ -492,8 +492,8 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 		result.put ( "x" , getX ( ) );
 		result.put ( "y" , getY ( ) );
 		result.put ( "z" , getZ ( ) );
-		result.put ( "pitch" , getPitch ( ) );
 		result.put ( "yaw" , getYaw ( ) );
+		result.put ( "pitch" , getPitch ( ) );
 		result.put ( "roll" , getRoll ( ) );
 		return result;
 	}
@@ -518,12 +518,12 @@ public class ParachuteCustomPartPosition implements Configurable, ConfigurationS
 			z = ( Double ) args.get ( "z" );
 		}
 		
-		if ( args.containsKey ( "pitch" ) ) {
-			pitch = ( Float ) args.get ( "pitch" );
-		}
-		
 		if ( args.containsKey ( "yaw" ) ) {
 			pitch = ( Float ) args.get ( "yaw" );
+		}
+		
+		if ( args.containsKey ( "pitch" ) ) {
+			pitch = ( Float ) args.get ( "pitch" );
 		}
 		
 		if ( args.containsKey ( "roll" ) ) {

@@ -43,6 +43,7 @@ import org.bukkit.block.Block;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -144,6 +145,10 @@ public class BattleRoyaleArena {
 	
 	public String getName ( ) {
 		return name;
+	}
+	
+	public String getDescription ( ) {
+		return configuration.getDescription ( );
 	}
 	
 	public BattleRoyaleArenaConfiguration getConfiguration ( ) {
@@ -742,7 +747,11 @@ public class BattleRoyaleArena {
 		
 		this.world.restart ( );
 		this.border.restart ( );
-		this.auto_starter.restart ( );
+		
+		if ( auto_starter != null ) {
+			this.auto_starter.restart ( );
+		}
+		
 		this.restarter.restart ( );
 		this.air_supplies.restart ( );
 		this.team_registry.clear ( );

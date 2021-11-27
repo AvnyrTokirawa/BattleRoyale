@@ -81,23 +81,29 @@ public class Chunk12 implements Chunk {
 		this.location = new ChunkLocation ( level.getInt ( NBTConstants.Pre13.CHUNK_X_POS_TAG ) ,
 											level.getInt ( NBTConstants.Pre13.CHUNK_Z_POS_TAG ) );
 		// reading data version
-		this.data_version = level.getInt ( NBTConstants.Pre13.CHUNK_DATA_VERSION_TAG );
+		this.data_version = tag.getInt ( NBTConstants.Pre13.CHUNK_DATA_VERSION_TAG );
+		
 		// reading last update
 		this.last_update = level.getLong ( NBTConstants.Pre13.CHUNK_LAST_UPDATE_TAG );
 		
 		// reading sections
-		for ( CompoundTag section_tag : level.getListTag (
-				NBTConstants.Pre13.CHUNK_SECTIONS_TAG ).asCompoundTagList ( ) ) {
-			ChunkSection12 section = new ChunkSection12 ( this , section_tag );
-			
-			// between 0 - 15
-			sections[ section.y & 0xF ] = section;
+		ListTag < ? > raw_sections = level.getListTag ( NBTConstants.Pre13.CHUNK_SECTIONS_TAG );
+		
+		if ( raw_sections != null && raw_sections.size ( ) > 0
+				&& CompoundTag.class.isAssignableFrom ( raw_sections.getTypeClass ( ) ) ) {
+			for ( CompoundTag section_tag : raw_sections.asCompoundTagList ( ) ) {
+				ChunkSection12 section = new ChunkSection12 ( this , section_tag );
+				
+				// between 0 - 15
+				sections[ section.y & 0xF ] = section;
+			}
 		}
 		
 		// reading tile entities
 		ListTag < ? > raw_tile_entities = level.getListTag ( NBTConstants.Pre13.CHUNK_TILE_ENTITIES_TAG );
 		
-		if ( raw_tile_entities != null ) {
+		if ( raw_tile_entities != null && raw_tile_entities.size ( ) > 0
+				&& CompoundTag.class.isAssignableFrom ( raw_tile_entities.getTypeClass ( ) ) ) {
 			for ( CompoundTag tile_entity_tag : raw_tile_entities.asCompoundTagList ( ) ) {
 				tile_entities.add ( new BlockTileEntity ( tile_entity_tag , EnumDataVersion.v1_12 ) );
 			}
@@ -338,6 +344,9 @@ public class Chunk12 implements Chunk {
 		level.put ( NBTConstants.Pre13.CHUNK_LIGHT_POPULATED_TAG ,
 					ByteBinaryTag.of ( ( byte ) ( light_populated ? 1 : 0 ) ) );
 		level.put ( NBTConstants.Pre13.CHUNK_ENTITIES_TAG , ListBinaryTag.empty ( ) );
+		
+		// heightmap
+		level.put ( NBTConstants.Pre13.CHUNK_HEIGHT_MAP_TAG , IntArrayBinaryTag.of ( heightmap.getHeights ( ) ) );
 		
 		root.put ( NBTConstants.Pre13.CHUNK_LEVEL_TAG , CompoundBinaryTag.from ( level ) );
 		root.put ( NBTConstants.Pre13.CHUNK_DATA_VERSION_TAG , IntBinaryTag.of ( data_version ) );

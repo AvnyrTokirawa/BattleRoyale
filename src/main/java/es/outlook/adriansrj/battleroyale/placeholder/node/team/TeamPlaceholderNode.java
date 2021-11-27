@@ -19,9 +19,11 @@ import java.util.stream.Stream;
  */
 public class TeamPlaceholderNode extends PlaceholderNode {
 	
+	public static final String IDENTIFIER = "team";
+	
 	@Override
 	public String getSubIdentifier ( ) {
-		return "team";
+		return IDENTIFIER;
 	}
 	
 	@Override

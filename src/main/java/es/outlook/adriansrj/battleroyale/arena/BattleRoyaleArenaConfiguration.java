@@ -32,6 +32,7 @@ import java.util.Objects;
  */
 public class BattleRoyaleArenaConfiguration implements Configurable {
 	
+	protected static final String DESCRIPTION_KEY                   = "description";
 	protected static final String BATTLEFIELD_KEY                   = "battlefield";
 	protected static final String MODE_KEY                          = "mode";
 	protected static final String SCOREBOARD_KEY                    = "scoreboard.name";
@@ -54,6 +55,11 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	public static BattleRoyaleArenaConfiguration of ( File file ) {
 		return of ( YamlConfigurationComments.loadConfiguration ( file ) );
 	}
+	
+	// description
+	@ConfigurableEntry ( key = DESCRIPTION_KEY,
+						 comment = "description of this arena." )
+	protected String description;
 	
 	// battlefield
 	@ConfigurableEntry ( key = BATTLEFIELD_KEY,
@@ -110,11 +116,12 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 						 comment = "the command to restart the server" )
 	protected String restart_server_command;
 	
-	public BattleRoyaleArenaConfiguration ( String battlefield_name , String mode_filename ,
+	public BattleRoyaleArenaConfiguration ( String description , String battlefield_name , String mode_filename ,
 			String scoreboard , EnumScoreboardPlugin scoreboard_plugin , boolean autostart_enable ,
 			int autostart_required_players , int autostart_required_teams ,
 			int autostart_countdown_display , Duration autostart_countdown_duration ,
 			Duration restart_countdown_duration , boolean restart_server , String restart_server_command ) {
+		this.description                  = description;
 		this.battlefield_name             = battlefield_name;
 		this.mode_filename                = mode_filename;
 		this.scoreboard                   = scoreboard;
@@ -130,6 +137,7 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	}
 	
 	public BattleRoyaleArenaConfiguration ( BattleRoyaleArenaConfiguration copy ) {
+		this.description                  = copy.description;
 		this.battlefield_name             = copy.battlefield_name;
 		this.battlefield                  = copy.battlefield;
 		this.mode_filename                = copy.mode_filename;
@@ -148,6 +156,12 @@ public class BattleRoyaleArenaConfiguration implements Configurable {
 	
 	public BattleRoyaleArenaConfiguration ( ) {
 		// to be loaded
+	}
+	
+	// -------- description configuration
+	
+	public String getDescription ( ) {
+		return description != null ? StringUtil.translateAlternateColorCodes ( description ) : StringUtil.EMPTY;
 	}
 	
 	// -------- battlefield configuration

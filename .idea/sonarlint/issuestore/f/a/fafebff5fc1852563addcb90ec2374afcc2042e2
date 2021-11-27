@@ -1,0 +1,19 @@
+
+m
+java:S1845“"QRename method "bitset" to prevent any misunderstanding/clash with field "bitset".(Ó¾ıàÿÿÿÿÿ
+B
+java:S1905©"&Remove this unnecessary cast to "int".(ªÉÜ‡ûÿÿÿÿ
+=
+java:S1905ª"&Remove this unnecessary cast to "int".(±¶ñ
+<
+java:S1905«"&Remove this unnecessary cast to "int".(¡”Í~
+=
+java:S1905¬"&Remove this unnecessary cast to "int".(º½¶¹
+=
+java:S1905­"&Remove this unnecessary cast to "int".(Õú¸¡
+I
+java:S1905®"&Remove this unnecessary cast to "int".(îÍğ”ÿÿÿÿÿ8•¾ŞïÕ/
+j
+java:S2975˜"SRemove this "clone" implementation; use a copy constructor or copy factory instead.(¯ä†·
+p
+java:S2293ê"YReplace the type specification in this constructor call with the diamond operator ("<>").(×ğÂİ

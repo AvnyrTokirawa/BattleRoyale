@@ -72,10 +72,16 @@ public class MinimapGenerator implements Closeable {
 				Chunk         chunk          = chunk_provider.getChunk ( chunk_location );
 				
 				if ( chunk != null && recalculated.add ( chunk_location ) ) {
-					chunk.recalculateHeightmap ( );
-					chunk.recalculateSurface ( );
-					
-					heightmap.setHeights ( chunk_location , chunk.getHeightmap ( ) );
+					try {
+						chunk.recalculateHeightmap ( );
+						chunk.recalculateSurface ( );
+						
+						heightmap.setHeights ( chunk_location , chunk.getHeightmap ( ) );
+					} catch ( Exception ex ) {
+						// we don't want the process to
+						// stop if a chunk cannot be loaded.
+						ex.printStackTrace ( );
+					}
 				}
 			}
 		}

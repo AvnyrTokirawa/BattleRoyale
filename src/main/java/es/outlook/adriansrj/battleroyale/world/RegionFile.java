@@ -171,6 +171,7 @@ public class RegionFile implements AutoCloseable {
 		int numSectors   = offset & 0xFF;
 		
 		if ( sectorNumber + numSectors > sectorFree.size ( ) ) {
+			//			return getChunkData ( x , z );
 			debugln ( "READ" , x , z , "invalid sector" );
 			throw new IllegalArgumentException (
 					String.format ( "READ %d,%d: invalid sector in region %d,%d" , x , z , this.x , this.z ) );
@@ -210,6 +211,79 @@ public class RegionFile implements AutoCloseable {
 		
 		throw new IllegalArgumentException ( "unknown version " + version );
 	}
+	
+	//	private static final int SECTOR_SIZE = 4096;
+	//
+	//	private synchronized DataInputStream getChunkData ( int x , int z ) throws IOException {
+	//		x = x & 31;
+	//		z = z & 31;
+	//		int index = x + z * 32;
+	//
+	//		long length = file.length ( );
+	//
+	//		if ( length < 2 * SECTOR_SIZE ) {
+	//			throw new IllegalArgumentException ( "Missing header in region file!" );
+	//		}
+	//
+	//		file.seek ( 4 * index );
+	//
+	//		int loc          = file.readInt ( );
+	//		int numSectors   = loc & 0xFF;
+	//		int sectorOffset = loc >> 8;
+	//
+	//		file.seek ( SECTOR_SIZE + 4 * index );
+	//
+	//		int timestamp = file.readInt ( );
+	//
+	//		if ( length < sectorOffset * SECTOR_SIZE + 4 ) {
+	//			throw new IllegalArgumentException ( String.format (
+	//					"Chunk %s is outside of region file %s! Expected chunk data at offset %d but file length is %d.%n" ,
+	//					( x + ", " + z ) , fileName.getName ( ) , sectorOffset * SECTOR_SIZE , length ) );
+	//		}
+	//
+	//		file.seek ( sectorOffset * SECTOR_SIZE );
+	//
+	//		int chunkSize = file.readInt ( );
+	//
+	//		if ( chunkSize > numSectors * SECTOR_SIZE ) {
+	//			throw new IllegalArgumentException ( "Error: chunk length does not fit in allocated sectors!" );
+	//		}
+	//
+	//		if ( length < sectorOffset * SECTOR_SIZE + 4 + chunkSize ) {
+	//			throw new IllegalArgumentException ( String.format (
+	//					"Chunk %s is outside of region file %s! Expected %d bytes at offset %d but file length is %d.%n" ,
+	//					( x + ", " + z ) , fileName.getName ( ) , chunkSize , sectorOffset * SECTOR_SIZE , length ) );
+	//		}
+	//
+	//		byte type = file.readByte ( );
+	//
+	//		if ( type != 1 && type != 2 ) {
+	//			throw new IllegalArgumentException ( "Error: unknown chunk data compression method: " + type + "!" );
+	//		}
+	//
+	//		if ( chunkSize <= 0 ) {
+	//			throw new IllegalArgumentException ( "Error: invalid chunk size: " + chunkSize );
+	//		}
+	//
+	//		byte[] buf = new byte[ chunkSize - 1 ];
+	//		file.read ( buf );
+	//
+	//		ByteArrayInputStream in = new ByteArrayInputStream ( buf );
+	//
+	//		if ( type == 1 ) {
+	//			return datainput ( new GZIPInputStream ( in ) );
+	//		} else {
+	//			return datainput ( new InflaterInputStream ( in ) );
+	//		}
+	//	}
+	//
+	//	private DataInputStream datainput ( InputStream in ) {
+	//		if ( in != null ) {
+	//			return new DataInputStream ( new FastBufferedInputStream ( in ) );
+	//		} else {
+	//			return null;
+	//		}
+	//	}
 	
 	public DataOutputStream getChunkDataOutputStream ( int x , int z ) {
 		if ( readOnly ) {

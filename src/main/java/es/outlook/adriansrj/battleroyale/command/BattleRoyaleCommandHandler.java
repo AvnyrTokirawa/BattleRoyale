@@ -22,6 +22,8 @@ public final class BattleRoyaleCommandHandler extends CommandHandler {
 		registerArgument ( new StartArgument ( this ) );
 		// 'restart' argument
 		registerArgument ( new RestartArgument ( this ) );
+		// 'parachutecreator' argument
+		registerArgument ( new ParachuteCreatorArgument ( this ) );
 	}
 	
 	@Override

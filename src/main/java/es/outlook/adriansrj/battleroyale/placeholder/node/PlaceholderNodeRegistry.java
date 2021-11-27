@@ -8,10 +8,7 @@ import es.outlook.adriansrj.battleroyale.placeholder.node.team.TeamPlaceholderNo
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import org.apache.commons.lang3.Validate;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * {@link PlaceholderNode} registry.
@@ -63,6 +60,24 @@ public final class PlaceholderNodeRegistry extends PluginHandler {
 	
 	public boolean unregisterNode ( String node_sub_identifier ) {
 		return node_map.remove ( identifierCheck ( node_sub_identifier ) ) != null;
+	}
+	
+	public PlaceholderNode getNode ( String node_sub_identifier ) {
+		return node_map.get ( node_sub_identifier );
+	}
+	
+	@SuppressWarnings ( "unchecked" )
+	public < T > Collection < PlaceholderTypableNode < T > > getNodesByType ( Class < T > type ) {
+		List < PlaceholderTypableNode < T > > nodes = new ArrayList <> ( );
+		
+		for ( PlaceholderNode node : node_map.values ( ) ) {
+			if ( node instanceof PlaceholderTypableNode &&
+					type.isAssignableFrom ( ( ( PlaceholderTypableNode < ? > ) node ).getType ( ) ) ) {
+				nodes.add ( ( PlaceholderTypableNode < T > ) node );
+			}
+		}
+		
+		return nodes;
 	}
 	
 	private String identifierCheck ( PlaceholderNode node ) {

@@ -5,7 +5,7 @@ package es.outlook.adriansrj.battleroyale.world.chunk;
  */
 public class ChunkHeightmap {
 	
-	protected final int values[] = new int[ 16 * 16 ];
+	protected final int[] values = new int[ 16 * 16 ];
 	
 	/**
 	 * The 16 * 16 int array storing the heights of the chunk.
@@ -33,8 +33,6 @@ public class ChunkHeightmap {
 	 *
 	 * @param x the block x relative to chunk ( 0 - 15 )
 	 * @param z the block z relative to chunk ( 0 - 15 )
-	 *
-	 * @return the height, between 0 and 255.
 	 */
 	public void setHeight ( int x , int z , int height ) {
 		values[ ( x & 0xF ) + ( z & 0xF ) * 16 ] = height & 0xFF;

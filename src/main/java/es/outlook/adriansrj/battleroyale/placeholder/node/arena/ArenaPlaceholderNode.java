@@ -7,7 +7,7 @@ import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderRes
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaStat;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
-import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderNode;
+import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderTypableNode;
 import es.outlook.adriansrj.battleroyale.util.time.TimeUtil;
 import es.outlook.adriansrj.core.util.Duration;
 
@@ -18,11 +18,17 @@ import java.util.stream.Stream;
  *
  * @author AdrianSR / 06/10/2021 / 12:26 p. m.
  */
-public class ArenaPlaceholderNode extends PlaceholderNode {
+public class ArenaPlaceholderNode extends PlaceholderTypableNode < BattleRoyaleArena > {
+	
+	public static final String IDENTIFIER = "arena";
+	
+	public ArenaPlaceholderNode ( ) {
+		super ( BattleRoyaleArena.class );
+	}
 	
 	@Override
 	public String getSubIdentifier ( ) {
-		return "arena";
+		return IDENTIFIER;
 	}
 	
 	@Override
@@ -31,8 +37,19 @@ public class ArenaPlaceholderNode extends PlaceholderNode {
 		BattleRoyaleArena arena     = br_player != null ? br_player.getArena ( ) : null;
 		
 		if ( arena != null ) {
+			return onRequest ( arena , params );
+		} else {
+			return null;
+		}
+	}
+	
+	@Override
+	protected String onRequest ( BattleRoyaleArena arena , String params ) {
+		if ( arena != null ) {
 			if ( params.toLowerCase ( ).startsWith ( "name" ) ) { // br_arena_name
 				return arena.getName ( );
+			} else if ( params.toLowerCase ( ).startsWith ( "description" ) ) { // br_arena_description
+				return arena.getDescription ( );
 			} else if ( params.toLowerCase ( ).startsWith ( "count" ) ) { // br_arena_count
 				return String.valueOf ( arena.getCount ( ) );
 			} else if ( params.toLowerCase ( ).startsWith ( "limit" ) ) { // br_arena_limit
@@ -41,7 +58,7 @@ public class ArenaPlaceholderNode extends PlaceholderNode {
 				return arena.getState ( ).getLanguage ( ).getAsStringStripColors ( );
 			} else if ( params.toLowerCase ( ).startsWith ( "left" ) ) { // br_arena_left
 				return String.valueOf (
-						br_player.getArena ( ).getTeamRegistry ( ).getHandle ( ).stream ( )
+						arena.getTeamRegistry ( ).getHandle ( ).stream ( )
 								.map ( team -> team.getPlayers ( ).stream ( )
 										.filter ( Player :: isPlaying )
 										.count ( ) )

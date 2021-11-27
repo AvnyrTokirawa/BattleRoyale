@@ -1,10 +1,7 @@
 package es.outlook.adriansrj.battleroyale.packet.factory;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.server.v1_12_R1.PacketDataSerializer;
-import net.minecraft.server.v1_12_R1.PacketPlayOutAttachEntity;
-import net.minecraft.server.v1_12_R1.PacketPlayOutEntity;
-import net.minecraft.server.v1_12_R1.PacketPlayOutEntityTeleport;
+import net.minecraft.server.v1_12_R1.*;
 
 import java.io.IOException;
 
@@ -67,6 +64,25 @@ class PacketFactoryServiceHandle_v1_12_R1 implements PacketFactoryServiceHandle 
 		data.writeInt ( entity_id );
 		// leash holder entity id
 		data.writeInt ( leash_holder_id );
+		
+		try {
+			packet.a ( data );
+		} catch ( IOException e ) {
+			e.printStackTrace ( );
+		}
+		
+		return packet;
+	}
+	
+	@Override
+	public Object createMountPacket ( int entity_id , int... passengers_ids ) {
+		PacketPlayOutMount   packet = new PacketPlayOutMount ( );
+		PacketDataSerializer data   = new PacketDataSerializer ( Unpooled.buffer ( ) );
+		
+		// entity id
+		data.d ( entity_id );
+		// passengers ids
+		data.a ( passengers_ids );
 		
 		try {
 			packet.a ( data );

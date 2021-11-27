@@ -12,7 +12,13 @@ import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.WeatherType;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
+
+import java.util.Objects;
 
 /**
  * Class responsible for keeping track of {@link BattleRoyaleArenaBorder}s.
@@ -32,6 +38,34 @@ public final class BattleRoyaleArenaBorderHandler extends PluginHandler implemen
 		// this executor will schedule a task that will
 		// keep track of the players outside bounds
 		Bukkit.getScheduler ( ).runTaskTimerAsynchronously ( plugin , this , 20L , 20L );
+	}
+	
+	// responsible for changing the player weather depending
+	// on whether the player is outside/inside bounds.
+	@EventHandler ( priority = EventPriority.MONITOR, ignoreCancelled = true )
+	public void weather ( PlayerMoveEvent event ) {
+		org.bukkit.entity.Player player    = event.getPlayer ( );
+		Player                   br_player = Player.getPlayer ( player );
+		BattleRoyaleArena        arena     = br_player.getArena ( );
+		Location                 to        = event.getTo ( );
+		Location                 from      = event.getFrom ( );
+		
+		if ( br_player.isPlaying ( ) && to != null && !Objects.equals ( to , from ) ) {
+			ZoneBounds  bounds = arena.getBorder ( ).getCurrentBounds ( );
+			WeatherType weather;
+			
+			if ( bounds.contains ( to.getX ( ) , to.getZ ( ) ) ) {
+				// weather: clear
+				weather = WeatherType.CLEAR;
+			} else {
+				// weather: rain
+				weather = WeatherType.DOWNFALL;
+			}
+			
+			if ( player.getPlayerWeather ( ) != weather ) {
+				player.setPlayerWeather ( weather );
+			}
+		}
 	}
 	
 	@Override

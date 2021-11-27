@@ -12,6 +12,7 @@ import es.outlook.adriansrj.core.util.itemstack.banner.BannerItemStack;
 import es.outlook.adriansrj.core.util.itemstack.wool.WoolColor;
 import es.outlook.adriansrj.core.util.itemstack.wool.WoolItemStack;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
+import es.outlook.adriansrj.core.util.reflection.general.EnumReflection;
 import es.outlook.adriansrj.core.util.server.Version;
 import es.outlook.adriansrj.core.util.yaml.YamlUtil;
 import org.bukkit.configuration.ConfigurationSection;
@@ -26,6 +27,7 @@ import java.util.Map;
 public class ParachuteCustomModelPartShape implements Configurable, Cloneable {
 	
 	protected static final String                            MATERIAL_KEY         = "material";
+	protected static final String                            COLOR_KEY            = "color";
 	protected static final Map < String, UniversalMaterial > EASY_MATERIALS       = new HashMap <> ( );
 	protected static final String                            EASY_MATERIAL_BANNER = "BANNER";
 	protected static final String                            EASY_MATERIAL_WOOL   = "WOOL";
@@ -41,7 +43,6 @@ public class ParachuteCustomModelPartShape implements Configurable, Cloneable {
 	
 	@ConfigurableEntry ( key = MATERIAL_KEY )
 	protected UniversalMaterial     material;
-	@ConfigurableEntry ( key = "color" )
 	protected ParachuteCustom.Color color;
 	@ConfigurableEntry ( key = "data" )
 	protected int                   data;
@@ -86,10 +87,10 @@ public class ParachuteCustomModelPartShape implements Configurable, Cloneable {
 			
 			if ( color != null && color != Parachute.Color.PLAYER ) {
 				if ( MaterialUtil.isWool ( material ) ) { // wool
-					WoolColor wool_color = color != null ? color.getAsWoolColor ( ) : null;
+					WoolColor wool_color = color.getAsWoolColor ( );
 					result = new WoolItemStack ( wool_color != null ? wool_color : WoolColor.WHITE );
 				} else if ( MaterialUtil.isBanner ( material ) ) { // banner
-					BannerColor banner_color = color != null ? color.getAsBannerColor ( ) : null;
+					BannerColor banner_color = color.getAsBannerColor ( );
 					result = new BannerItemStack ( banner_color != null ? banner_color : BannerColor.WHITE );
 				}
 			} else { // any other
@@ -114,8 +115,8 @@ public class ParachuteCustomModelPartShape implements Configurable, Cloneable {
 	
 	public ItemStack toItemStack ( Player player ) {
 		// color from player settings
-		return toItemStack ( player.getDataStorage ( ).getSetting (
-				Parachute.Color.class , EnumPlayerSetting.PARACHUTE_COLOR ) );
+		return toItemStack ( color == Parachute.Color.PLAYER ? player.getDataStorage ( ).getSetting (
+				Parachute.Color.class , EnumPlayerSetting.PARACHUTE_COLOR ) : color );
 	}
 	
 	public ItemStack toItemStack ( ) {
@@ -144,6 +145,11 @@ public class ParachuteCustomModelPartShape implements Configurable, Cloneable {
 				material = EASY_MATERIALS.get ( material_name.trim ( ).toUpperCase ( ) );
 			}
 		}
+		
+		// loading color
+		this.color = EnumReflection.getEnumConstant (
+				Parachute.Color.class , section.getString ( COLOR_KEY , StringUtil.EMPTY ) );
+		
 		return this;
 	}
 	
@@ -160,7 +166,12 @@ public class ParachuteCustomModelPartShape implements Configurable, Cloneable {
 			}
 		}
 		
-		return saveEntries ( section );
+		// color
+		if ( color != null ) {
+			save += YamlUtil.setNotEqual ( section , COLOR_KEY , color.name ( ) ) ? 1 : 0;
+		}
+		
+		return save;
 	}
 	
 	@Override

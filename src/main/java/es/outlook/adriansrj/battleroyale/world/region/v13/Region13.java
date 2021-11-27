@@ -5,12 +5,10 @@ import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.world.RegionFile;
 import es.outlook.adriansrj.battleroyale.world.chunk.v13.Chunk13;
 import es.outlook.adriansrj.battleroyale.world.region.Region;
-import net.kyori.adventure.nbt.BinaryTagIO;
 import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.tag.CompoundTag;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -71,8 +69,6 @@ public class Region13 implements Region {
 				try ( RegionFile handler = new RegionFile ( file , true ) ;
 						DataInputStream input = handler.getChunkDataInputStream ( x , z ) ) {
 					if ( input != null ) {
-						chunks[ x ][ z ] = ( chunk = new Chunk13 (
-								BinaryTagIO.reader ( ).read ( ( DataInput ) input ) ) );
 						NamedTag tag = new NBTDeserializer ( false ).fromStream ( input );
 						
 						if ( tag != null && tag.getTag ( ) instanceof CompoundTag ) {

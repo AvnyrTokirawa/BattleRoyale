@@ -218,12 +218,6 @@ public class BattlefieldSetupSession {
 			generator.insert ( input , new Vector ( -x_size_half , 0 , -z_size_half ) , true );
 			generator.save ( );
 			
-			/* world generated, let's load it */
-			// we want to load the generated world asynchronously,
-			// so we temporarily disable the async-catcher of Spigot.
-			final boolean async_catcher = AsyncCatcherUtil.isEnabled ( );
-			AsyncCatcherUtil.disable ( );
-			
 			// setup session successfully created, let's call
 			// the callback from the bukkit thread.
 			SchedulerUtil.runTask ( ( ) -> {
@@ -239,8 +233,6 @@ public class BattlefieldSetupSession {
 					e.printStackTrace ( );
 				}
 			} );
-			
-			AsyncCatcherUtil.setEnabled ( async_catcher );
 		} );
 	}
 	
@@ -284,11 +276,11 @@ public class BattlefieldSetupSession {
 	protected final Map < UUID, BattlefieldSetupTool > tool_map   = new HashMap <> ( );
 	
 	// result
-	protected String                   name;
-	protected ZoneBounds               bounds;
-	protected Minimap                  minimap;
-	protected BattlefieldConfiguration configuration;
-	protected BattlefieldSetupResult   result;
+	protected          String                   name;
+	protected          ZoneBounds               bounds;
+	protected          Minimap                  minimap;
+	protected          BattlefieldConfiguration configuration;
+	protected volatile BattlefieldSetupResult   result;
 	
 	// this constructor is for cases where the input is an entire world.
 	// it will be a different world in a different folder.
@@ -407,7 +399,7 @@ public class BattlefieldSetupSession {
 	 *
 	 * @return the result of this session, or <b>null</b> if incomplete.
 	 */
-	public synchronized BattlefieldSetupResult getResult ( ) {
+	public BattlefieldSetupResult getResult ( ) {
 		if ( result == null &&
 				( name != null && bounds != null && minimap != null ) ) {
 			result = new BattlefieldSetupResultBase ( name , bounds , minimap , configuration );
@@ -431,7 +423,7 @@ public class BattlefieldSetupSession {
 	 *
 	 * @return whether the <b>name</b> of the battlefield is set.
 	 */
-	public synchronized boolean isNameSet ( ) {
+	public boolean isNameSet ( ) {
 		return StringUtil.isNotBlank ( name );
 	}
 	
@@ -441,7 +433,7 @@ public class BattlefieldSetupSession {
 	 *
 	 * @return whether the <b>bounds</b> of the battlefield is set.
 	 */
-	public synchronized boolean isBoundsSet ( ) {
+	public boolean isBoundsSet ( ) {
 		return bounds != null && minimap != null;
 	}
 	
@@ -820,7 +812,8 @@ public class BattlefieldSetupSession {
 	 * @param callback a callback which returns the resulting {@link Minimap}, or <b>null</b> if something went
 	 *                       wrong.
 	 */
-	public synchronized void recalculateMinimap ( Consumer < Minimap > callback ) {
+	public void recalculateMinimap ( Consumer < Minimap > callback ) {
+		Validate.isTrue ( StringUtil.isNotBlank ( name ) , "name never set or invalid" );
 		Validate.notNull ( bounds , "bounds never set" );
 		
 		// the generation might take a while,
@@ -869,7 +862,7 @@ public class BattlefieldSetupSession {
 	 * <br>
 	 * @see #recalculateMinimap(Consumer)
 	 */
-	public synchronized void recalculateMinimap ( ) {
+	public void recalculateMinimap ( ) {
 		recalculateMinimap ( null );
 	}
 	

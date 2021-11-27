@@ -48,6 +48,11 @@ public final class PacketFactoryService extends PluginHandler implements PacketF
 	}
 	
 	@Override
+	public Object createMountPacket ( int entity_id , int... passengers_ids ) {
+		return handle.createMountPacket ( entity_id , passengers_ids );
+	}
+	
+	@Override
 	protected boolean isAllowMultipleInstances ( ) {
 		return false;
 	}

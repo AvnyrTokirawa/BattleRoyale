@@ -36,6 +36,7 @@ public class NBTConstants {
 		public static final String CHUNK_SECTION_DATA_TAG        = "Data";
 		public static final String CHUNK_SECTION_BLOCK_LIGHT_TAG = "BlockLight";
 		public static final String CHUNK_SECTION_SKY_LIGHT_TAG   = "SkyLight";
+		public static final String CHUNK_HEIGHT_MAP_TAG          = "HeightMap";
 	}
 	
 	/**

@@ -1,9 +1,6 @@
 package es.outlook.adriansrj.battleroyale.packet.factory;
 
-import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityAttach;
-import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityRelativeMove;
-import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityRelativeMoveLook;
-import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityTeleport;
+import es.outlook.adriansrj.battleroyale.packet.wrapper.out.*;
 import es.outlook.adriansrj.core.util.server.Version;
 import org.bukkit.util.Vector;
 
@@ -71,5 +68,13 @@ public interface PacketFactoryServiceHandle {
 	
 	default Object createEntityAttachPacket ( PacketOutEntityAttach wrapper ) {
 		return createEntityAttachPacket ( wrapper.getEntityId ( ) , wrapper.getLeashHolderId ( ) );
+	}
+	
+	// ------ mount packet
+	
+	Object createMountPacket ( int entity_id , int... passengers_ids );
+	
+	default Object createMountPacket ( PacketOutMount wrapper ) {
+		return createMountPacket ( wrapper.getEntityId ( ) , wrapper.getPassengerIds ( ) );
 	}
 }

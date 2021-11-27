@@ -21,6 +21,8 @@ import org.bukkit.util.Vector;
  */
 public class PlayerPlaceholderNode extends PlaceholderNode {
 	
+	public static final String IDENTIFIER = "player";
+	
 	/**
 	 * @author AdrianSR / 10/10/2021 / 06:42 p. m.
 	 */
@@ -65,7 +67,7 @@ public class PlayerPlaceholderNode extends PlaceholderNode {
 	
 	@Override
 	public String getSubIdentifier ( ) {
-		return "player";
+		return IDENTIFIER;
 	}
 	
 	@Override

@@ -58,7 +58,9 @@ public class ChunkSection13 implements NBTSerializable {
 			palette_materials[ i ] = getPaletteMaterial ( palette.get ( i ) );
 		}
 		
-		readPalette ( block_states , palette_materials );
+		if ( palette_materials.length > 0 ) {
+			readPalette ( block_states , palette_materials );
+		}
 	}
 	
 	public ChunkSection13 ( Chunk13 chunk , CompoundTag tag ) {
@@ -88,8 +90,10 @@ public class ChunkSection13 implements NBTSerializable {
 		for ( int i = 0 ; i < palette_materials.length ; i++ ) {
 			palette_materials[ i ] = getPaletteMaterial ( palette.get ( i ) );
 		}
-		
-		readPalette ( block_states , palette_materials );
+	
+		if ( palette_materials.length > 0 ) {
+			readPalette ( block_states , palette_materials );
+		}
 	}
 	
 	public int getY ( ) {

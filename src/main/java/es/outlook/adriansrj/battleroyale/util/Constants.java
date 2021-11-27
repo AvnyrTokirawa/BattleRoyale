@@ -112,6 +112,7 @@ public class Constants {
 	public static final String PACKET_OUT_ENTITY_NAME                    = "PacketPlayOutEntity";
 	public static final String PACKET_OUT_ENTITY_TELEPORT_NAME           = "PacketPlayOutEntityTeleport";
 	public static final String PACKET_OUT_ATTACH_ENTITY_NAME             = "PacketPlayOutAttachEntity";
+	public static final String PACKET_OUT_MOUNT_NAME                     = "PacketPlayOutMount";
 	public static final String PACKET_OUT_ENTITY_RELATIVE_MOVE_NAME      = "PacketPlayOutRelEntityMove";
 	public static final String PACKET_OUT_ENTITY_RELATIVE_MOVE_LOOK_NAME = "PacketPlayOutRelEntityMoveLook";
 	
@@ -122,6 +123,7 @@ public class Constants {
 	public static final Class < ? > PACKET_OUT_ENTITY_RELATIVE_MOVE_LOOK_CLASS;
 	public static final Class < ? > PACKET_OUT_ENTITY_TELEPORT_CLASS;
 	public static final Class < ? > PACKET_OUT_ATTACH_ENTITY_CLASS;
+	public static final Class < ? > PACKET_OUT_MOUNT_CLASS;
 	
 	public static final Class < ? >       PACKET_CLASS;
 	public static final Method            PACKET_WRITE_DATA_METHOD;
@@ -141,6 +143,9 @@ public class Constants {
 			
 			PACKET_OUT_ATTACH_ENTITY_CLASS = ClassReflection.getMinecraftClass (
 					PACKET_OUT_ATTACH_ENTITY_NAME , "network.protocol.game" );
+			
+			PACKET_OUT_MOUNT_CLASS = ClassReflection.getMinecraftClass (
+					PACKET_OUT_MOUNT_NAME , "network.protocol.game" );
 			
 			// entity relative move packet
 			PACKET_OUT_ENTITY_RELATIVE_MOVE_CLASS = ClassReflection.getSubClass (

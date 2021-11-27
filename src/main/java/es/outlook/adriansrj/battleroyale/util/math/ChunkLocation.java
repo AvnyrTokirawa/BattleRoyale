@@ -1,8 +1,10 @@
 package es.outlook.adriansrj.battleroyale.util.math;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Represents a chunk location.
- * <p>
  *
  * @author AdrianSR / Saturday 29 August, 2020 / 02:14 PM
  */
@@ -30,5 +32,24 @@ public class ChunkLocation extends Location2I {
 	
 	public Location2I getRegionLocation ( ) {
 		return region_location;
+	}
+	
+	@Override
+	public boolean equals ( Object o ) {
+		if ( this == o ) { return true; }
+		
+		if ( o == null || getClass ( ) != o.getClass ( ) ) { return false; }
+		
+		ChunkLocation that = ( ChunkLocation ) o;
+		
+		return new EqualsBuilder ( ).appendSuper ( super.equals ( o ) )
+				.append ( region_x , that.region_x ).append ( region_z , that.region_z ).isEquals ( );
+	}
+	
+	@Override
+	public int hashCode ( ) {
+		return new HashCodeBuilder ( 17 , 37 )
+				.appendSuper ( super.hashCode ( ) ).append ( region_x ).append ( region_z )
+				.toHashCode ( );
 	}
 }

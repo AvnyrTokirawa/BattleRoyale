@@ -54,7 +54,7 @@ public enum EnumDirectory {
 	/**
 	 * Directory that stores the parachutes.
 	 */
-	PARACHUTE_DIRECTORY ( "parachute" , true ),
+	PARACHUTE_DIRECTORY ( "parachute" , false ),
 	
 	/**
 	 * Directory that stores the loot configurations.

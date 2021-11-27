@@ -25,14 +25,25 @@ public class ParachuteCustomModel implements Configurable, Cloneable {
 	static {
 		DEFAULT_MODEL = new ParachuteCustomModel.Builder ( )
 				// left wing
-				.withPart ( new ParachuteCustomPartPosition ( 0.2 , 3 , 0 , 0 , 90 , 100 ) ,
+				.withPart ( new ParachuteCustomPartPosition ( 0.2 , 3 , 0 , 90 , 0 , 100 ) ,
 							new ParachuteCustomModelPartShape ( UniversalMaterial.WHITE_BANNER ,
 																Parachute.Color.PLAYER ) )
 				// right wing
-				.withPart ( new ParachuteCustomPartPosition ( -0.2 , 3 , 0 , 0 , -90 , -100 ) ,
+				.withPart ( new ParachuteCustomPartPosition ( -0.2 , 3 , 0 , -90 , 0 , -100 ) ,
 							new ParachuteCustomModelPartShape ( UniversalMaterial.WHITE_BANNER ,
 																Parachute.Color.PLAYER ) )
 				.build ( );
+		
+//		DEFAULT_MODEL = new ParachuteCustomModel.Builder ( )
+//				// left wing
+//				.withPart ( new ParachuteCustomPartPosition ( 0.2 , 3 , 0 , 0 , 90 , 100 ) ,
+//							new ParachuteCustomModelPartShape ( UniversalMaterial.WHITE_BANNER ,
+//																Parachute.Color.PLAYER ) )
+//				// right wing
+//				.withPart ( new ParachuteCustomPartPosition ( -0.2 , 3 , 0 , 0 , -90 , -100 ) ,
+//							new ParachuteCustomModelPartShape ( UniversalMaterial.WHITE_BANNER ,
+//																Parachute.Color.PLAYER ) )
+//				.build ( );
 	}
 	
 	public static ParachuteCustomModel of ( ConfigurationSection section ) {
