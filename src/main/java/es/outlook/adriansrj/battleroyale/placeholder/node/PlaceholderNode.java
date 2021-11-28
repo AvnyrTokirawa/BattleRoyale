@@ -37,8 +37,7 @@ public abstract class PlaceholderNode {
 	public String onPlaceholderRequest ( Player player , String params ) {
 		String identifier = getSubIdentifier ( ).toLowerCase ( );
 		
-		if ( params.toLowerCase ( ).startsWith ( identifier )
-				|| params.toLowerCase ( ).startsWith ( identifier + '_' ) ) {
+		if ( params.toLowerCase ( ).startsWith ( identifier ) ) {
 			params = params.toLowerCase ( ).replaceFirst ( identifier , "" );
 			
 			if ( params.length ( ) > 0 && params.charAt ( 0 ) == '_' ) {

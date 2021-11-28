@@ -1,7 +1,5 @@
 package es.outlook.adriansrj.battleroyale.placeholder.node;
 
-import org.bukkit.entity.Player;
-
 /**
  * @author AdrianSR / 27/11/2021 / 03:39 p. m.
  */
@@ -17,16 +15,19 @@ public abstract class PlaceholderTypableNode < T > extends PlaceholderNode {
 		return type_class;
 	}
 	
-	public String set ( T context , String contents ) {
-		
-		return null;
-	}
-	
-	@Override
-	protected String onRequest ( Player player , String params ) {
-		// not supported by default
-		return null;
-	}
-	
 	protected abstract String onRequest ( T context , String params );
+	
+	public String onPlaceholderRequest ( Object context , String params ) {
+		if ( context != null && type_class.isAssignableFrom ( context.getClass ( ) ) ) {
+			String identifier = getSubIdentifier ( ).toLowerCase ( );
+			
+			if ( params.toLowerCase ( ).startsWith ( identifier ) ) {
+				return onRequest ( type_class.cast ( context ) , extractIdentifier ( params ) );
+			} else {
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
 }

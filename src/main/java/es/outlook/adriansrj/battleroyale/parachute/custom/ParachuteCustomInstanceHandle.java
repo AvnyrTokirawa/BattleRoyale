@@ -53,10 +53,11 @@ class ParachuteCustomInstanceHandle {
 				PARACHUTE_SET.stream ( )
 						.filter ( handle -> handle.started && !handle.destroyed && handle.seat != null )
 						.forEach ( ParachuteCustomInstanceHandle :: lifeLoop );
-				// unregistering destroyed parachutes
-				PARACHUTE_SET.removeIf ( handle -> handle.destroyed
-						|| ( handle.started && handle.seat == null ) );
 			}
+			
+			// unregistering destroyed parachutes
+			PARACHUTE_SET.removeIf ( handle -> handle.destroyed
+					|| ( handle.started && handle.seat == null ) );
 		};
 		
 		// scheduling life loop
@@ -227,9 +228,7 @@ class ParachuteCustomInstanceHandle {
 		this.fall_speed = EnumParachuteConfiguration.FALLING_SPEED.getAsDouble ( );
 		
 		// registering
-		synchronized ( PARACHUTE_SET ) {
-			PARACHUTE_SET.add ( this );
-		}
+		PARACHUTE_SET.add ( this );
 	}
 	
 	@SuppressWarnings ( "deprecation" )

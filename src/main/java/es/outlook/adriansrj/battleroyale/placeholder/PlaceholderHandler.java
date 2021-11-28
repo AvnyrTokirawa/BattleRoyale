@@ -104,6 +104,12 @@ public final class PlaceholderHandler extends PluginHandler {
 				processors.get ( Processor.INTERNAL ).process ( player , result ) , result );
 	}
 	
+	public String setPlaceholders ( Object context , String contents ) {
+		// process currently supported only by the internal processor.
+		return StringUtil.defaultString (
+				processors.get ( Processor.INTERNAL ).process ( context , contents ) , contents );
+	}
+	
 	@Override
 	protected boolean isAllowMultipleInstances ( ) {
 		return false;

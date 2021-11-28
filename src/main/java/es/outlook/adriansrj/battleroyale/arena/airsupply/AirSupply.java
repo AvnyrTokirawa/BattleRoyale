@@ -94,8 +94,10 @@ public class AirSupply {
 				if ( chest_holder.getEyeLocation ( ).getBlock ( ).getType ( ).isSolid ( ) ) {
 					// stopping and placing loot chest
 					airsupply.stop ( );
-					airsupply.destroyShape ( );
-					airsupply.placeLootChest ( );
+					Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
+						airsupply.destroyShape ( );
+						airsupply.placeLootChest ( );
+					} );
 					
 					// landing sound
 					land.getWorld ( ).playSound ( land.getLocation ( ) , Sound.valueOf (
@@ -405,7 +407,11 @@ public class AirSupply {
 	protected void destroyShape ( ) {
 		// removing chest holder
 		if ( chest_holder != null ) {
-			chest_holder.remove ( );
+			// must remove synchronously
+			ArmorStand final_ref = chest_holder;
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , final_ref :: remove );
+			
 			chest_holder = null;
 		}
 		

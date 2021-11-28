@@ -1,6 +1,7 @@
 package es.outlook.adriansrj.battleroyale.placeholder.processor.internal;
 
 import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderNode;
+import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderTypableNode;
 import es.outlook.adriansrj.battleroyale.placeholder.processor.PlaceholderProcessor;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import org.bukkit.entity.Player;
@@ -20,6 +21,15 @@ public class InternalPlaceholderProcessor implements PlaceholderProcessor {
 	
 	@Override
 	public String process ( Player player , String contents ) {
+		return process ( player , null , contents );
+	}
+	
+	@Override
+	public String process ( Object context , String contents ) {
+		return process ( null , context , contents );
+	}
+	
+	protected String process ( Player player , Object context , String contents ) {
 		if ( contents == null ) { return null; }
 		
 		int index = 0;
@@ -35,7 +45,20 @@ public class InternalPlaceholderProcessor implements PlaceholderProcessor {
 				String parameters = lower_case.substring ( next_index + 1 , end_index )
 						.replaceFirst ( Constants.BATTLE_ROYALE_PLACEHOLDER_IDENTIFIER , "" );
 				parameters = parameters.charAt ( 0 ) == '_' ? parameters.replaceFirst ( "_" , "" ) : parameters;
-				String replacement = onPlaceholderRequest ( player , parameters );
+				
+				String replacement;
+				
+				if ( context != null ) {
+					if ( context instanceof Player ) {
+						replacement = onPlaceholderRequest ( ( Player ) context , parameters );
+					} else {
+						replacement = onPlaceholderRequest ( context , parameters );
+					}
+				} else if ( player != null ) {
+					replacement = onPlaceholderRequest ( player , parameters );
+				} else {
+					replacement = onPlaceholderRequest ( null , parameters );
+				}
 				
 				if ( replacement != null ) {
 					String before_placeholder = contents.substring ( 0 , next_index );
@@ -65,5 +88,15 @@ public class InternalPlaceholderProcessor implements PlaceholderProcessor {
 		} else {
 			return null;
 		}
+	}
+	
+	protected String onPlaceholderRequest ( Object context , String params ) {
+		PlaceholderNode uncast_node = matchNode ( params );
+		
+		if ( uncast_node instanceof PlaceholderTypableNode ) {
+			return ( ( PlaceholderTypableNode < ? > ) uncast_node ).onPlaceholderRequest ( context , params );
+		}
+		
+		return null;
 	}
 }

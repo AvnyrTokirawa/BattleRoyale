@@ -92,6 +92,10 @@ public class PlayerPlaceholderNode extends PlaceholderNode {
 			}
 		}
 		
+		if ( params.toLowerCase ( ).startsWith ( "balance" ) ) { // br_player_balance
+			return String.valueOf ( br_player.getDataStorage ( ).getBalance ( ) );
+		}
+		
 		// requires the player to actually be in an arena
 		if ( br_player.isInArena ( ) ) {
 			if ( params.toLowerCase ( ).startsWith ( "safecompass" ) ) { // br_player_safecompass_{index}

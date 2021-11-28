@@ -47,7 +47,9 @@ public final class ArenaSelectorGUIHandler extends PluginHandler {
 		// this task is responsible for updating
 		// the team selector guis so players can
 		// actually see changes in real-time.
-		Bukkit.getScheduler ( ).runTaskTimerAsynchronously ( plugin , ( ) -> {
+		// cannot schedule it asynchronously as it
+		// will result in an exception in the 1.17.
+		Bukkit.getScheduler ( ).runTaskTimer ( plugin , ( ) -> {
 			for ( org.bukkit.entity.Player player : Bukkit.getOnlinePlayers ( ) ) {
 				ArenaSelectorGUIInstance instance = handle_map.get ( player.getUniqueId ( ) );
 				

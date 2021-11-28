@@ -8,9 +8,6 @@ import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.gui.GUIIconInstance;
 import es.outlook.adriansrj.battleroyale.gui.GUIInstance;
 import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
-import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderNode;
-import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderNodeRegistry;
-import es.outlook.adriansrj.battleroyale.placeholder.node.arena.ArenaPlaceholderNode;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.core.menu.action.ItemClickAction;
 import es.outlook.adriansrj.core.util.StringUtil;
@@ -94,27 +91,9 @@ public class ArenaSelectorGUIButtonArenaInstance extends GUIIconInstance {
 			for ( int i = 0 ; i < description.size ( ) ; i++ ) {
 				String line = description.get ( i );
 				
-				System.out.println ( "- " + line );
-				
 				if ( StringUtil.isNotBlank ( line ) ) {
 					line = PlaceholderHandler.getInstance ( ).setPlaceholders ( null , line );
-					
-					// arena node placeholder
-					PlaceholderNode uncast_arena_placeholder = PlaceholderNodeRegistry.getInstance ( )
-							.getNode ( ArenaPlaceholderNode.IDENTIFIER );
-					
-					System.out.println ( "uncast_arena_placeholder = " + uncast_arena_placeholder );
-					
-					if ( uncast_arena_placeholder instanceof ArenaPlaceholderNode ) {
-						ArenaPlaceholderNode arena_placeholder = ( ArenaPlaceholderNode ) uncast_arena_placeholder;
-						String               result            = arena_placeholder.onRequest ( arena , line );
-						
-						System.out.println ( "result = " + result );
-						
-						if ( result != null ) {
-							line = result;
-						}
-					}
+					line = PlaceholderHandler.getInstance ( ).setPlaceholders ( arena , line );
 					
 					// then setting
 					if ( line.toLowerCase ( ).contains ( "\n" ) ) {

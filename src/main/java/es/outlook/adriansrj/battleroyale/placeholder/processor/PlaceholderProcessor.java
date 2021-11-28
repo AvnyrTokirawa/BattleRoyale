@@ -13,6 +13,11 @@ public interface PlaceholderProcessor {
 	
 	String process ( Player player , String contents );
 	
+	default String process ( Object context , String contents ) {
+		// not supported by default.
+		return null;
+	}
+	
 	default PlaceholderNode matchNode ( String params ) {
 		if ( params != null ) {
 			for ( PlaceholderNode node : PlaceholderNodeRegistry.getInstance ( ).getRegisteredNodes ( ) ) {

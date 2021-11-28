@@ -87,38 +87,43 @@ public final class ItemDropHandler extends PluginHandler implements Runnable {
 							loot_chest_vector ).toLocation ( arena.getWorld ( ) ) : null;
 					Block block = chest_location != null ? chest_location.getBlock ( ) : null;
 					
-					if ( block != null && block.getState ( ) instanceof Chest && chest_location.distance (
-							player_location ) <= CLOSE_ENOUGH_DISTANCE ) {
-						Chest chest = ( Chest ) block.getState ( );
-						
-						// dropping contents
-						LootConfiguration loot_configuration = arena.getBattlefield ( ).getConfiguration ( )
-								.getLootConfiguration ( );
-						LootConfigurationContainer container = loot_configuration != null
-								? loot_configuration.getContainer ( EnumLootContainer.CHEST ) : null;
-						
-						if ( container != null ) {
-							Set < LootConfigurationEntry > contents = container.getRandomEntries ( Math.max (
-									RandomUtil.nextInt ( ( container.getMaximum ( ) *
-											( chest.getInventory ( ).getSize ( ) / 9 ) ) + 1 ) , 1 ) );
-							
-							// dropping
-							contents.stream ( ).map ( entry -> entry.toItemStack ( br_player.getPlayer ( ) ) ).filter (
-									Objects :: nonNull ).forEach ( item -> drop ( arena , block , item ) );
-						}
-						
-						// removing loot chest
-						SchedulerUtil.runTask ( ( ) -> {
-							chest.getInventory ( ).clear ( );
-							block.setType ( UniversalMaterial.AIR.getMaterial ( ) );
-							block.getState ( ).update ( true , false );
-							// we don't need the metadata anymore.
-							block.removeMetadata ( Constants.LOOT_CHEST_METADATA_KEY , BattleRoyale.getInstance ( ) );
-						} );
+					if ( block != null && block.getType ( ) == UniversalMaterial.CHEST.getMaterial ( )
+							&& chest_location.distance ( player_location ) <= CLOSE_ENOUGH_DISTANCE ) {
+						Bukkit.getScheduler ( ).runTask (
+								BattleRoyale.getInstance ( ) , ( ) -> drop ( block , arena , br_player ) );
 					}
 				}
 			}
 		}
+	}
+	
+	private void drop ( Block block , BattleRoyaleArena arena , Player br_player ) {
+		Chest chest = ( Chest ) block.getState ( );
+		
+		// dropping contents
+		LootConfiguration loot_configuration = arena.getBattlefield ( ).getConfiguration ( )
+				.getLootConfiguration ( );
+		LootConfigurationContainer container = loot_configuration != null
+				? loot_configuration.getContainer ( EnumLootContainer.CHEST ) : null;
+		
+		if ( container != null ) {
+			Set < LootConfigurationEntry > contents = container.getRandomEntries ( Math.max (
+					RandomUtil.nextInt ( ( container.getMaximum ( ) *
+							( chest.getInventory ( ).getSize ( ) / 9 ) ) + 1 ) , 1 ) );
+			
+			// dropping
+			contents.stream ( ).map ( entry -> entry.toItemStack ( br_player.getPlayer ( ) ) ).filter (
+					Objects :: nonNull ).forEach ( item -> drop ( arena , block , item ) );
+		}
+		
+		// removing loot chest
+		SchedulerUtil.runTask ( ( ) -> {
+			chest.getInventory ( ).clear ( );
+			block.setType ( UniversalMaterial.AIR.getMaterial ( ) );
+			block.getState ( ).update ( true , false );
+			// we don't need the metadata anymore.
+			block.removeMetadata ( Constants.LOOT_CHEST_METADATA_KEY , BattleRoyale.getInstance ( ) );
+		} );
 	}
 	
 	private void drop ( BattleRoyaleArena arena , Block block , ItemStack item ) {
