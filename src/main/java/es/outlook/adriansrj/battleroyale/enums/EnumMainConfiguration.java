@@ -38,7 +38,7 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 								  "execute this command to join the battle royale." , "bttrl" ),
 	
 	// database enable
-	ENABLE_DATABASE ( "database.enable" , "enable/disable database" , true ),
+	ENABLE_DATABASE ( "database.enable" , "enable/disable database" , false ),
 	// database type
 	DATABASE_TYPE ( "database.type" , "the type of database to use.\n" +
 			"types: " + Arrays.stream ( EnumDataStorage.values ( ) ).map ( type -> type.name ( ).toLowerCase ( ) )
@@ -105,6 +105,9 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 													  "\nwill be affected. (recommended)" , true ),
 	
 	METRICS_ENABLE ( "metrics.enable" , "whether to enable metrics" , true ),
+	
+	ADVANCEMENTS_ANNOUNCEMENT_DISABLE ( "advancements.disable-announcement" ,
+										"whether to disable advancements announcement" , false ),
 	
 	;
 	

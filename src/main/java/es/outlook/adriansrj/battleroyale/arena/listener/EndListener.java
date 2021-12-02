@@ -8,6 +8,7 @@ import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.entity.EntityUtil;
+import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -42,6 +43,12 @@ public final class EndListener extends BattleRoyaleArenaListener {
 				.map ( Player :: getBukkitPlayerOptional )
 				.filter ( Optional :: isPresent ).map ( Optional :: get )
 				.forEach ( player -> {
+					// we set the player in spectator mode
+					// as it otherwise it would result in the
+					// player being kicked as it will get bugged.
+					player.setGameMode ( GameMode.SPECTATOR );
+					
+					// don't move man!
 					EntityUtil.addPotionEffectForcing (
 							player , PotionEffectType.SLOW , Duration.INFINITE , 100 );
 					EntityUtil.addPotionEffectForcing (

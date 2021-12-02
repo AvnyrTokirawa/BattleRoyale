@@ -23,6 +23,10 @@ public enum EnumLobbyConfiguration implements ConfigurationEntrySettable {
 	WORLD_DISABLE_MOBS ( "world.disable-mobs" ,
 						 "whether to disable mobs in the world of the lobby" , true ),
 	
+	WORLD_DISABLE_ADVANCEMENTS_ANNOUNCEMENT ( "world.advancements.disable-announcement" ,
+						 "whether to disable advancements announcement\n" +
+								 "in the world of the lobby" , false ),
+	
 	SPAWN_ENABLE ( "spawn.enable" , "whether to use a custom spawn location" , true ),
 	SPAWN_JOIN ( "spawn.join" , "whether to send players to lobby spawn when joining the server" , false ),
 	SPAWN_VOID ( "spawn.void" , "whether to send players back to spawn when falling into void" , true ),

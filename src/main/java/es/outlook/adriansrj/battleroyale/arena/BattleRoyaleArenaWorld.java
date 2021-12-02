@@ -4,6 +4,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldShape;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldShapePart;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
+import es.outlook.adriansrj.battleroyale.enums.EnumMainConfiguration;
 import es.outlook.adriansrj.battleroyale.enums.EnumWorldGenerator;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
@@ -15,6 +16,7 @@ import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
 import es.outlook.adriansrj.battleroyale.world.data.WorldData;
 import es.outlook.adriansrj.core.util.server.Version;
 import es.outlook.adriansrj.core.util.world.GameRuleDisableDaylightCycle;
+import es.outlook.adriansrj.core.util.world.GameRuleType;
 import es.outlook.adriansrj.core.util.world.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -368,6 +370,10 @@ public class BattleRoyaleArenaWorld {
 		}
 		
 		new GameRuleDisableDaylightCycle ( ).apply ( world );
+		
+		if ( EnumMainConfiguration.ADVANCEMENTS_ANNOUNCEMENT_DISABLE.getAsBoolean ( ) ) {
+			GameRuleType.ANNOUNCE_ADVANCEMENTS.apply ( world , false );
+		}
 		
 		return world;
 	}

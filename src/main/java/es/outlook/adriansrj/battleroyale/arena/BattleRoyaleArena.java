@@ -43,7 +43,6 @@ import org.bukkit.block.Block;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.io.FileNotFoundException;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -521,11 +520,23 @@ public class BattleRoyaleArena {
 	 * @param spectator whether to introduce the player as spectator.
 	 */
 	public void introduce ( Player br_player , boolean spectator ) {
-		Validate.notNull ( br_player , "player cannot be null" );
+		Validate.notNull ( br_player , "br_player cannot be null" );
 		
 		// player must actually be online to be introduced
 		br_player.getBukkitPlayerOptional ( ).ifPresent (
 				player -> introduce ( player , spectator ) );
+	}
+	
+	protected void remove ( org.bukkit.entity.Player player ) {
+		remove ( Player.getPlayer ( Objects.requireNonNull ( player , "player cannot be null" ) ) );
+	}
+	
+	protected void remove ( Player br_player ) {
+		Validate.notNull ( br_player , "br_player cannot be null" );
+		
+		// un-showing border
+		border.getPlayers ( ).remove ( br_player );
+		border.refresh ( );
 	}
 	
 	public synchronized void start ( ) {

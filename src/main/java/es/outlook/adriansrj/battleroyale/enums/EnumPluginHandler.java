@@ -33,6 +33,7 @@ import es.outlook.adriansrj.battleroyale.configuration.parachute.ParachuteConfig
 import es.outlook.adriansrj.battleroyale.configuration.parachute.ParachutesConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.parachute.color.ParachuteColorConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.scoreboard.ScoreboardConfigHandler;
+import es.outlook.adriansrj.battleroyale.configuration.stat.StatRewardConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.vehicle.BattleRoyaleVehiclesConfigHandler;
 import es.outlook.adriansrj.battleroyale.data.DataStorageHandler;
 import es.outlook.adriansrj.battleroyale.game.item.BattleRoyaleItemHandler;
@@ -106,6 +107,7 @@ public enum EnumPluginHandler {
 	SPECTATOR_GUI ( SpectatorGUI.class , false ),
 	KNOCK_HANDLER ( PlayerKnockHandler.class , false ),
 	REANIMATION_HANDLER ( PlayerReviveHandler.class , false ),
+	STAT_REWARD_CONFIGURATION_HANDLER ( StatRewardConfigHandler.class ),
 	
 	ITEM_HANDLER ( BattleRoyaleItemHandler.class ),
 	SHOP_GUIS_CONFIGURATION_HANDLER ( ShopGUIsConfigHandler.class ),

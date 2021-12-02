@@ -293,6 +293,7 @@ public class BattleRoyaleArenaBorder {
 		}
 		
 		handle.getPlayers ( ).clear ( );
+		handle.refresh ( );
 		
 		// recalculating succession
 		recalculatePoints ( );

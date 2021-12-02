@@ -258,4 +258,11 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 		
 		br_player.leaveArena ( );
 	}
+	
+	// responsible for removing players from the
+	// arena the player is leaving.
+	@EventHandler ( priority = EventPriority.LOWEST )
+	public void onLeave ( PlayerArenaLeaveEvent event ) {
+		event.getArena ( ).remove ( event.getPlayer ( ) );
+	}
 }

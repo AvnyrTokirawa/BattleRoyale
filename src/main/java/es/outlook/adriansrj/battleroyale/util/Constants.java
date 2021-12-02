@@ -64,6 +64,8 @@ public class Constants {
 	//	public static final long BUS_DISPLACEMENT_EXECUTOR_PERIOD    = 60L;
 	/** Parachute life-loop executor period */
 	public static final long PARACHUTE_LIFE_LOOP_EXECUTOR_PERIOD = 30L;
+	/** Bus life-loop executor period */
+	public static final long BUS_LIFE_LOOP_EXECUTOR_PERIOD = 30L;
 	
 	// ---------- plugin
 	

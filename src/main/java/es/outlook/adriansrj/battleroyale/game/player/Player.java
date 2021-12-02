@@ -303,8 +303,49 @@ public final class Player extends PlayerWrapper {
 		return TeamHandler.getInstance ( ).setTeam ( this , team );
 	}
 	
+	public synchronized boolean setTeamDirty ( Team team ) {
+		if ( team == null ) {
+			leaveTeamDirty ( );
+			return true;
+		} else if ( Objects.equals ( team.getArena ( ) , arena ) && !Objects.equals ( team , this.team ) ) {
+			leaveTeamDirty ( );
+			
+			if ( !team.players.contains ( this ) ) {
+				team.players.add ( this );
+			}
+			
+			if ( team.players.isEmpty ( ) && team.arena.getMode ( ).isTeamCreationEnabled ( ) ) {
+				team.getArena ( ).getTeamRegistry ( ).unregisterTeam ( team );
+			}
+			
+			team = null;
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public synchronized boolean leaveTeam ( boolean send_to_lobby ) {
+		return TeamHandler.getInstance ( ).leaveTeam ( this , send_to_lobby );
+	}
+	
 	public synchronized boolean leaveTeam ( ) {
 		return TeamHandler.getInstance ( ).leaveTeam ( this );
+	}
+	
+	public synchronized boolean leaveTeamDirty ( ) {
+		if ( team != null ) {
+			team.players.remove ( this );
+			
+			if ( team.players.isEmpty ( ) && team.arena.getMode ( ).isTeamCreationEnabled ( ) ) {
+				team.getArena ( ).getTeamRegistry ( ).unregisterTeam ( team );
+			}
+			
+			team = null;
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public synchronized void setSpectator ( boolean flag ) {

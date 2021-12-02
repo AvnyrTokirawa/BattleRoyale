@@ -89,8 +89,11 @@ public final class ItemDropHandler extends PluginHandler implements Runnable {
 					
 					if ( block != null && block.getType ( ) == UniversalMaterial.CHEST.getMaterial ( )
 							&& chest_location.distance ( player_location ) <= CLOSE_ENOUGH_DISTANCE ) {
-						Bukkit.getScheduler ( ).runTask (
-								BattleRoyale.getInstance ( ) , ( ) -> drop ( block , arena , br_player ) );
+						Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
+							if ( block.getState ( ) instanceof Chest ) {
+								drop ( block , arena , br_player );
+							}
+						} );
 					}
 				}
 			}
@@ -117,13 +120,12 @@ public final class ItemDropHandler extends PluginHandler implements Runnable {
 		}
 		
 		// removing loot chest
-		SchedulerUtil.runTask ( ( ) -> {
-			chest.getInventory ( ).clear ( );
-			block.setType ( UniversalMaterial.AIR.getMaterial ( ) );
-			block.getState ( ).update ( true , false );
-			// we don't need the metadata anymore.
-			block.removeMetadata ( Constants.LOOT_CHEST_METADATA_KEY , BattleRoyale.getInstance ( ) );
-		} );
+		chest.getInventory ( ).clear ( );
+		
+		block.setType ( UniversalMaterial.AIR.getMaterial ( ) );
+		block.getState ( ).update ( true , false );
+		// we don't need the metadata anymore.
+		block.removeMetadata ( Constants.LOOT_CHEST_METADATA_KEY , BattleRoyale.getInstance ( ) );
 	}
 	
 	private void drop ( BattleRoyaleArena arena , Block block , ItemStack item ) {

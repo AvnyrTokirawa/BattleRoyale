@@ -10,6 +10,7 @@ import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.util.packet.PacketChannelHandler;
 import es.outlook.adriansrj.core.util.packet.PacketEvent;
 import es.outlook.adriansrj.core.util.packet.PacketListener;
+import org.bukkit.Bukkit;
 
 /**
  * Class responsible for handling battle royale buses.
@@ -39,14 +40,15 @@ public final class BusHandler extends PluginHandler implements PacketListener {
 		BattleRoyaleArenaBusRegistry registry  = arena != null ? arena.getBusRegistry ( ) : null;
 		BusInstance < ? >            bus       = registry != null ? registry.getBus ( player ) : null;
 		
-		if ( VehicleUtil.isSneaking ( event.getPacket ( ) )
-				&& bus != null && bus.isStarted ( ) && !bus.isFinished ( ) ) {
+		if ( VehicleUtil.isSneaking ( event.getPacket ( ) ) && bus != null && bus.isStarted ( ) ) {
 			if ( bus.isDoorOpen ( ) ) {
-				if ( bus instanceof BusDragonInstance ) {
-					( ( BusDragonInstance ) bus ).ejectPlayer ( br_player );
-				} else {
-					bus.finish ( );
-				}
+				Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
+					if ( bus instanceof BusDragonInstance ) {
+						( ( BusDragonInstance ) bus ).ejectPlayer ( br_player );
+					} else if ( !bus.isFinished ( ) ) {
+						bus.finish ( );
+					}
+				} );
 			}
 			
 			event.setCancelled ( true );

@@ -4,6 +4,7 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
 import es.outlook.adriansrj.battleroyale.configuration.ConfigurationHandler;
 import es.outlook.adriansrj.battleroyale.data.DataStorageHandler;
+import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
 import es.outlook.adriansrj.battleroyale.enums.EnumMainConfiguration;
 import es.outlook.adriansrj.battleroyale.enums.EnumPluginHandler;
@@ -141,8 +142,11 @@ public final class BattleRoyale extends PluginAdapter {
 				player.teleport ( spawn );
 			}
 			
+			if ( arena.getState ( ) != EnumArenaState.STOPPED ) {
+				arena.stop ( );
+			}
+			
 			Bukkit.unloadWorld ( arena.getWorld ( ) , false );
-			arena.stop ( );
 		}
 		
 		// closing database connection.

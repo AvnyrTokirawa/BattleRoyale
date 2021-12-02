@@ -8,6 +8,7 @@ import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.packet.reader.PacketReaderService;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
 import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityTeleport;
+import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.packet.interceptor.PacketInterceptorAcceptor;
@@ -18,19 +19,27 @@ import es.outlook.adriansrj.battleroyale.util.packet.reader.PacketReader;
 import es.outlook.adriansrj.battleroyale.util.reflection.bukkit.EntityReflection;
 import es.outlook.adriansrj.core.util.math.DirectionUtil;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
+import es.outlook.adriansrj.core.util.world.WorldUtil;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -38,26 +47,39 @@ import java.util.stream.Collectors;
 /**
  * @author AdrianSR / 09/09/2021 / 08:32 p. m.
  */
-class ParachuteCustomInstanceHandle {
+class ParachuteCustomInstanceHandle implements Listener {
 	
-	private static final Set < ParachuteCustomInstanceHandle > PARACHUTE_SET;
-	private static final ScheduledExecutorService              EXECUTOR_SERVICE;
+	private static final ConcurrentLinkedQueue < ParachuteCustomInstanceHandle > INSTANCES;
+	private static final ScheduledExecutorService                                EXECUTOR_SERVICE;
 	
 	static {
+		INSTANCES        = new ConcurrentLinkedQueue <> ( );
 		EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getSingleThreadScheduledExecutor ( );
-		PARACHUTE_SET    = Collections.synchronizedSet ( new HashSet <> ( ) );
 		
 		// parachutes life loop
 		Runnable life_loop = ( ) -> {
-			synchronized ( PARACHUTE_SET ) {
-				PARACHUTE_SET.stream ( )
-						.filter ( handle -> handle.started && !handle.destroyed && handle.seat != null )
-						.forEach ( ParachuteCustomInstanceHandle :: lifeLoop );
+			try {
+				Iterator < ParachuteCustomInstanceHandle > iterator = INSTANCES.iterator ( );
+				
+				while ( iterator.hasNext ( ) ) {
+					ParachuteCustomInstanceHandle handle = iterator.next ( );
+					
+					if ( handle.started ) {
+						if ( !handle.destroyed && handle.seat != null ) {
+							try {
+								handle.lifeLoop ( );
+							} catch ( Exception ex ) {
+								ex.printStackTrace ( );
+							}
+						} else {
+							// unregistering destroyed parachute
+							iterator.remove ( );
+						}
+					}
+				}
+			} catch ( Exception ex ) {
+				ex.printStackTrace ( );
 			}
-			
-			// unregistering destroyed parachutes
-			PARACHUTE_SET.removeIf ( handle -> handle.destroyed
-					|| ( handle.started && handle.seat == null ) );
 		};
 		
 		// scheduling life loop
@@ -81,15 +103,10 @@ class ParachuteCustomInstanceHandle {
 			// first var int is the entity id
 			int entity_id = reader.readVarInt ( );
 			
-			synchronized ( PARACHUTE_SET ) {
-				if ( PARACHUTE_SET.stream ( ).anyMatch ( parachute -> parachute.seat != null
-						&& entity_id == parachute.seat.getEntityId ( ) ) ) {
-					// coming from the server, we must cancel it; otherwise
-					// it would cause client-side flickering.
-					return true;
-				}
-			}
-			return false;
+			// coming from the server, we must cancel it; otherwise
+			// it would cause client-side flickering.
+			return INSTANCES.stream ( ).anyMatch ( parachute -> parachute.seat != null
+					&& entity_id == parachute.seat.getEntityId ( ) );
 		};
 		
 		tp_interceptor.registerAcceptor ( canceller );
@@ -102,19 +119,16 @@ class ParachuteCustomInstanceHandle {
 			// so we can identify if the packet is coming from the server or from this class.
 			PacketOutEntityTeleport wrapper = PacketReaderService.getInstance ( )
 					.readEntityTeleportPacket ( packet );
+			ParachuteCustomInstanceHandle handle = INSTANCES.stream ( )
+					.filter ( parachute -> parachute.seat != null
+							&& wrapper.getEntityId ( ) == parachute.seat.getEntityId ( ) << 4 )
+					.findAny ( ).orElse ( null );
 			
-			synchronized ( PARACHUTE_SET ) {
-				ParachuteCustomInstanceHandle handle = PARACHUTE_SET.stream ( )
-						.filter ( parachute -> parachute.seat != null
-								&& wrapper.getEntityId ( ) == parachute.seat.getEntityId ( ) << 4 )
-						.findAny ( ).orElse ( null );
+			if ( handle != null ) {
+				// then we can pass the actual entity id
+				wrapper.setEntityId ( handle.seat.getEntityId ( ) );
 				
-				if ( handle != null ) {
-					// then we can pass the actual entity id
-					wrapper.setEntityId ( handle.seat.getEntityId ( ) );
-					
-					return wrapper.createInstance ( );
-				}
+				return wrapper.createInstance ( );
 			}
 			
 			return packet;
@@ -228,7 +242,21 @@ class ParachuteCustomInstanceHandle {
 		this.fall_speed = EnumParachuteConfiguration.FALLING_SPEED.getAsDouble ( );
 		
 		// registering
-		PARACHUTE_SET.add ( this );
+		INSTANCES.add ( this );
+	}
+	
+	// responsible for closing the parachute when
+	// the player is teleported to avoid bugs.
+	@EventHandler ( priority = EventPriority.MONITOR, ignoreCancelled = true )
+	public void onTeleport ( PlayerTeleportEvent event ) {
+		Player            br_player = Player.getPlayer ( event.getPlayer ( ) );
+		ParachuteInstance parachute = br_player.getParachute ( );
+		
+		if ( parachute instanceof ParachuteCustomInstance
+				&& Objects.equals ( ( ( ParachuteCustomInstance ) parachute ).handle , this )
+				&& started && !destroyed ) {
+			parachute.close ( );
+		}
 	}
 	
 	@SuppressWarnings ( "deprecation" )
@@ -275,6 +303,10 @@ class ParachuteCustomInstanceHandle {
 			
 			// marking as started
 			this.started = true;
+			
+			// registering listener
+			Bukkit.getPluginManager ( ).registerEvents (
+					this , BattleRoyale.getInstance ( ) );
 		} else {
 			return false;
 		}
@@ -321,7 +353,9 @@ class ParachuteCustomInstanceHandle {
 		this.rotation = player_rotation;
 		
 		// making sure has not landed
-		if ( isOnGround ( ) ) {
+		int world_min_height = WorldUtil.getMinHeight ( arena.getWorld ( ) );
+		
+		if ( isOnGround ( ) || y < world_min_height ) {
 			// updating last location (from server thread).
 			final ArmorStand final_seat = seat; // last reference
 			
@@ -390,11 +424,10 @@ class ParachuteCustomInstanceHandle {
 		arena.getPlayers ( ).stream ( ).filter (
 				other -> !Objects.equals ( this.player , other ) ).map (
 				Player :: getBukkitPlayer ).filter (
-				Objects :: nonNull ).forEach ( other -> {
-			PacketSenderService.getInstance ( ).sendEntityTeleportPacket (
-					other , EntityReflection.getEntityID ( player ) ,
-					false , x , y , z , player_rotation , 0.0F );
-		} );
+				Objects :: nonNull ).forEach ( other -> PacketSenderService.getInstance ( )
+				.sendEntityTeleportPacket (
+						other , EntityReflection.getEntityID ( player ) ,
+						false , x , y , z , player_rotation , 0.0F ) );
 	}
 	
 	protected Set < org.bukkit.entity.Player > getPlayersInArena ( ) {
@@ -411,18 +444,17 @@ class ParachuteCustomInstanceHandle {
 		this.destroyed = true;
 		
 		// sending player to last location
-		org.bukkit.entity.Player player = this.player.getBukkitPlayer ( );
+		org.bukkit.entity.Player player  = this.player.getBukkitPlayer ( );
+		Entity                   vehicle = player != null ? player.getVehicle ( ) : null;
 		
-		if ( player != null ) {
+		if ( vehicle != null && seat != null
+				&& Objects.equals ( vehicle.getUniqueId ( ) , seat.getUniqueId ( ) ) ) {
 			// must be teleported from server thread
-			org.bukkit.entity.Player finalPlayer = player;
-			
-			SchedulerUtil.runTask ( ( ) -> finalPlayer.teleport (
-					new Location ( finalPlayer.getWorld ( ) , x , y , z , rotation , 0.0F ) ) );
-		} else {
-			if ( ( player = this.player.getLastHandle ( ) ) != null ) {
-				EntityReflection.setPositionDirty ( player , new Vector ( x , y , z ) );
-			}
+			SchedulerUtil.runTask ( ( ) -> {
+				player.leaveVehicle ( );
+				player.teleport ( new Location (
+						player.getWorld ( ) , x , y , z , rotation , 0.0F ) );
+			} );
 		}
 		
 		// removing parts
@@ -432,11 +464,7 @@ class ParachuteCustomInstanceHandle {
 			// as we will later set seat to null, resulting
 			// in NullPointerException
 			final ArmorStand final_ref = seat;
-			
-			SchedulerUtil.runTask ( ( ) -> {
-				final_ref.eject ( );
-				final_ref.remove ( );
-			} );
+			SchedulerUtil.runTask ( final_ref :: remove );
 			
 			seat = null;
 		}
@@ -446,6 +474,9 @@ class ParachuteCustomInstanceHandle {
 		
 		// firing event from server thread.
 		new PlayerCloseParachuteEvent ( this.player , parachute ).callSafe ( );
+		
+		// unregistering listener
+		HandlerList.unregisterAll ( this );
 	}
 	
 	@Override

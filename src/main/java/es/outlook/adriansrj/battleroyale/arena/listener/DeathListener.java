@@ -263,7 +263,8 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 				event.setKeepLevel ( true );
 			} else {
 				PlayerStuffChestHandler.getInstance ( ).spawnStuffChest (
-						event.getDrops ( ) , player.getLocation ( ).add ( 0.0D , 1.0D , 0.0D ) );
+						Arrays.asList ( player.getInventory ( ).getContents ( ) ) ,
+						player.getLocation ( ).add ( 0.0D , 1.0D , 0.0D ) );
 				
 				// clearing drops
 				event.getDrops ( ).clear ( );
@@ -271,6 +272,13 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 			
 			// processing
 			processRanking ( processDeathEvent ( event ) );
+			
+			// closing parachute
+			ParachuteInstance parachute = br_player.getParachute ( );
+			
+			if ( parachute.isOpen ( ) ) {
+				parachute.close ( );
+			}
 		}
 	}
 	
@@ -310,15 +318,17 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 						task_map.put ( player.getUniqueId ( ) , task );
 					}
 				} else {
-					// introducing into spectator mode
-					SchedulerUtil.scheduleSyncDelayedTask ( ( ) -> br_player.setSpectator ( true ) );
-					
-					// displaying position.
-					int rank = br_player.getRank ( );
-					
-					if ( rank != -1 ) {
-						sendRankTitle ( br_player , rank );
-					}
+					SchedulerUtil.scheduleSyncDelayedTask ( ( ) -> {
+						// introducing into spectator mode
+						br_player.setSpectator ( true );
+						
+						// displaying rank.
+						int rank = br_player.getRank ( );
+						
+						if ( rank != -1 ) {
+							sendRankTitle ( br_player , rank );
+						}
+					} );
 				}
 			}
 		}

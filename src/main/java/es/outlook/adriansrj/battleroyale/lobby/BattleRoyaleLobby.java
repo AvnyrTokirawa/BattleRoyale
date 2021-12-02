@@ -46,6 +46,10 @@ public class BattleRoyaleLobby implements Listener {
 		if ( EnumLobbyConfiguration.WORLD_DISABLE_HUNGER.getAsBoolean ( ) ) {
 			GameRuleType.DISABLE_HUNGER.apply ( world , true );
 		}
+		
+		if ( EnumLobbyConfiguration.WORLD_DISABLE_ADVANCEMENTS_ANNOUNCEMENT.getAsBoolean ( ) ) {
+			GameRuleType.ANNOUNCE_ADVANCEMENTS.apply ( world , false );
+		}
 	}
 	
 	public World getWorld ( ) {

@@ -91,6 +91,13 @@ public final class StatListener extends BattleRoyaleArenaListener {
 	private void incrementStat ( Player player , EnumStat stat ) {
 		player.getDataStorage ( ).incrementStat ( stat , 1 , true );
 		player.getDataStorage ( ).incrementTempStat ( stat , 1 );
+		
+		// reward
+		int reward = stat.getReward ( );
+		
+		if ( reward > 0 ) {
+			player.getDataStorage ( ).balanceDeposit ( reward , true );
+		}
 	}
 	
 	private void incrementArenaStat ( BattleRoyaleArena arena , EnumArenaStat stat ) {

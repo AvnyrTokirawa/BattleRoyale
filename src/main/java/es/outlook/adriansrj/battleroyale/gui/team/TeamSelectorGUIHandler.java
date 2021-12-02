@@ -46,7 +46,7 @@ public final class TeamSelectorGUIHandler extends PluginHandler {
 		// this task is responsible for updating
 		// the team selector guis so players can
 		// actually see changes in real-time.
-		Bukkit.getScheduler ( ).runTaskTimerAsynchronously ( plugin , ( ) -> {
+		Bukkit.getScheduler ( ).runTaskTimer ( plugin , ( ) -> {
 			for ( Map.Entry < UUID, BookItemMenu > next : handle_map.entrySet ( ) ) {
 				org.bukkit.entity.Player player = Bukkit.getPlayer ( next.getKey ( ) );
 				

@@ -203,23 +203,23 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 				Player :: getBukkitPlayer ).filter ( Objects :: nonNull ).forEach ( this :: putPlayer );
 	}
 	
-	@Override
-	protected synchronized void displace ( Vector location ) {
-		PacketSenderService packet_service = PacketSenderService.getInstance ( );
-		
-		// displacing players
-		displacePlayers ( location.clone ( ).add ( new Vector ( 0.0D , 2.0D , 0.0D ) ) );
-		
-		// displacing dragon
-		arena.getPlayers ( ).stream ( ).map ( Player :: getBukkitPlayer ).filter (
-				Objects :: nonNull ).forEach ( player -> {
-			// dragon yaw seems to be inverted
-			packet_service.sendEntityTeleportPacket (
-					player , EntityReflection.getEntityID ( shape ) , false ,
-					location.getX ( ) , location.getY ( ) , location.getZ ( ) ,
-					spawn.getYaw ( ) + 180.0F , 0.0F );
-		} );
-	}
+//	@Override
+//	protected synchronized void displace ( Vector location ) {
+//		PacketSenderService packet_service = PacketSenderService.getInstance ( );
+//
+//		// displacing players
+//		displacePlayers ( location.clone ( ).add ( new Vector ( 0.0D , 2.0D , 0.0D ) ) );
+//
+//		// displacing dragon
+//		arena.getPlayers ( ).stream ( ).map ( Player :: getBukkitPlayer ).filter (
+//				Objects :: nonNull ).forEach ( player -> {
+//			// dragon yaw seems to be inverted
+//			packet_service.sendEntityTeleportPacket (
+//					player , EntityReflection.getEntityID ( shape ) , false ,
+//					location.getX ( ) , location.getY ( ) , location.getZ ( ) ,
+//					spawn.getYaw ( ) + 180.0F , 0.0F );
+//		} );
+//	}
 	
 	private void displacePlayers ( Vector location ) {
 		PacketSenderService packet_service = PacketSenderService.getInstance ( );

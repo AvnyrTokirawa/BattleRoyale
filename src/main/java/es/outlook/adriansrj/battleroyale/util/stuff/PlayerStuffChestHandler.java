@@ -25,7 +25,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Class that manages the stuff-chests of the players how died.
@@ -148,7 +151,8 @@ public final class PlayerStuffChestHandler extends PluginHandler {
 			Object                 uncast   = value != null ? value.value ( ) : null;
 			
 			if ( uncast instanceof Inventory ) {
-				player.openInventory ( ( Inventory ) uncast );
+				Bukkit.getScheduler ( ).scheduleSyncDelayedTask (
+						BattleRoyale.getInstance ( ) , ( ) -> player.openInventory ( ( Inventory ) uncast ) );
 			}
 		}
 	}
@@ -171,8 +175,11 @@ public final class PlayerStuffChestHandler extends PluginHandler {
 		ItemMenuSize size      = ItemMenuSize.fitOf ( stuff.size ( ) );
 		Inventory    inventory = Bukkit.createInventory ( null , size.getSize ( ) );
 		
-		stuff.stream ( ).filter ( Objects :: nonNull )
-				.forEach ( inventory :: addItem );
+		for ( ItemStack item : stuff ) {
+			if ( item != null ) {
+				inventory.addItem ( item );
+			}
+		}
 		
 		return inventory;
 	}

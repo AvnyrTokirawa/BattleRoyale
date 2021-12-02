@@ -89,9 +89,10 @@ public final class TeamHandler extends PluginHandler {
 	 * the player will also leave the arena, and sent back to the lobby</b>.
 	 *
 	 * @param player the player that leaves.
+	 * @param send_to_lobby whether to send the player back to lobby.
 	 * @return whether the player leave the team or not.
 	 */
-	public synchronized boolean leaveTeam ( Player player ) {
+	public synchronized boolean leaveTeam ( Player player , boolean send_to_lobby ) {
 		Team team = player.team;
 		
 		if ( team != null ) {
@@ -108,8 +109,8 @@ public final class TeamHandler extends PluginHandler {
 			// firing event
 			new PlayerLeaveTeamEvent ( player , team ).call ( );
 			
-			// sending back to lobby in case the game is running
-			if ( team.getArena ( ).getState ( ) == EnumArenaState.RUNNING ) {
+			// sending back to lobby
+			if ( send_to_lobby ) {
 				BattleRoyaleArenaHandler.getInstance ( ).leaveArena ( player );
 			}
 			
@@ -119,6 +120,11 @@ public final class TeamHandler extends PluginHandler {
 		}
 	}
 	
+	public synchronized boolean leaveTeam ( Player player ) {
+		return leaveTeam ( player , player.isInArena ( )
+				&& player.getArena ( ).getState ( ) == EnumArenaState.RUNNING );
+	}
+
 	@Override
 	protected boolean isAllowMultipleInstances ( ) {
 		return false;

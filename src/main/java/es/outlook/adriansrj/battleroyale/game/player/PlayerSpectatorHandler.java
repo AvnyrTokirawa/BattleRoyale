@@ -82,8 +82,16 @@ public final class PlayerSpectatorHandler extends PluginHandler implements Packe
 					event.setCancelled ( true );
 					
 					// resetting target
-					SchedulerUtil.scheduleSyncDelayedTask (
-							( ) -> player.setSpectatorTarget ( target ) );
+					SchedulerUtil.scheduleSyncDelayedTask ( ( ) -> {
+						// must make sure player is spectator
+						if ( br_player.isSpectator ( ) ) {
+							if ( player.getGameMode ( ) != GameMode.SPECTATOR ) {
+								player.setGameMode ( GameMode.SPECTATOR );
+							}
+							
+							player.setSpectatorTarget ( target );
+						}
+					} );
 				}
 			}
 		}

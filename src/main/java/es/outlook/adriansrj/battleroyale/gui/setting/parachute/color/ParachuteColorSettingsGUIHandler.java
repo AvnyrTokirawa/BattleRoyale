@@ -51,7 +51,7 @@ public final class ParachuteColorSettingsGUIHandler extends PluginHandler {
 		// this task is responsible for updating
 		// the guis so players can actually
 		// see changes in real-time.
-		Bukkit.getScheduler ( ).runTaskTimerAsynchronously ( plugin , ( ) -> {
+		Bukkit.getScheduler ( ).runTaskTimer ( plugin , ( ) -> {
 			for ( Map.Entry < UUID, BookItemMenu > next : handle_map.entrySet ( ) ) {
 				org.bukkit.entity.Player player = Bukkit.getPlayer ( next.getKey ( ) );
 				

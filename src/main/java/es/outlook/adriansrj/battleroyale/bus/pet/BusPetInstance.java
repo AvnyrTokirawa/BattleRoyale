@@ -5,36 +5,31 @@ import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerJumpOffBusEvent;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.packet.reader.PacketReaderService;
 import es.outlook.adriansrj.battleroyale.packet.sender.PacketSenderService;
-import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityRelativeMove;
-import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityRelativeMoveLook;
-import es.outlook.adriansrj.battleroyale.packet.wrapper.out.PacketOutEntityTeleport;
-import es.outlook.adriansrj.battleroyale.util.Constants;
-import es.outlook.adriansrj.battleroyale.util.packet.interceptor.PacketInterceptorAcceptor;
-import es.outlook.adriansrj.battleroyale.util.packet.interceptor.PacketInterceptorInjector;
-import es.outlook.adriansrj.battleroyale.util.packet.interceptor.entity.PacketEntityRelativeMoveInterceptorSimple;
-import es.outlook.adriansrj.battleroyale.util.packet.interceptor.entity.PacketEntityTeleportInterceptorSimple;
-import es.outlook.adriansrj.battleroyale.util.packet.reader.PacketReader;
+import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.battleroyale.util.reflection.bukkit.EntityReflection;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.entity.EntityUtil;
-import es.outlook.adriansrj.core.util.server.Version;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * {@link BusPet} instance.
@@ -44,165 +39,10 @@ import java.util.*;
  */
 public class BusPetInstance extends BusInstanceBase < BusPet > implements Listener {
 	
-	protected static final Set < BusPetInstance > INSTANCES = Collections.synchronizedSet ( new HashSet <> ( ) );
-	
-	static {
-		// packet interceptors
-		// order is important
-		PacketEntityTeleportInterceptorSimple     tp_interceptor = new PacketEntityTeleportInterceptorSimple ( );
-		PacketEntityRelativeMoveInterceptorSimple mv_interceptor = new PacketEntityRelativeMoveInterceptorSimple ( );
-		
-		tp_interceptor.register ( );
-		mv_interceptor.register ( );
-		
-		if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_12_R1 ) ) {
-			// the system in server versions 1.12+ is the following:
-			// the seat location will be set through reflection with
-			// the setPositionDirty method in the class EntityReflection
-			// which will set the location by directly setting the
-			// values of the fields that holds the location of the entity.
-			// this will of course trigger teleport/relative-move packets,
-			// that we will intercept and cancel, as we will send our custom
-			// teleport packets which will have the id of the entity but masked;
-			// the id will be unmasked by the injector.
-			
-			// this acceptor will cancel the packets coming from the server.
-			PacketInterceptorAcceptor canceller = packet -> {
-				PacketReader reader = new PacketReader ( packet );
-				// first var int is the entity id
-				int entity_id = reader.readVarInt ( );
-				
-				synchronized ( INSTANCES ) {
-					if ( INSTANCES.stream ( ).anyMatch ( instance -> instance.seat != null
-							&& entity_id == instance.seat.getEntityId ( ) ) ) {
-						// coming from the server, we must cancel it; otherwise
-						// it would cause client-side flickering.
-						return true;
-					}
-				}
-				return false;
-			};
-			
-			tp_interceptor.registerAcceptor ( canceller );
-			mv_interceptor.registerAcceptor ( canceller );
-			
-			// this acceptor will inject the outgoing teleport packet (coming from this class)
-			tp_interceptor.registerAcceptor ( ( PacketInterceptorInjector ) packet -> {
-				// this class will send teleport packets to teleport
-				// the seat; the thing is that the id of the seat is masked,
-				// so we can identify if the packet is coming from the server or from this class.
-				PacketOutEntityTeleport wrapper = PacketReaderService.getInstance ( )
-						.readEntityTeleportPacket ( packet );
-				
-				synchronized ( INSTANCES ) {
-					BusPetInstance instance = INSTANCES.stream ( ).filter ( bus -> bus.seat != null
-									&& wrapper.getEntityId ( ) == bus.seat.getEntityId ( ) << 4 )
-							.findAny ( ).orElse ( null );
-					
-					if ( instance != null ) {
-						// then we can pass the actual entity id
-						wrapper.setEntityId ( instance.seat.getEntityId ( ) );
-						
-						return wrapper.createInstance ( );
-					}
-				}
-				
-				return packet;
-			} );
-		} else {
-			// the system in server versions 1.9 - 1.11 is the following:
-			// the seat location will be set through reflection with the
-			// setLocation method, which will trigger teleport/relative-move
-			// packets that we will intercept; a copy of each intercepted
-			// packet will be created, and the id of the shape will be
-			// set in the packet copies. in other words, the outgoing
-			// packets that teleport/moves the seat will also apply for
-			// the shape.
-			tp_interceptor.registerAcceptor ( packet -> {
-				PacketOutEntityTeleport wrapper = PacketReaderService.getInstance ( )
-						.readEntityTeleportPacket ( packet );
-				
-				synchronized ( INSTANCES ) {
-					BusPetInstance instance = INSTANCES.stream ( ).filter ( bus -> bus.seat != null
-									&& wrapper.getEntityId ( ) == bus.seat.getEntityId ( ) )
-							.findAny ( ).orElse ( null );
-					
-					if ( instance != null ) {
-						wrapper.setEntityId ( instance.shape.getEntityId ( ) );
-						
-						// fixing y
-						Vector location = wrapper.getLocation ( );
-						
-						location.setY ( location.getY ( ) + ( instance.seat.getEyeHeight ( ) -
-								EntityReflection.getHeight ( instance.shape ) ) );
-						wrapper.setLocation ( location );
-						
-						// the sending
-						instance.arena.getPlayers ( true ).stream ( )
-								.map ( Player :: getBukkitPlayerOptional )
-								.filter ( Optional :: isPresent )
-								.map ( Optional :: get ).forEach ( wrapper :: send );
-					}
-				}
-				return false;
-			} );
-			
-			mv_interceptor.registerAcceptor ( packet -> {
-				// move
-				if ( Objects.equals ( packet.getClass ( ) , Constants.PACKET_OUT_ENTITY_RELATIVE_MOVE_CLASS ) ) {
-					PacketOutEntityRelativeMove wrapper = PacketReaderService.getInstance ( )
-							.readEntityRelativeMovePacket ( packet );
-					
-					synchronized ( INSTANCES ) {
-						BusPetInstance instance = INSTANCES.stream ( ).filter ( bus -> bus.seat != null
-										&& wrapper.getEntityId ( ) == bus.seat.getEntityId ( ) )
-								.findAny ( ).orElse ( null );
-						
-						if ( instance != null ) {
-							wrapper.setEntityId ( instance.shape.getEntityId ( ) );
-							wrapper.setDeltaY ( 0 ); // must not move in y
-							
-							// the sending
-							instance.arena.getPlayers ( true ).stream ( )
-									.map ( Player :: getBukkitPlayerOptional )
-									.filter ( Optional :: isPresent )
-									.map ( Optional :: get ).forEach ( wrapper :: send );
-						}
-					}
-				}
-				
-				// move and look
-				if ( Objects.equals ( packet.getClass ( ) , Constants.PACKET_OUT_ENTITY_RELATIVE_MOVE_LOOK_CLASS ) ) {
-					PacketOutEntityRelativeMoveLook wrapper = PacketReaderService.getInstance ( )
-							.readEntityRelativeMoveLookPacket ( packet );
-					
-					synchronized ( INSTANCES ) {
-						BusPetInstance instance = INSTANCES.stream ( ).filter ( bus -> bus.seat != null
-										&& wrapper.getEntityId ( ) == bus.seat.getEntityId ( ) )
-								.findAny ( ).orElse ( null );
-						
-						if ( instance != null ) {
-							wrapper.setEntityId ( instance.shape.getEntityId ( ) );
-							wrapper.setDeltaY ( 0 ); // must not move in y
-							
-							// the sending
-							instance.arena.getPlayers ( true ).stream ( )
-									.map ( Player :: getBukkitPlayerOptional )
-									.filter ( Optional :: isPresent )
-									.map ( Optional :: get ).forEach ( wrapper :: send );
-						}
-					}
-				}
-				
-				return false;
-			} );
-		}
-	}
-	
-	protected final Player     player;
-	protected       ArmorStand seat;
-	protected       Entity     shape;
-	protected       boolean    in_queue;
+	protected final Player  player;
+	protected       Entity  shape;
+	protected       Chicken seat;
+	protected       boolean in_queue;
 	
 	protected BusPetInstance ( BusPet configuration , Player player ) {
 		super ( configuration );
@@ -211,11 +51,6 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 		Validate.notNull ( player , "player cannot be null" );
 		
 		this.player = player;
-		
-		// registering
-		synchronized ( INSTANCES ) {
-			INSTANCES.add ( this );
-		}
 	}
 	
 	public Player getPlayer ( ) {
@@ -230,10 +65,8 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 	
 	@Override
 	public void start ( ) {
+		syncCheck ( );
 		super.start ( );
-		
-		// updating and relocating shape
-		EntityReflection.setLocation ( updateShape ( ) , location );
 		
 		// we must listen for PlayerChangeWorldEvent
 		Bukkit.getPluginManager ( ).registerEvents (
@@ -244,30 +77,36 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 	}
 	
 	protected void putPlayer ( ) {
-		if ( Bukkit.isPrimaryThread ( ) ) {
-			org.bukkit.entity.Player player = this.player.getBukkitPlayer ( );
+		syncCheck ( );
+		org.bukkit.entity.Player player = this.player.getBukkitPlayer ( );
+		
+		if ( player != null ) {
+			// as the displacement task is constantly
+			// running even when the player is not in
+			// the seat, we have to make sure that the
+			// finish() method will not be called before
+			// even spawning the seat.
+			in_queue = true;
 			
-			if ( player != null ) {
-				// as the displacement task is constantly
-				// running even when the player is not in
-				// the seat, we have to make sure that the
-				// finish() method will not be called before
-				// even spawning the seat.
-				in_queue = true;
+			// player must be in the world of the arena, otherwise
+			// we will need to teleport them, and wait until the teleportation
+			// process is finished to actually put the player.
+			if ( Objects.equals ( player.getWorld ( ) , arena.getWorld ( ) ) ) {
+				Bukkit.getScheduler ( ).scheduleSyncDelayedTask (
+						BattleRoyale.getInstance ( ) , ( ) -> putPlayer0 ( player ) );
+			} else {
+				// making sure chunk is loaded
+				Location location = getLocation ( ).toLocation (
+						arena.getWorld ( ) , getSpawn ( ).getYaw ( ) , 0.0F );
+				Chunk chunk = location.getChunk ( );
 				
-				// player must be in the world of the arena, otherwise
-				// we will need to teleport them, and wait until the teleportation
-				// process is finished to actually put the player.
-				if ( Objects.equals ( player.getWorld ( ) , arena.getWorld ( ) ) ) {
-					Bukkit.getScheduler ( ).scheduleSyncDelayedTask (
-							BattleRoyale.getInstance ( ) , ( ) -> putPlayer0 ( player ) );
-				} else {
-					// changing world
-					player.teleport ( getLocation ( ).toLocation ( arena.getWorld ( ) ) );
+				if ( !chunk.isLoaded ( ) ) {
+					chunk.load ( true );
 				}
+				
+				// changing world
+				player.teleport ( location );
 			}
-		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , this :: putPlayer );
 		}
 	}
 	
@@ -281,43 +120,48 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 		if ( Objects.equals ( player.getWorld ( ).getWorldFolder ( ) , arena.getWorld ( ).getWorldFolder ( ) )
 				&& in_queue && Objects.equals ( player.getUniqueId ( ) , this.player.getUniqueId ( ) ) ) {
 			Bukkit.getScheduler ( ).scheduleSyncDelayedTask (
-					BattleRoyale.getInstance ( ) , ( ) -> putPlayer0 ( player ) );
+					BattleRoyale.getInstance ( ) , ( ) -> putPlayer0 ( player ) , 2L );
+		}
+	}
+	
+	@EventHandler ( priority = EventPriority.HIGHEST )
+	public void onDamage ( EntityDamageEvent event ) {
+		if ( seat != null && Objects.equals (
+				event.getEntity ( ).getUniqueId ( ) , seat.getUniqueId ( ) ) ) {
+			event.setCancelled ( true );
 		}
 	}
 	
 	@SuppressWarnings ( "deprecation" )
 	protected void putPlayer0 ( org.bukkit.entity.Player player ) {
-		seat = arena.getWorld ( ).spawn ( getLocation ( ).toLocation (
-				arena.getWorld ( ) , spawn.getYaw ( ) , 0.0F ) , ArmorStand.class );
+		syncCheck ( );
 		
-		seat.setGravity ( false );
-		seat.setSmall ( false );
-		seat.setBasePlate ( false );
-		seat.setRemoveWhenFarAway ( false );
-		seat.setVisible ( false );
+		this.seat = arena.getWorld ( ).spawn (
+				getLocation ( ).toLocation ( arena.getWorld ( ) , spawn.getYaw ( ) , 0.0F ) ,
+				Chicken.class );
+		
+		this.seat.setRemoveWhenFarAway ( false );
+		this.seat.setAdult ( );
+		this.seat.addPotionEffect ( new PotionEffect (
+				PotionEffectType.INVISIBILITY , Integer.MAX_VALUE , 0 ) );
+		
+		try {
+			this.seat.addPassenger ( player );
+		} catch ( NoSuchMethodError ex ) {
+			// legacy versions
+			this.seat.setPassenger ( player );
+		}
 		
 		// seat spawned, we can now
 		// disable the queue flag
 		this.in_queue = false;
 		
-		// as the player is going to spawn in the bus
-		// flying should be enabled.
-		if ( player.getGameMode ( ) != GameMode.CREATIVE ) {
-			player.setAllowFlight ( true );
-			player.setFlying ( true );
-		}
-		
 		// hiding player for others
-		arena.getPlayers ( false ).stream ( ).map ( Player :: getBukkitPlayer ).filter (
-				Objects :: nonNull ).forEach (
-				other -> Player.getPlayer ( other ).hidePlayer ( player ) );
-		
-		try {
-			seat.addPassenger ( player );
-		} catch ( NoSuchMethodError ex ) {
-			// legacy versions
-			seat.setPassenger ( player );
-		}
+		arena.getPlayers ( false ).stream ( ).map ( Player :: getBukkitPlayer )
+				.filter ( Objects :: nonNull )
+				.filter ( other -> !Objects.equals ( other.getUniqueId ( ) , player.getUniqueId ( ) )
+						&& other.canSee ( player ) )
+				.forEach ( other -> Player.getPlayer ( other ).hidePlayer ( player ) );
 		
 		// blindness effect
 		EntityUtil.addPotionEffectForcing (
@@ -326,137 +170,162 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 				player , PotionEffectType.BLINDNESS , Duration.ofSeconds ( 3 ) , 0 );
 		
 		// showing shape
-		if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_12_R1 ) ) {
-			PacketSenderService packet_service = PacketSenderService.getInstance ( );
-			Entity              shape          = updateShape ( );
-			
-			packet_service.sendSpawnEntityPacket ( player , shape );
-			packet_service.sendEntityMetadataPacket ( player , shape );
-		} else {
-			PacketSenderService packet_service = PacketSenderService.getInstance ( );
-			Entity              shape          = updateShape ( );
-			
-			// shape and seat positions must match at
-			// the moment of spawning, otherwise, the
-			// movement packets outgoing from the server
-			// will cause the shape to be away from the seat.
-			Location seat_position = seat.getLocation ( );
-			
-			EntityReflection.setLocation ( shape , new Vector (
-					seat_position.getX ( ) ,
-					seat_position.getY ( ) + ( seat.getEyeHeight ( ) - EntityReflection.getHeight ( shape ) ) ,
-					seat_position.getZ ( ) ) );
-			EntityReflection.setYawPitch ( shape , spawn.getYaw ( ) , 0.0F );
-			
-			packet_service.sendSpawnEntityPacket ( player , shape );
-			packet_service.sendEntityMetadataPacket ( player , shape );
-		}
+		PacketSenderService packet_service = PacketSenderService.getInstance ( );
+		Entity              shape          = updateShape ( );
+		
+		// shape and seat positions must match at
+		// the moment of spawning, otherwise, the
+		// movement packets outgoing from the server
+		// will cause the shape to be away from the seat.
+		Location seat_position = seat.getLocation ( );
+		
+		EntityReflection.setLocation ( shape , new Vector (
+				seat_position.getX ( ) ,
+				seat_position.getY ( ) + ( seat.getEyeHeight ( ) - EntityReflection.getHeight ( shape ) ) ,
+				seat_position.getZ ( ) ) );
+		EntityReflection.setYawPitch ( shape , spawn.getYaw ( ) , 0.0F );
+		
+		packet_service.sendSpawnEntityPacket ( player , shape );
+		packet_service.sendEntityMetadataPacket ( player , shape );
 	}
 	
 	protected void eject ( ) {
-		if ( Bukkit.isPrimaryThread ( ) ) {
-			this.in_queue = false;
-			
-			// disposing seat
-			if ( seat != null ) {
-				// we will update the last location in the server
-				if ( location != null ) {
-					EntityReflection.setLocation (
-							seat , location.getX ( ) , location.getY ( ) , location.getZ ( ) ,
-							spawn.getYaw ( ) , 0.0F );
-				}
-				
-				// then disposing
-				seat.eject ( );
-				seat.remove ( );
+		syncCheck ( );
+		this.in_queue = false;
+		
+		// disposing seat
+		if ( seat != null ) {
+			seat.remove ( );
+			seat = null;
+		}
+		
+		player.setCanOpenParachute ( true ); // parachute
+		player.getBukkitPlayerOptional ( ).ifPresent ( player -> {
+			// disabling fly
+			if ( player.getGameMode ( ) != GameMode.CREATIVE ) {
+				player.setAllowFlight ( false );
+				player.setFlying ( false );
 			}
 			
-			player.getBukkitPlayerOptional ( ).ifPresent ( player -> {
-				// we will update the last location in the server
-				if ( location != null ) {
-					EntityReflection.setLocation (
-							player , location.getX ( ) , location.getY ( ) , location.getZ ( ) ,
-							player.getLocation ( ).getYaw ( ) , player.getLocation ( ).getPitch ( ) );
-				}
-				
-				// disabling fly
-				if ( player.getGameMode ( ) != GameMode.CREATIVE ) {
-					player.setAllowFlight ( false );
-					player.setFlying ( false );
-				}
-				
-				// showing player for others
-				if ( arena != null ) {
-					arena.getPlayers ( false ).stream ( ).map ( Player :: getBukkitPlayer ).filter (
-							Objects :: nonNull ).forEach (
-							other -> Player.getPlayer ( other ).showPlayer ( player ) );
-				}
-			} );
-			
-			// firing event
-			new PlayerJumpOffBusEvent ( player , this ).call ( );
-		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , this :: eject );
-		}
+			// showing player for others
+			if ( arena != null ) {
+				arena.getPlayers ( false ).stream ( ).map ( Player :: getBukkitPlayer )
+						.filter ( Objects :: nonNull )
+						.filter ( other -> !Objects.equals ( player.getUniqueId ( ) , other.getUniqueId ( ) )
+								&& !other.canSee ( player ) )
+						.forEach ( other -> Player.getPlayer ( other ).showPlayer ( player ) );
+			}
+		} );
+		
+		// firing event
+		new PlayerJumpOffBusEvent ( player , this ).call ( );
 	}
 	
 	@Override
-	protected void displace ( Vector location ) {
-		org.bukkit.entity.Player player = this.player.getBukkitPlayer ( );
+	protected void lifeLoop ( ) {
+		syncCheck ( );
+		
+		// displacing
+		boolean                  success = true;
+		org.bukkit.entity.Player player  = this.player.getBukkitPlayer ( );
 		
 		if ( player != null && player.isOnline ( ) ) {
 			if ( seat != null ) {
-				if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_12_R1 ) ) {
-					// displacing seat
-					PacketSenderService.getInstance ( ).sendEntityTeleportPacket (
-							player ,
-							// masking id
-							( seat.getEntityId ( ) << 4 ) ,
-							false ,
-							location.getX ( ) ,
-							location.getY ( ) ,
-							location.getZ ( ) ,
-							spawn.getYaw ( ) ,
-							0
-					);
-					
-					EntityReflection.setPositionDirty ( seat , location );
-					
-					// displacing shape
-					PacketSenderService.getInstance ( ).sendEntityTeleportPacket (
-							player ,
-							shape.getEntityId ( ) ,
-							false ,
-							location.getX ( ) ,
-							// including shape height
-							location.getY ( ) + ( seat.getEyeHeight ( ) - shape.getHeight ( ) ) ,
-							location.getZ ( ) ,
-							spawn.getYaw ( ) ,
-							0
-					);
-				} else {
-					// displacing seat
-					if ( Bukkit.isPrimaryThread ( ) ) {
-						EntityReflection.setLocation ( seat , location );
-						EntityReflection.setYawPitch ( seat , spawn.getYaw ( ) , 0.0F );
-					} else {
-						Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
-							EntityReflection.setLocation ( seat , location );
-							EntityReflection.setYawPitch ( seat , spawn.getYaw ( ) , 0.0F );
-						} );
-					}
-				}
+				// calculating stuff
+				Vector   velocity       = direction.clone ( ).multiply ( spawn.getSpeed ( ) );
+				Location shape_location = seat.getLocation ( ).add ( velocity );
+				
+				//				// floor
+				//				Block floor_base = shape_location.getBlock ( ).getRelative ( BlockFace.DOWN );
+				//				floor_base.setType ( UniversalMaterial.BARRIER.getMaterial ( ) );
+				//				floor_base.getState ( ).update ( true );
+				//
+				//				for ( BlockFace face : DirectionUtil.FACES_90 ) {
+				//					Block floor = floor_base.getRelative ( face );
+				//
+				//					floor.setType ( UniversalMaterial.BARRIER.getMaterial ( ) );
+				//					floor.getState ( ).update ( true );
+				//				}
+				
+				// then displacing
+				seat.setVelocity ( velocity );
+				
+				// updating location
+				location.setX ( shape_location.getX ( ) );
+				location.setY ( shape_location.getY ( ) );
+				location.setZ ( shape_location.getZ ( ) );
+				
+				// displacing shape
+				Entity shape = updateShape ( );
+				
+				PacketSenderService.getInstance ( ).sendEntityTeleportPacket (
+						player , shape.getEntityId ( ) , false ,
+						location.getX ( ) ,
+						location.getY ( ) + ( seat.getEyeHeight ( ) - EntityReflection.getHeight ( shape ) ) ,
+						location.getZ ( ) ,
+						spawn.getYaw ( ) , 0.0F );
+				PacketSenderService.getInstance ( ).sendEntityMetadataPacket ( player , shape );
 			} else {
 				// it seems that seat was
 				// removed for any reason.
 				if ( !in_queue ) {
 					this.finish ( );
+					success = false;
 				}
 			}
 		} else {
 			// player seems to be offline.
 			this.finish ( );
+			success = false;
 		}
+		
+		// then life loop
+		if ( success ) {
+			super.lifeLoop ( );
+		}
+	}
+	
+	//	@Override
+	//	protected void displace ( Vector location ) {
+	//		syncCheck ( );
+	//		org.bukkit.entity.Player player = this.player.getBukkitPlayer ( );
+	//
+	//		if ( player != null && player.isOnline ( ) ) {
+	//			if ( shape != null ) {
+	//				shape.setVelocity ( direction.clone ( ).multiply ( 1.2D ) );
+	//
+	//				//				// displacing seat
+	//				//				EntityReflection.setLocation ( seat , location );
+	//				//
+	//				//				// displacing shape
+	//				//				Entity shape = updateShape ( );
+	//				//
+	//				//				PacketSenderService.getInstance ( ).sendEntityTeleportPacket (
+	//				//						player , shape.getEntityId ( ) , false ,
+	//				//						location.getX ( ) ,
+	//				//						location.getY ( ) + ( seat.getEyeHeight ( ) - EntityReflection.getHeight ( shape )
+	//				) ,
+	//				//						location.getZ ( ) ,
+	//				//						spawn.getYaw ( ) , 0.0F );
+	//				//				PacketSenderService.getInstance ( )
+	//				//						.sendEntityMetadataPacket ( player , shape );
+	//			} else {
+	//				// it seems that seat was
+	//				// removed for any reason.
+	//				if ( !in_queue ) {
+	//					this.finish ( );
+	//				}
+	//			}
+	//		} else {
+	//			// player seems to be offline.
+	//			this.finish ( );
+	//		}
+	//	}
+	
+	protected Set < org.bukkit.entity.Player > getPlayersInArena ( ) {
+		return arena.getPlayers ( true ).stream ( ).map ( Player :: getBukkitPlayerOptional )
+				.filter ( Optional :: isPresent ).map ( Optional :: get )
+				.collect ( Collectors.toSet ( ) );
 	}
 	
 	@Override
@@ -472,32 +341,26 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 	
 	@Override
 	public synchronized void finish ( ) {
-		if ( Bukkit.isPrimaryThread ( ) ) {
-			this.eject ( );
-			
-			// then finishing
-			super.finish ( );
-			this.dispose ( );
-		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
-				// we will have to make sure that it is not already
-				// finished as we are switching threads; this can
-				// result in a desynchronization problem.
-				if ( !isFinished ( ) ) {
-					finish ( );
-				}
-			} );
-		}
+		syncCheck ( );
+		this.eject ( );
+		
+		// then finishing
+		super.finish ( );
+		this.dispose ( );
 	}
 	
 	@Override
 	public synchronized void restart ( ) {
+		syncCheck ( );
+		
 		this.eject ( );
 		super.restart ( );
 		this.dispose ( );
 	}
 	
 	protected Entity updateShape ( ) {
+		syncCheck ( );
+		
 		// spawning shape
 		if ( shape == null ) {
 			this.shape = PacketSenderService.getInstance ( ).spawnEntity (
@@ -514,6 +377,7 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 	}
 	
 	protected void dispose ( ) {
+		syncCheck ( );
 		HandlerList.unregisterAll ( this );
 		
 		// de-spawning shape

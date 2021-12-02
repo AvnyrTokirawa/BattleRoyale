@@ -85,6 +85,11 @@ public enum EnumFile {
 	 */
 	SHOP_GUIS_CONFIGURATION ( "BattleRoyaleShopGUIs.yml" ),
 	
+	/**
+	 * Stat reward configuration file.
+	 */
+	START_REWARD_CONFIGURATION ( "BattleRoyaleStatReward.yml" ) ,
+	
 	;
 	
 	private final String        name;

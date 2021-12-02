@@ -94,27 +94,41 @@ public enum EnumLanguage implements ConfigurationEntry {
 	
 	BORDER_STATE_RESIZE_IN_ANNOUNCEMENT_TITLE (
 			"border.screen-announcement.state.resizing-in.title" ,
-			"announcement title to warn players that the border will resize soon" ,
+			"announcement title to warn players that the border will resize soon. new minecraft\n" +
+					"version requires both the title and\n" +
+					"the subtitle not to be empty in order to show" ,
 			ChatColor.GOLD + "Border Resizing In" ),
 	
 	BORDER_STATE_RESIZE_IN_ANNOUNCEMENT_SUBTITLE (
 			"border.screen-announcement.state.resizing-in.subtitle" ,
-			"announcement subtitle to warn players that the border will resize soon (intended to show the time)" ,
+			"announcement subtitle to warn players that the border will resize soon (intended to show the time). new minecraft\n" +
+					"version requires both the title and\n" +
+					"the subtitle not to be empty in order to show" ,
 			ChatColor.GOLD + "%s" ),
 	
 	BORDER_STATE_RESIZING_ANNOUNCEMENT_TITLE (
 			"border.screen-announcement.state.start-resizing.title" ,
-			"announcement title to warn players that the border is resizing" ,
+			"announcement title to warn players that the border is resizing. new minecraft\n" +
+					"version requires both the title and\n" +
+					"the subtitle not to be empty in order to show" ,
 			ChatColor.GOLD + "Border is Resizing" ),
 	
 	BORDER_STATE_RESIZING_ANNOUNCEMENT_SUBTITLE (
 			"border.screen-announcement.state.start-resizing.subtitle" ,
-			"announcement subtitle to warn players that the border is resizing (intended to show the time)" ,
+			"announcement subtitle to warn players that the border is resizing (intended to show the time). new minecraft\n" +
+					"version requires both the title and\n" +
+					"the subtitle not to be empty in order to show",
 			ChatColor.GOLD + "%s" ),
 	
-	BUS_JUMP_TITLE ( "bus.jump.title" , "bus jump title" , "" ),
+	BUS_JUMP_TITLE ( "bus.jump.title" ,
+					 "bus jump title. new minecraft\n" +
+							 "version requires both the title and\n" +
+							 "the subtitle not to be empty in order to show" , ChatColor.RED.toString ( ) ),
 	
-	BUS_JUMP_SUBTITLE ( "bus.jump.subtitle" , "bus jump subtitle" ,
+	BUS_JUMP_SUBTITLE ( "bus.jump.subtitle" ,
+						"bus jump subtitle. new minecraft\n" +
+								"version requires both the title and\n" +
+								"the subtitle not to be empty in order to show" ,
 						ChatColor.BLUE + "PRESS " + ChatColor.AQUA + "SNEAK" + ChatColor.BLUE + " TO JUMP" ),
 	
 	KNOCKED_BEING_REVIVED ( "knocked.being-revived" , "being revived action bar message" ,
@@ -133,27 +147,39 @@ public enum EnumLanguage implements ConfigurationEntry {
 								StringUtil.concatenate ( ChatColor.GOLD , ChatColor.BOLD ) + "%s" ),
 	
 	RESPAWN_COUNTDOWN_TITLE ( "respawn.countdown.title" ,
-							  "respawn countdown title" ,
+							  "respawn countdown title. new minecraft\n" +
+									  "version requires both the title and\n" +
+									  "the subtitle not to be empty in order to show" ,
 							  StringUtil.EMPTY ),
 	
 	RESPAWN_COUNTDOWN_SUBTITLE ( "respawn.countdown.subtitle" ,
-								 "respawn countdown subtitle" ,
+								 "respawn countdown subtitle. new minecraft\n" +
+										 "version requires both the title and\n" +
+										 "the subtitle not to be empty in order to show" ,
 								 ChatColor.GOLD + "Respawning in %s" ),
 	
 	RANK_WINNER_TITLE ( "rank.winner.title" ,
-						"winner rank title" ,
+						"winner rank title. new minecraft\n" +
+								"version requires both the title and\n" +
+								"the subtitle not to be empty in order to show" ,
 						ChatColor.GREEN + "#1 WINNER" ),
 	
 	RANK_WINNER_SUBTITLE ( "rank.winner.subtitle" ,
-						   "winner rank subtitle" ,
+						   "winner rank subtitle. new minecraft\n" +
+								   "version requires both the title and\n" +
+								   "the subtitle not to be empty in order to show" ,
 						   ChatColor.GOLD + "Battle Royale" ),
 	
 	RANK_GAME_OVER_TITLE ( "rank.game-over.title" ,
-						   "game-over rank title" ,
+						   "game-over rank title. new minecraft\n" +
+								   "version requires both the title and\n" +
+								   "the subtitle not to be empty in order to show" ,
 						   ChatColor.DARK_RED + "#%d GAME OVER" ),
 	
 	RANK_GAME_OVER_SUBTITLE ( "rank.game-over.subtitle" ,
-							  "game-over rank subtitle" ,
+							  "game-over rank subtitle. new minecraft\n" +
+									  "version requires both the title and\n" +
+									  "the subtitle not to be empty in order to show" ,
 							  ChatColor.GOLD + "Battle Royale" ),
 	
 	// -------- killed phrases
@@ -241,11 +267,15 @@ public enum EnumLanguage implements ConfigurationEntry {
 								  "Starting in: " + ChatColor.GREEN + "%s" ),
 	
 	AUTO_STARTER_COUNTDOWN_TITLE ( "auto-start.countdown.title" ,
-								   "auto-starter countdown title" ,
+								   "auto-starter countdown title. new minecraft\n" +
+										   "version requires both the title and\n" +
+										   "the subtitle not to be empty in order to show" ,
 								   ChatColor.GOLD + "%d" ),
 	
 	AUTO_STARTER_COUNTDOWN_SUBTITLE ( "auto-start.countdown.subtitle" ,
-									  "auto-starter countdown subtitle" ,
+									  "auto-starter countdown subtitle. new minecraft\n" +
+											  "version requires both the title and\n" +
+											  "the subtitle not to be empty in order to show" ,
 									  "" ),
 	
 	// -------- restarter

@@ -36,9 +36,11 @@ import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 import xyz.xenondevs.particle.ParticleEffect;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -238,7 +240,9 @@ public class AirSupply {
 		}
 		
 		public void restore ( ) {
-			handle.restore ( );
+			// sever thread
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , handle :: restore );
 		}
 	}
 	
@@ -316,7 +320,7 @@ public class AirSupply {
 		if ( isValidPlace ( ) ) {
 			if ( spawn ( ) ) {
 				this.fall_task = new AirSupplyFallTask ( this );
-				this.fall_task.runTaskTimerAsynchronously ( BattleRoyale.getInstance ( ) , 1 , 1 );
+				this.fall_task.runTaskTimer ( BattleRoyale.getInstance ( ) , 1 , 1 );
 			}
 		} else {
 			throw new IllegalStateException ( "not valid place" );
@@ -391,7 +395,8 @@ public class AirSupply {
 		// restoring block original types
 		for ( Block block : place ) {
 			if ( block != null && block.hasMetadata ( AIR_SUPPLY_META_KEY ) ) {
-				Object raw_info = block.getMetadata ( AIR_SUPPLY_META_KEY ).get ( 0 ).value ( );
+				List < MetadataValue > metadata = block.getMetadata ( AIR_SUPPLY_META_KEY );
+				Object                 raw_info = metadata.size ( ) > 0 ? metadata.get ( 0 ).value ( ) : null;
 				
 				if ( raw_info instanceof BlockInfo ) {
 					( ( BlockInfo ) raw_info ).restore ( );

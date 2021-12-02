@@ -4,6 +4,7 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.battlefield.bus.BusSpawn;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.util.Vector;
 
 /**
@@ -39,7 +40,7 @@ public abstract class BusInstance < C extends Bus > {
 	 * @return whether the door of the bus is open.
 	 */
 	public boolean isDoorOpen ( ) {
-		return arena.getFullBounds ( ).unproject ( getCurrentLocation ( ) )
+		return isStarted ( ) && arena.getFullBounds ( ).unproject ( getCurrentLocation ( ) )
 				.distance ( spawn.getStartLocation ( ) ) >= spawn.getDoorPointDistance ( );
 	}
 	
@@ -84,4 +85,10 @@ public abstract class BusInstance < C extends Bus > {
 	public abstract void finish ( );
 	
 	public abstract void restart ( );
+	
+	// ----- utils
+	
+	protected void syncCheck ( ) {
+		Validate.isTrue ( Bukkit.isPrimaryThread ( ) , "must run on server thread" );
+	}
 }
