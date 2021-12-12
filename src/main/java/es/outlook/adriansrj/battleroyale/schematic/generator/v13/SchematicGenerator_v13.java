@@ -1,10 +1,10 @@
 package es.outlook.adriansrj.battleroyale.schematic.generator.v13;
 
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
+import es.outlook.adriansrj.battleroyale.schematic.generator.SchematicGeneratorBase;
 import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
 import es.outlook.adriansrj.battleroyale.world.Material;
 import es.outlook.adriansrj.battleroyale.world.block.BlockTileEntity;
-import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProvider;
 import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProviderWorldFolder;
 import es.outlook.adriansrj.battleroyale.world.chunk.v13.Chunk13;
 import es.outlook.adriansrj.battleroyale.world.chunk.v13.ChunkSection13;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  *
  * @author AdrianSR / 29/08/2021 / 01:50 p. m.
  */
-public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale.schematic.generator.SchematicGenerator {
+public class SchematicGenerator_v13 extends SchematicGeneratorBase {
 	
 	/**
 	 * @author AdrianSR / 29/08/2021 / 02:36 p. m.
@@ -68,13 +68,182 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 		this.data_version = data_version;
 	}
 	
+	//	protected final ConcurrentLinkedQueue < Vector3I > queue = new ConcurrentLinkedQueue <> ( );
+	
+	//	@Override
+	//	public void generate ( World world , BoundingBox bounds , File out ) {
+	//		System.out.println ( ">>>> generate: " + out + " (start)" );
+	//
+	//		// extracting required data
+	//		File                      folder          = world.getWorldFolder ( );
+	//		Vector                    origin          = bounds.getMinimum ( );
+	//		int                       width           = ( int ) Math.round ( bounds.getWidth ( ) );
+	//		int                       height          = ( int ) Math.round ( bounds.getHeight ( ) );
+	//		int                       depth           = ( int ) Math.round ( bounds.getDepth ( ) );
+	//		BlockData[][][]           blocks          = new BlockData[ width ][ height ][ depth ];
+	//		List < BlockTileEntity >  tile_entities   = new ArrayList <> ( );
+	//		ChunkProviderWorldFolder  chunk_provider  = new ChunkProviderWorldFolder ( folder );
+	//		RegionProviderWorldFolder region_provider = chunk_provider.getRegionProvider ( );
+	//
+	//		System.out.println ( ">>>> generate: " + out + " (middle)" );
+	//		for ( int y = 0 ; y < height ; y++ ) {
+	//			int yy = origin.getBlockY ( ) + y;
+	//			for ( int z = 0 ; z < depth ; z++ ) {
+	//				int zz = origin.getBlockZ ( ) + z;
+	//				for ( int x = 0 ; x < width ; x++ ) {
+	//					int xx = origin.getBlockX ( ) + x;
+	//
+	//					// reading chunk
+	//					ChunkLocation chunk_location = new ChunkLocation ( xx >> 4 , zz >> 4 );
+	//					Region region = region_provider.getRegion (
+	//							chunk_location.getRegionX ( ) , chunk_location.getRegionZ ( ) );
+	//					File region_file = region.getFile ( );
+	//
+	//					try {
+	//						if ( busy_map.get ( region_file ) != Files.size ( region_file.toPath ( ) ) ) {
+	//							System.out.println ( ">>>>> region file " + region_file.getName ( )
+	//														 + " | " + chunk_location + " | "
+	//														 + " will probably cause a problem (A): a = "
+	//														 + busy_map.get ( region_file ) + " b = " + Files.size (
+	//									region_file.toPath ( ) ) );
+	//						}
+	//					} catch ( IOException e ) {
+	//						System.out.println ( ">>>>> region file " + region_file.getName ( )
+	//													 + " | " + chunk_location + " | "
+	//													 + " will probably cause a problem (B)" );
+	//						e.printStackTrace ( );
+	//					}
+	//
+	//					Chunk13 chunk = ( Chunk13 ) chunk_provider.getChunk ( chunk_location );
+	//
+	//					// block material
+	//					ChunkSection13 section = chunk != null ? chunk.getSectionFromYCoordinate ( yy ) : null;
+	//
+	//					if ( section != null ) {
+	//						Material material = section.getMaterial ( xx & 0xF , yy & 0xF , zz & 0xF );
+	//
+	//						if ( material != null && !material.isEmpty ( ) ) {
+	//							blocks[ x ][ y ][ z ] = new BlockData ( new Vector3D ( x , y , z ) , material );
+	//						}
+	//					}
+	//
+	//					// tile entity
+	//					BlockTileEntity tile_entity = chunk != null ? chunk.getTileEntity ( xx , yy , zz ) : null;
+	//
+	//					if ( tile_entity != null ) {
+	//						// relocating
+	//						BlockTileEntity relocated = new BlockTileEntity ( tile_entity );
+	//
+	//						relocated.setX ( x );
+	//						relocated.setY ( y );
+	//						relocated.setZ ( z );
+	//
+	//						// done
+	//						if ( !tile_entities.contains ( relocated ) ) {
+	//							tile_entities.add ( relocated );
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
+	//
+	//		//		while ( queue.size ( ) > 0 ) {
+	//		//			System.out.println ( ">>>> left: " + queue.size ( ) );
+	//		//
+	//		//			Vector3I next = queue.peek ( );
+	//		//
+	//		//			if ( next == null ) {
+	//		//				break;
+	//		//			}
+	//		//
+	//		//			int x = next.getX ( );
+	//		//			int y = next.getY ( );
+	//		//			int z = next.getZ ( );
+	//		//
+	//		//			// reading chunk
+	//		//			ChunkLocation chunk_location = new ChunkLocation ( xx >> 4 , zz >> 4 );
+	//		//			int           region_x       = chunk_location.getRegionX ( );
+	//		//			int           region_z       = chunk_location.getRegionZ ( );
+	//		//			Region        region         = region_provider.getRegion ( region_x , region_z );
+	//		//			File          region_file    = Objects.requireNonNull ( region.getFile ( ) );
+	//		//
+	//		//			if ( !granted.contains ( region_file ) ) {
+	//		//				try ( FileWriter ignored = new FileWriter ( region_file ) ) {
+	//		//					// access granted
+	//		//					granted.add ( region_file );
+	//		//				} catch ( IOException ex ) {
+	//		//					test.put ( region_file , region_file.lastModified ( ) );
+	//		//
+	//		//					// region file is probably being modified
+	//		//					// by the server right now, or will be at
+	//		//					// any moment so let's wait until then.
+	//		//					continue;
+	//		//				}
+	//		//			}
+	//		//
+	//		//			queue.remove ( next );
+	//		//
+	//		//			//			FileWriter    dummy_writer   = null;
+	//		//			//
+	//		//			//			try {
+	//		//			//				dummy_writer = new FileWriter ( region_file );
+	//		//			//
+	//		//			//				// access granted
+	//		//			//				queue.remove ( next );
+	//		//			//			} catch ( IOException ex ) {
+	//		//			//				// region file is probably being modified
+	//		//			//				// by the server right now, or will be at
+	//		//			//				// any moment so let's wait until then.
+	//		//			//				continue;
+	//		//			//			} finally {
+	//		//			//				if ( dummy_writer != null ) {
+	//		//			//					try {
+	//		//			//						dummy_writer.close ( );
+	//		//			//					} catch ( IOException e ) {
+	//		//			//						e.printStackTrace ( );
+	//		//			//					}
+	//		//			//				}
+	//		//			//			}
+	//		//
+	//		//			Chunk13 chunk = ( Chunk13 ) chunk_provider.getChunk ( chunk_location );
+	//		//
+	//		//			// block material
+	//		//			ChunkSection13 section = chunk != null ? chunk.getSectionFromYCoordinate ( yy ) : null;
+	//		//
+	//		//			if ( section != null ) {
+	//		//				Material material = section.getMaterial ( xx & 0xF , yy & 0xF , zz & 0xF );
+	//		//
+	//		//				if ( material != null && !material.isEmpty ( ) ) {
+	//		//					blocks[ x ][ y ][ z ] = new BlockData ( new Vector3D ( x , y , z ) , material );
+	//		//				}
+	//		//			}
+	//		//
+	//		//			// tile entity
+	//		//			BlockTileEntity tile_entity = chunk != null ? chunk.getTileEntity ( xx , yy , zz ) : null;
+	//		//
+	//		//			if ( tile_entity != null ) {
+	//		//				// relocating
+	//		//				BlockTileEntity relocated = new BlockTileEntity ( tile_entity );
+	//		//
+	//		//				relocated.setX ( x );
+	//		//				relocated.setY ( y );
+	//		//				relocated.setZ ( z );
+	//		//
+	//		//				// done
+	//		//				if ( !tile_entities.contains ( relocated ) ) {
+	//		//					tile_entities.add ( relocated );
+	//		//				}
+	//		//			}
+	//		//		}
+	//
+	//		System.out.println ( ">>>> generate: " + out + " (pre-end)" );
+	//		// then generating
+	//		generate ( width , height , depth , blocks , tile_entities , out );
+	//		System.out.println ( ">>>> generate: " + out + " (end)" );
+	//	}
+	
 	@Override
 	public void generate ( World world , BoundingBox bounds , File out ) {
-		// we're disabling the auto-saving as we don't want
-		// the world to be saved while we're acceding its files
-		final boolean autosave = world.isAutoSave ( );
-		world.setAutoSave ( false );
-		
 		// extracting required data
 		File                     folder         = world.getWorldFolder ( );
 		Vector                   origin         = bounds.getMinimum ( );
@@ -83,7 +252,7 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 		int                      depth          = ( int ) Math.round ( bounds.getDepth ( ) );
 		BlockData[][][]          blocks         = new BlockData[ width ][ height ][ depth ];
 		List < BlockTileEntity > tile_entities  = new ArrayList <> ( );
-		ChunkProvider            chunk_provider = new ChunkProviderWorldFolder ( folder );
+		ChunkProviderWorldFolder chunk_provider = new ChunkProviderWorldFolder ( folder );
 		
 		for ( int y = 0 ; y < height ; y++ ) {
 			int yy = origin.getBlockY ( ) + y;
@@ -126,9 +295,6 @@ public class SchematicGenerator_v13 implements es.outlook.adriansrj.battleroyale
 				}
 			}
 		}
-		
-		// re-enabling auto-save
-		world.setAutoSave ( autosave );
 		
 		// then generating
 		generate ( width , height , depth , blocks , tile_entities , out );

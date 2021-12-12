@@ -24,4 +24,9 @@ public abstract class BattleRoyaleModeAdapter extends BattleRoyaleMode {
 	public boolean isTeamSelectionEnabled ( ) {
 		return true;
 	}
+	
+	@Override
+	public boolean isRespawnInAir ( ) {
+		return true;
+	}
 }

@@ -1,6 +1,5 @@
 package es.outlook.adriansrj.battleroyale.game.mode;
 
-import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.Validable;
@@ -15,7 +14,6 @@ public abstract class BattleRoyaleMode implements Validable {
 	/**
 	 * Ask for the initialization of this battle mode.
 	 * <br>
-	 * @param arena the arena.
 	 * @return true if successfully initialized.
 	 */
 	protected abstract boolean initialize ( );
@@ -156,6 +154,13 @@ public abstract class BattleRoyaleMode implements Validable {
 	 * @return how long it will take to respawn a player.
 	 */
 	public abstract Duration getRespawnTime ( );
+	
+	/**
+	 * Gets whether to respawn the player in the air.
+	 *
+	 * @return whether to respawn the player in the air.
+	 */
+	public abstract boolean isRespawnInAir ( );
 	
 	/**
 	 * Gets whether the parachute redeploy is enabled or not.

@@ -39,50 +39,24 @@ public interface SchematicGenerator {
 	}
 	
 	/**
+	 * Blocks until done.
+	 * <br>
+	 * World save method <b>should not</b> be called before
+	 * calling this method.
 	 *
 	 * @param world
 	 * @param bounds
 	 * @param folder the folder of the battlefield.
 	 */
-	default BattlefieldShape generateBattlefieldShape ( World world , BoundingBox bounds , File folder )
-			throws Exception {
-		Set < Location2I > done   = new HashSet <> ( );
-		Vector             origin = bounds.getMinimum ( );
-		int                width  = ( int ) Math.round ( bounds.getWidth ( ) );
-		int                height = ( int ) Math.round ( bounds.getHeight ( ) );
-		int                depth  = ( int ) Math.round ( bounds.getDepth ( ) );
-		
-		// data file
-		BattlefieldShapeData data = new BattlefieldShapeData ( Math.max ( width , depth ) );
-		data.save ( new File ( folder , BattlefieldShapeData.SHAPE_DATA_FILENAME ) );
-		
-		// generating parts
-		for ( int x = 0 ; x < width ; x++ ) {
-			for ( int z = 0 ; z < depth ; z++ ) {
-				int        part_x        = x >> 7;
-				int        part_z        = z >> 7;
-				Location2I part_location = new Location2I ( part_x , part_z );
-				
-				if ( done.add ( part_location ) ) {
-					File file = new File ( folder , String.format (
-							BattlefieldShapePart.PART_FILE_NAME_FORMAT , part_x , part_z ) );
-					
-					int part_min_x = origin.getBlockX ( ) + ( part_x << 7 );
-					int part_min_z = origin.getBlockZ ( ) + ( part_z << 7 );
-					int part_max_x = part_min_x + ( 1 << 7 );
-					int part_max_z = part_min_z + ( 1 << 7 );
-					
-					generate ( world , new BoundingBox (
-							part_min_x , origin.getBlockY ( ) , part_min_z ,
-							part_max_x , origin.getBlockY ( ) + height , part_max_z ) , file );
-				}
-			}
-		}
-		
-		return new BattlefieldShape ( data , done.stream ( ).map (
-				BattlefieldShapePart :: new ).collect ( Collectors.toSet ( ) ) );
-	}
+	BattlefieldShape generateBattlefieldShape ( World world , BoundingBox bounds , File folder ) throws Exception;
 	
+	/**
+	 * Blocks until done.
+	 *
+	 * @param world
+	 * @param bounds
+	 * @param out
+	 * @throws Exception
+	 */
 	void generate ( World world , BoundingBox bounds , File out ) throws Exception;
-	
 }

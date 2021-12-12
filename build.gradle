@@ -26,6 +26,10 @@ dependencies {
     implementation 'net.kyori:adventure-nbt:4.9.2'
     // querz nbt
     implementation 'com.github.Querz:NBT:6.1'
+    // including querz nbt in the final jar
+    // as it is causing problems when downloading
+    // from the repository
+    include 'com.github.Querz:NBT:6.1'
 
     // spigot api
     implementation fileTree(dir: 'D:/Documentos/Librerias', include:
@@ -67,7 +71,8 @@ dependencies {
     implementation 'com.github.MilkBowl:VaultAPI:1.7'
 
     // ParticleLib
-    implementation 'xyz.xenondevs:particle:1.6.4'
+    implementation 'xyz.xenondevs:particle:1.6.6'
+//    implementation 'xyz.xenondevs:particle:1.6.4'
 
     // HikariCP
     implementation 'com.zaxxer:HikariCP:5.0.0'
@@ -97,6 +102,12 @@ dependencies {
     // 1.12-
     //implementation 'com.sk89q.worldedit:worldedit-core:6.0'
     //implementation 'com.sk89q.worldedit:worldedit-bukkit:6.0'
+
+    // libraries downloaded when the plugin is loaded
+    library 'com.zaxxer:HikariCP:5.0.0'
+    library 'org.mongodb:mongodb-driver-sync:4.2.1'
+    library 'net.kyori:adventure-nbt:4.9.2'
+    library 'xyz.xenondevs:particle:1.6.6'
 }
 
 bukkit {

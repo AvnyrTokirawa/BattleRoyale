@@ -170,46 +170,62 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		}
 		
 		private Location calculateRespawnLocation ( Location player_location ) {
-			World      world          = br_player.getArena ( ).getWorld ( );
-			ZoneBounds current_bounds = br_player.getArena ( ).getCurrentBounds ( );
-			Location2I center         = current_bounds.getCenter ( );
-			Vector[]   corners        = current_bounds.toBoundingBox ( ).getCorners ( );
-			Vector     respawn_vector = corners[ 0 ];
+			Location          result;
+			BattleRoyaleArena arena          = br_player.getArena ( );
+			boolean           respawn_in_air = arena.getMode ( ).isRespawnInAir ( );
+			Vector            player_spawn   = arena.getBattlefield ( ).getConfiguration ( ).getRandomPlayerSpawn ( );
+			ZoneBounds        current_bounds = arena.getCurrentBounds ( );
+			Location2I        center         = current_bounds.getCenter ( );
 			
-			// finding out closets corner
-			double closest_distance = Double.MAX_VALUE;
-			
-			for ( Vector corner : corners ) {
-				double distance = new Vector2D ( corner.getX ( ) , corner.getZ ( ) )
-						.distance ( new Vector2D ( player_location.getX ( ) , player_location.getZ ( ) ) );
+			if ( !respawn_in_air && player_spawn != null ) {
+				result = arena.getFullBounds ( ).project ( player_spawn ).toLocation ( arena.getWorld ( ) );
+			} else {
+				if ( !respawn_in_air ) {
+					// respawn in air is enabled, but
+					// a valid player spawn couldn't be
+					// found. let's log the problem.
+					ConsoleUtil.sendPluginMessage (
+							ChatColor.RED , "Couldn't find a valid player spawn." ,
+							BattleRoyale.getInstance ( ) );
+				}
 				
-				if ( distance < closest_distance ) {
-					closest_distance = distance;
-					respawn_vector   = corner;
+				World    world          = arena.getWorld ( );
+				Vector[] corners        = current_bounds.toBoundingBox ( ).getCorners ( );
+				Vector   respawn_vector = corners[ 0 ];
+				
+				// finding out closets corner
+				double closest_distance = Double.MAX_VALUE;
+				
+				for ( Vector corner : corners ) {
+					double distance = new Vector2D ( corner.getX ( ) , corner.getZ ( ) )
+							.distance ( new Vector2D ( player_location.getX ( ) , player_location.getZ ( ) ) );
+					
+					if ( distance < closest_distance ) {
+						closest_distance = distance;
+						respawn_vector   = corner;
+					}
+				}
+				
+				// direction towards bounds center
+				result = respawn_vector.toLocation ( world );
+				Block highest = world.getHighestBlockAt ( result );
+				
+				// height. the very top must be a bit
+				// below the maximum height, otherwise
+				// weird things with the player and the
+				// parachute could happen.
+				int very_top = world.getMaxHeight ( ) - 5;
+				
+				if ( highest.getY ( ) < 0 || highest.isEmpty ( ) ) {
+					result.setY ( very_top );
+				} else {
+					result.setY ( Math.min ( highest.getY ( ) + 50.0D , very_top ) );
 				}
 			}
 			
-			// direction towards bounds center
-			float[] look = DirectionUtil.lookAt (
-					player_location.toVector ( ) , new Vector ( center.getX ( ) , 0 , center.getZ ( ) ) );
-			
-			Location result  = respawn_vector.toLocation ( world );
-			Block    highest = world.getHighestBlockAt ( result );
-			
-			// height. the very top must be a bit
-			// below the maximum height, otherwise
-			// weird things with the player and the
-			// parachute could happen.
-			int very_top = world.getMaxHeight ( ) - 5;
-			
-			if ( highest.getY ( ) < 0 || highest.isEmpty ( ) ) {
-				result.setY ( very_top );
-			} else {
-				result.setY ( Math.min ( highest.getY ( ) + 50.0D , very_top ) );
-			}
-			
 			// facing direction
-			result.setYaw ( look[ 0 ] );
+			result.setYaw ( DirectionUtil.lookAt ( result.toVector ( ) , new Vector (
+					center.getX ( ) , 0 , center.getZ ( ) ) )[ 0 ] );
 			
 			return result;
 		}

@@ -46,6 +46,7 @@ public class Region13 implements Region {
 	 *
 	 * @return file this region loads chunks from.
 	 */
+	@Override
 	public File getFile ( ) {
 		return file;
 	}
@@ -66,6 +67,8 @@ public class Region13 implements Region {
 			if ( file != null ) {
 				// adventure nbt is not working properly, so we will
 				// use querz nbt to load the chunk.
+//				System.out.println ( ">>>>> " + x + ", " + z );
+				
 				try ( RegionFile handler = new RegionFile ( file , true ) ;
 						DataInputStream input = handler.getChunkDataInputStream ( x , z ) ) {
 					if ( input != null ) {

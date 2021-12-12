@@ -27,6 +27,7 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 	public static final Boolean DEFAULT_TEAM_SELECTION        = true;
 	public static final Boolean DEFAULT_AUTO_FILL             = true;
 	public static final Double  DEFAULT_HEALTH_AFTER_REVIVING = 6.0;
+	public static final Boolean DEFAULT_RESPAWN_IN_AIR        = true;
 	
 	public static final ConfigurableDuration DEFAULT_REVIVING_TIME = new ConfigurableDuration ( Duration.ofSeconds ( 10 ) );
 	public static final ConfigurableDuration DEFAULT_RESPAWN_TIME  = new ConfigurableDuration ( Duration.ofSeconds ( 5 ) );
@@ -51,6 +52,7 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 		protected double               reviving_health      = DEFAULT_HEALTH_AFTER_REVIVING;
 		protected boolean              respawn;
 		protected ConfigurableDuration respawn_time         = DEFAULT_RESPAWN_TIME;
+		protected boolean              respawn_in_air       = DEFAULT_RESPAWN_IN_AIR;
 		protected boolean              redeploy;
 		
 		public Builder initialHealth ( double initial_health ) {
@@ -120,6 +122,11 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 			return this;
 		}
 		
+		public Builder respawnInAir ( boolean flag ) {
+			this.respawn_in_air = flag;
+			return this;
+		}
+		
 		public Builder redeploy ( boolean redeploy ) {
 			this.redeploy = redeploy;
 			return this;
@@ -129,7 +136,7 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 			return new SimpleBattleRoyaleMode (
 					initial_health , maximum_health , maximum_kills , maximum_teams ,
 					maximum_players_team , autofill , reviving , reviving_time ,
-					reviving_health , respawn , respawn_time , redeploy );
+					reviving_health , respawn , respawn_time , respawn_in_air , redeploy );
 		}
 	}
 	
@@ -185,6 +192,9 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 	@ConfigurableEntry ( key = "respawning.time", comment = "how long will players have to wait to respawn" )
 	protected ConfigurableDuration respawn_time = DEFAULT_RESPAWN_TIME;
 	
+	@ConfigurableEntry ( key = "respawning.in-air", comment = "if enabled, players will be respawned in the air." )
+	protected boolean respawn_in_air;
+	
 	@ConfigurableEntry ( key = "parachute.redeploy.enable", comment = "if disabled, players will not be able to open" +
 			"\ntheir parachutes after landing" )
 	protected boolean redeploy;
@@ -192,7 +202,7 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 	public SimpleBattleRoyaleMode ( double initial_health , double maximum_health , int maximum_kills , int maximum_teams ,
 			int maximum_players_team , boolean autofill , boolean team_creation , boolean team_selection , boolean reviving ,
 			ConfigurableDuration reviving_time , double reviving_health , boolean respawn ,
-			ConfigurableDuration respawn_time , boolean redeploy ) {
+			ConfigurableDuration respawn_time , boolean respawn_in_air , boolean redeploy ) {
 		this.initial_health       = initial_health;
 		this.maximum_health       = maximum_health;
 		this.maximum_kills        = maximum_kills;
@@ -206,16 +216,17 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 		this.reviving_health      = reviving_health;
 		this.respawn              = respawn;
 		this.respawn_time         = respawn_time;
+		this.respawn_in_air       = respawn_in_air;
 		this.redeploy             = redeploy;
 	}
 	
 	public SimpleBattleRoyaleMode ( double initial_health , double maximum_health , int maximum_kills , int maximum_teams ,
 			int maximum_players_team , boolean autofill , boolean reviving ,
 			ConfigurableDuration reviving_time , double reviving_health , boolean respawn ,
-			ConfigurableDuration respawn_time , boolean redeploy ) {
+			ConfigurableDuration respawn_time , boolean respawn_in_air , boolean redeploy ) {
 		this ( initial_health , maximum_health , maximum_kills , maximum_teams , maximum_players_team , autofill ,
 			   true , true ,
-			   reviving , reviving_time , reviving_health , respawn , respawn_time , redeploy );
+			   reviving , reviving_time , reviving_health , respawn , respawn_time , respawn_in_air , redeploy );
 	}
 	
 	public SimpleBattleRoyaleMode ( ) {
@@ -305,6 +316,11 @@ public class SimpleBattleRoyaleMode extends BattleRoyaleModeAdapter implements C
 	@Override
 	public Duration getRespawnTime ( ) {
 		return respawn_time != null ? respawn_time : DEFAULT_RESPAWN_TIME;
+	}
+	
+	@Override
+	public boolean isRespawnInAir ( ) {
+		return respawn_in_air;
 	}
 	
 	@Override

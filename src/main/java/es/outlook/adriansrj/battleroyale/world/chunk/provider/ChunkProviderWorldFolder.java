@@ -20,6 +20,14 @@ public class ChunkProviderWorldFolder implements ChunkProvider {
 		this.region_provider = new RegionProviderWorldFolder ( world_folder );
 	}
 	
+	public File getWorldFolder ( ) {
+		return world_folder;
+	}
+	
+	public RegionProviderWorldFolder getRegionProvider ( ) {
+		return region_provider;
+	}
+	
 	/**
 	 * Gets the chunk at the specified chunk coordinates.
 	 *

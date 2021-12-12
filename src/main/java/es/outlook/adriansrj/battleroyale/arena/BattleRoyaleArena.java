@@ -240,7 +240,11 @@ public class BattleRoyaleArena {
 	}
 	
 	public synchronized EnumArenaState getState ( ) {
-		return state;
+		if ( state == null ) {
+			return EnumArenaState.STOPPED;
+		} else {
+			return state;
+		}
 	}
 	
 	/**

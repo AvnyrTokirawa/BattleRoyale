@@ -1,6 +1,7 @@
 package es.outlook.adriansrj.battleroyale.schematic.generator.v12;
 
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
+import es.outlook.adriansrj.battleroyale.schematic.generator.SchematicGeneratorBase;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
 import es.outlook.adriansrj.battleroyale.world.block.BlockTileEntity;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
  *
  * @author AdrianSR / 29/08/2021 / 01:50 p. m.
  */
-public class SchematicGenerator_v12 implements es.outlook.adriansrj.battleroyale.schematic.generator.SchematicGenerator {
+public class SchematicGenerator_v12 extends SchematicGeneratorBase {
 	
 	protected final EnumDataVersion data_version;
 	

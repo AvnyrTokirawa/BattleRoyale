@@ -314,11 +314,7 @@ public final class Player extends PlayerWrapper {
 				team.players.add ( this );
 			}
 			
-			if ( team.players.isEmpty ( ) && team.arena.getMode ( ).isTeamCreationEnabled ( ) ) {
-				team.getArena ( ).getTeamRegistry ( ).unregisterTeam ( team );
-			}
-			
-			team = null;
+			this.team = team;
 			return true;
 		} else {
 			return false;

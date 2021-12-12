@@ -109,6 +109,11 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 	ADVANCEMENTS_ANNOUNCEMENT_DISABLE ( "advancements.disable-announcement" ,
 										"whether to disable advancements announcement" , false ),
 	
+	MOTD_CUSTOM ( "motd.enable" ,
+				  "enable custom server motd.\n" +
+						  "works only if plugins is\n" +
+						  "running in bungee mode." , false ),
+	
 	;
 	
 	private final String      key;

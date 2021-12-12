@@ -725,18 +725,18 @@ public class BattlefieldSetupSession {
 	
 	public void recalculateShapeChanges ( boolean recalculate_minimap , Consumer < Minimap > minimap_callback ,
 			boolean export_schematic , Consumer < Boolean > schematic_callback ) {
-		// both minimap recalculation and schematic exporting
-		// requires the world to be saved.
-		if ( recalculate_minimap || export_schematic ) {
-			if ( Bukkit.isPrimaryThread ( ) ) {
-				world.save ( );
-			} else {
-				BattleRoyale.getInstance ( ).getLogger ( ).warning (
-						"setBounds() called from a thread other than server thread. the result is not guaranteed to " +
-								"be completely accurate, as saving the world from the current thread could result in" +
-								" a concurrency exception." );
-			}
-		}
+		//		// both minimap recalculation and schematic exporting
+		//		// requires the world to be saved.
+		//		if ( recalculate_minimap || export_schematic ) {
+		//			if ( Bukkit.isPrimaryThread ( ) ) {
+		//				world.save ( );
+		//			} else {
+		//				BattleRoyale.getInstance ( ).getLogger ( ).warning (
+		//						"setBounds() called from a thread other than server thread. the result is not guaranteed to " +
+		//								"be completely accurate, as saving the world from the current thread could result in" +
+		//								" a concurrency exception." );
+		//			}
+		//		}
 		
 		// recalculating minimap
 		if ( recalculate_minimap ) {

@@ -12,6 +12,7 @@ import es.outlook.adriansrj.core.util.configurable.ConfigurableCollectionEntry;
 import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
 import es.outlook.adriansrj.core.util.configurable.vector.ConfigurableVector;
 import es.outlook.adriansrj.core.util.file.FilenameUtil;
+import es.outlook.adriansrj.core.util.math.RandomUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.util.Vector;
@@ -103,6 +104,21 @@ public class BattlefieldConfiguration implements Configurable {
 	
 	public Set < ConfigurableVector > getPlayerSpawns ( ) {
 		return player_spawns;
+	}
+	
+	public ConfigurableVector getRandomPlayerSpawn ( ) {
+		ConfigurableVector spawn = null;
+		
+		if ( player_spawns.size ( ) > 0 && player_spawns.stream ( )
+				.anyMatch ( ConfigurableVector :: isValid ) ) {
+			while ( spawn == null ) {
+				spawn = RandomUtil.getRandomElement ( player_spawns );
+				spawn = spawn != null && spawn.isValid ( )
+						? spawn : null;
+			}
+		}
+		
+		return spawn;
 	}
 	
 	public boolean addPlayerSpawn ( Vector location ) {

@@ -30,7 +30,7 @@ public abstract class ScalableConfigurationHandler extends SingleFileConfigurati
 	public void initialize ( ) {
 		File file = safeGetFile ( );
 		
-		if ( ! file.exists ( ) ) {
+		if ( !file.exists ( ) ) {
 			try {
 				file.getParentFile ( ).mkdirs ( );
 				file.createNewFile ( );

@@ -31,6 +31,7 @@ public class SchematicUtil {
 	}
 	
 	/**
+	 * Blocks until done.
 	 *
 	 * @param world
 	 * @param bounds

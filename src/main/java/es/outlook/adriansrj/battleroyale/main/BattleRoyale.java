@@ -19,6 +19,7 @@ import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.plugin.Plugin;
 import es.outlook.adriansrj.core.plugin.PluginAdapter;
 import es.outlook.adriansrj.core.util.console.ConsoleUtil;
+import es.outlook.adriansrj.core.util.server.Version;
 import org.apache.commons.io.FileDeleteStrategy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -42,20 +43,27 @@ public final class BattleRoyale extends PluginAdapter {
 	
 	@Override
 	public MavenDependencyRepository[] getLibraryRepositories ( ) {
-		return new MavenDependencyRepository[] {
-				new MavenDependencyRepository ( "jitpack" , "https://jitpack.io/" )
-		};
+		if ( Version.getServerVersion ( ).isOlder ( Version.v1_17_R1 ) ) {
+			return new MavenDependencyRepository[] {
+					new MavenDependencyRepository ( "jitpack" , "https://jitpack.io/" )
+			};
+		} else {
+			return new MavenDependencyRepository[ 0 ];
+		}
 	}
 	
 	@Override
 	public MavenDependency[] getLibraries ( ) {
-		return new MavenDependency[] {
-				new MavenDependency ( "com.zaxxer:HikariCP:5.0.0" ) ,
-				new MavenDependency ( "org.mongodb:mongodb-driver-sync:4.2.1" ) ,
-				new MavenDependency ( "net.kyori:adventure-nbt:4.9.2" ) ,
-				new MavenDependency ( "com.github.Querz:NBT:6.1" ) ,
-				new MavenDependency ( "xyz.xenondevs:particle:1.6.4" ) ,
-		};
+		if ( Version.getServerVersion ( ).isOlder ( Version.v1_17_R1 ) ) {
+			return new MavenDependency[] {
+					new MavenDependency ( "com.zaxxer:HikariCP:5.0.0" ) ,
+					new MavenDependency ( "org.mongodb:mongodb-driver-sync:4.2.1" ) ,
+					new MavenDependency ( "net.kyori:adventure-nbt:4.9.2" ) ,
+					new MavenDependency ( "xyz.xenondevs:particle:1.6.6" ) ,
+			};
+		} else {
+			return new MavenDependency[ 0 ];
+		}
 	}
 	
 	@Override

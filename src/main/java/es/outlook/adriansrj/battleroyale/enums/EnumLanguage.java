@@ -40,6 +40,15 @@ public enum EnumLanguage implements ConfigurationEntry {
 	TIME_FORMAT_SECONDS ( "time.format-seconds" , "time format that only includes seconds" ,
 						  "ss's'" ),
 	
+	MOTD_RUNNING ( "motd.running" ,
+				   "running motd" , ChatColor.RED + "Running" ),
+	MOTD_STOPPED ( "motd.stopped" ,
+				   "stopped motd" , ChatColor.DARK_RED + "Stopped" ),
+	MOTD_WAITING ( "motd.waiting" ,
+				   "waiting motd" , ChatColor.GREEN + "Waiting" ),
+	MOTD_RESTARTING ( "motd.restarting" ,
+					  "restarting motd" , ChatColor.GOLD + "Restarting" ),
+	
 	ARENA_MESSAGE_FULL ( "arena.message.full" ,
 						 "message players will receive when trying to\njoin an arena that is full" ,
 						 ChatColor.DARK_RED + "This arena is full!" ),
@@ -101,7 +110,8 @@ public enum EnumLanguage implements ConfigurationEntry {
 	
 	BORDER_STATE_RESIZE_IN_ANNOUNCEMENT_SUBTITLE (
 			"border.screen-announcement.state.resizing-in.subtitle" ,
-			"announcement subtitle to warn players that the border will resize soon (intended to show the time). new minecraft\n" +
+			"announcement subtitle to warn players that the border will resize soon (intended to show the time). new " +
+					"minecraft\n" +
 					"version requires both the title and\n" +
 					"the subtitle not to be empty in order to show" ,
 			ChatColor.GOLD + "%s" ),
@@ -117,7 +127,7 @@ public enum EnumLanguage implements ConfigurationEntry {
 			"border.screen-announcement.state.start-resizing.subtitle" ,
 			"announcement subtitle to warn players that the border is resizing (intended to show the time). new minecraft\n" +
 					"version requires both the title and\n" +
-					"the subtitle not to be empty in order to show",
+					"the subtitle not to be empty in order to show" ,
 			ChatColor.GOLD + "%s" ),
 	
 	BUS_JUMP_TITLE ( "bus.jump.title" ,
