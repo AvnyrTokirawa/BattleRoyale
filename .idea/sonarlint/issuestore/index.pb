@@ -89,8 +89,6 @@ asrc/main/java/es/outlook/adriansrj/battleroyale/battlefield/setup/BattlefieldSe
 Usrc/main/java/es/outlook/adriansrj/battleroyale/event/player/PlayerJoinTeamEvent.java,f\5\f53160c26684ae67ac4d40a57f30256cb4918e28
 á
 Wsrc/main/java/es/outlook/adriansrj/battleroyale/event/player/PlayerChangeTeamEvent.java,0\7\073d56e45797899318d8a803e1404d3c1f57fffe
-ï
-esrc/main/java/es/outlook/adriansrj/battleroyale/battlefield/minimap/renderer/MinimapRendererBase.java,b\4\b41df37d10ee0de3692fad17786b1e5c8b2c4bb7
 ñ
 fsrc/main/java/es/outlook/adriansrj/battleroyale/battlefield/minimap/renderer/MinimapRendererArena.java,4\e\4eefa1c214daa55ffe9d039a05f710ddeb0bbd8c
 |
@@ -111,8 +109,6 @@ Jsrc/main/java/es/outlook/adriansrj/battleroyale/scoreboard/Scoreboard.java,c\2
 bsrc/main/java/es/outlook/adriansrj/battleroyale/world/arena/ArenaWorldGeneratorMainv1_9_v1_12.java,7\a\7a11d640770d33b79307a107dbc8a5f44471ed53
 w
 Gsrc/main/java/es/outlook/adriansrj/battleroyale/util/WorldEditUtil.java,5\5\55ca1651a3997f06745bdc9ced5e9259857f829f
-v
-Fsrc/main/java/es/outlook/adriansrj/battleroyale/world/chunk/Chunk.java,d\3\d3ca385a76e0a281ecf7ad81b0f7473c8b092fa0
 á
 Wsrc/main/java/es/outlook/adriansrj/battleroyale/event/player/PlayerKnockedOutEvent.java,b\e\be1f069cf3abd1962eb33478f969979c8da55098
 Ç
@@ -351,8 +347,6 @@ w
 Gsrc/main/java/es/outlook/adriansrj/battleroyale/util/time/TimeUtil.java,e\a\ea2f0f22fd8bd168212d6cb04fea4a89f0c348c4
 ê
 `src/main/java/es/outlook/adriansrj/battleroyale/arena/border/BattleRoyaleArenaBorderHandler.java,5\f\5f0d6688f74eeb9ce6b16f6d34e40e7e7d89ad29
-Ä
-Psrc/main/java/es/outlook/adriansrj/battleroyale/battlefield/minimap/Minimap.java,e\5\e51207e9b70f99b4fbae55c89111b1cc503c3bf8
 {
 Ksrc/main/java/es/outlook/adriansrj/battleroyale/event/arena/ArenaEvent.java,8\7\87ef79e0f8673456d937b43bb8329f5a0a0a6903
 ~
@@ -361,8 +355,6 @@ Nsrc/main/java/es/outlook/adriansrj/battleroyale/event/arena/ArenaEndEvent.java
 ^src/main/java/es/outlook/adriansrj/battleroyale/arena/airsupply/AirSupplyGeneratorHandler.java,3\0\30eccc8c0bcbcab9747178cfaa82ed6304e7708e
 á
 Wsrc/main/java/es/outlook/adriansrj/battleroyale/arena/airsupply/AirSupplyGenerator.java,2\d\2de814cd68acf208d651578623b2566e31b11eca
-ì
-csrc/main/java/es/outlook/adriansrj/battleroyale/battlefield/minimap/generator/MinimapGenerator.java,8\a\8aa90b4785781d750941de7810d19c647e1e3d4c
 z
 Jsrc/main/java/es/outlook/adriansrj/battleroyale/enums/EnumDataVersion.java,f\9\f99da74161a553421a1a8aa426601f9602481e45
 Ñ
@@ -643,8 +635,6 @@ x
 Hsrc/main/java/es/outlook/adriansrj/battleroyale/enums/EnumArenaStat.java,6\7\672a9ec20a4cdaa7b4fe73e817f6f2c08925c43b
 â
 Ysrc/main/java/es/outlook/adriansrj/battleroyale/arena/border/BattleRoyaleArenaBorder.java,b\a\ba14053d4963e083e9f7e2bc4ffc2780ac75b885
-Å
-Qsrc/main/java/es/outlook/adriansrj/battleroyale/arena/BattleRoyaleArenaWorld.java,a\5\a5141cbc6e3d448ccf25bb93cb077a72536afdd6
 É
 Ssrc/main/java/es/outlook/adriansrj/battleroyale/lobby/BattleRoyaleLobbyHandler.java,9\9\99c5cf3dc9084dc4faa87bc7351ab9ede0564f8e
 Å
@@ -749,8 +739,6 @@ Isrc/main/java/es/outlook/adriansrj/battleroyale/enums/EnumArenaState.java,7\8\
 `src/main/java/es/outlook/adriansrj/battleroyale/placeholder/node/arena/ArenaPlaceholderNode.java,a\6\a666cd61765842cfa5092409498b11b834e9259c
 É
 Ssrc/main/java/es/outlook/adriansrj/battleroyale/arena/BattleRoyaleArenaHandler.java,b\a\ba8e93df66517339da36fbc904f6ebf0f8aeb9fa
-Ä
-Psrc/main/java/es/outlook/adriansrj/battleroyale/enums/EnumMainConfiguration.java,1\1\11c7e3f3175cf14ae7f37c450689fb142d7fcb42
 w
 Gsrc/main/java/es/outlook/adriansrj/battleroyale/enums/EnumLanguage.java,2\5\2541d3fd8e5370bdf17606096a561ecd036779a8
 á
@@ -763,3 +751,17 @@ Fsrc/main/java/es/outlook/adriansrj/battleroyale/main/BattleRoyale.java,4\e\4eb
 Ksrc/main/java/es/outlook/adriansrj/battleroyale/util/server/ServerUtil.java,5\d\5d75acec114c80c31a1cfb8999722229aec2c6c5
 Ä
 Psrc/main/java/es/outlook/adriansrj/battleroyale/arena/listener/MotdListener.java,b\7\b7a2eb33d03c97bada82aca292ea59dbae196832
+
+Osrc/main/java/es/outlook/adriansrj/battleroyale/arena/listener/EndListener.java,8\1\81463795e641665698376c91ca92d20986328b1f
+x
+Hsrc/main/java/es/outlook/adriansrj/battleroyale/mode/RunModeHandler.java,2\5\2523b0b2999d0eb0c358c53d183aabe127c47224
+Ä
+Psrc/main/java/es/outlook/adriansrj/battleroyale/enums/EnumMainConfiguration.java,1\1\11c7e3f3175cf14ae7f37c450689fb142d7fcb42
+s
+Csrc/main/java/es/outlook/adriansrj/battleroyale/enums/EnumMode.java,f\f\ffd8e7a0c2041756848e58b8d7c8a6e6b27c4ab7
+Ü
+Vsrc/main/java/es/outlook/adriansrj/battleroyale/event/arena/ArenaStateChangeEvent.java,6\f\6fd688f7c270badd963d541fbf2254c27181f13f
+|
+Lsrc/main/java/es/outlook/adriansrj/battleroyale/arena/BattleRoyaleArena.java,9\e\9e4e0be3f372dcdc646b4dd86f42dc6c8bc8cd64
+Å
+Qsrc/main/java/es/outlook/adriansrj/battleroyale/arena/BattleRoyaleArenaWorld.java,a\5\a5141cbc6e3d448ccf25bb93cb077a72536afdd6

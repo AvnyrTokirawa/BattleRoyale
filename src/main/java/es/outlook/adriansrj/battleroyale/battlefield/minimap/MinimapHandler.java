@@ -47,7 +47,7 @@ public final class MinimapHandler extends PluginHandler {
 		MapView   view   = item != null ? ItemStackUtil.getMapItemStackView ( item ) : null;
 		
 		if ( view != null && view.getRenderers ( ).stream ( )
-				.anyMatch ( renderer -> renderer instanceof MinimapRenderer ) ) {
+				.anyMatch ( MinimapRenderer.class :: isInstance ) ) {
 			// toggling zoom
 			getSettings ( player ).toggleZoom ( );
 			

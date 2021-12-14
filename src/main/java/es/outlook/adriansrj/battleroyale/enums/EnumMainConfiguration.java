@@ -24,9 +24,9 @@ public enum EnumMainConfiguration implements ConfigurationEntry {
 						"the name of the only arena to be\n" +
 								"played in this server." , "example" ),
 	
-	MODE_BUNGEE_RESTART_COMMAND ( "mode.bungee.restart-command" ,
-								  "the command to restart the server\n" +
-										  "after the arena ends." , "restart" ),
+//	MODE_BUNGEE_RESTART_COMMAND ( "mode.bungee.restart-command" ,
+//								  "the command to restart the server\n" +
+//										  "after the arena ends." , "restart" ),
 	
 	// shared mode
 	MODE_SHARED_COMMAND ( "mode.shared.command" ,

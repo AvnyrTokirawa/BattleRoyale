@@ -88,7 +88,8 @@ public class MinimapGenerator implements Closeable {
 		
 		// and now that the heightmap is done, we can apply the gradient,
 		// and fill our color matrix.
-		recalculated.stream ( ).map ( location -> chunk_provider.getChunk ( location ) ).map ( Chunk :: getSurface )
+		recalculated.stream ( ).map ( location -> chunk_provider.getChunk ( location ) )
+				.map ( Chunk :: getSurface )
 				.forEach ( surface -> surface.applyGradient ( this.heightmap ) );
 		
 		for ( int x = 0 ; x < size ; x++ ) {

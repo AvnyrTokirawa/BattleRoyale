@@ -16,11 +16,11 @@ public enum EnumMode {
 			return EnumMainConfiguration.MODE_BUNGEE_ARENA.getAsString ( ).trim ( );
 		}
 		
-		@Override
-		public String getRestartCommand ( ) {
-			return EnumMainConfiguration.MODE_BUNGEE_RESTART_COMMAND.getAsString ( )
-					.trim ( ).replace ( "/" , "" );
-		}
+//		@Override
+//		public String getRestartCommand ( ) {
+//			return EnumMainConfiguration.MODE_BUNGEE_RESTART_COMMAND.getAsString ( )
+//					.trim ( ).replace ( "/" , "" );
+//		}
 	},
 	
 	MULTIARENA,
@@ -70,19 +70,19 @@ public enum EnumMode {
 				getArenaName ( ) ).orElse ( null );
 	}
 	
-	/**
-	 * Gets the command that is to be
-	 * executed to restart the server after
-	 * the arena ends.
-	 * <br>
-	 * <b>Note that {@link #BUNGEE} is the only mode
-	 * that supports this value.</b>
-	 *
-	 * @return the name of the arena that is to be played in this server.
-	 */
-	public String getRestartCommand ( ) {
-		throw new UnsupportedOperationException ( );
-	}
+//	/**
+//	 * Gets the command that is to be
+//	 * executed to restart the server after
+//	 * the arena ends.
+//	 * <br>
+//	 * <b>Note that {@link #BUNGEE} is the only mode
+//	 * that supports this value.</b>
+//	 *
+//	 * @return the name of the arena that is to be played in this server.
+//	 */
+//	public String getRestartCommand ( ) {
+//		throw new UnsupportedOperationException ( );
+//	}
 	
 	// ----- shared
 	

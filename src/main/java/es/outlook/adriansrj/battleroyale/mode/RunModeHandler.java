@@ -1,9 +1,7 @@
 package es.outlook.adriansrj.battleroyale.mode;
 
-import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumMainConfiguration;
 import es.outlook.adriansrj.battleroyale.enums.EnumMode;
-import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.core.handler.PluginHandler;
@@ -28,7 +26,7 @@ public final class RunModeHandler extends PluginHandler {
 	}
 	
 	private final EnumMode mode;
-	private       String   arena_name;
+	//	private       String   arena_name;
 	private       String   shared_mode_command;
 	
 	/**
@@ -56,9 +54,10 @@ public final class RunModeHandler extends PluginHandler {
 							"plugin in MultiArena mode..." , plugin );
 		}
 		
-		if ( mode == EnumMode.BUNGEE ) {
+		/*if ( mode == EnumMode.BUNGEE ) {
 			this.arena_name = mode.getArenaName ( );
-		} else if ( mode == EnumMode.SHARED ) {
+		} else*/
+		if ( mode == EnumMode.SHARED ) {
 			String command         = mode.getCommand ( );
 			String default_command = ( String ) EnumMainConfiguration.MODE_SHARED_COMMAND.getDefaultValue ( );
 			
@@ -93,17 +92,17 @@ public final class RunModeHandler extends PluginHandler {
 	
 	// ----- bungee
 	
-	// this event handler restart the server when the
-	// only arena in the server ends.
-	@EventHandler ( priority = EventPriority.HIGHEST, ignoreCancelled = true )
-	public void onRestart ( ArenaStateChangeEvent event ) {
-		if ( mode == EnumMode.BUNGEE && event.getState ( ) == EnumArenaState.RESTARTING
-				&& event.getArena ( ).getName ( ).equalsIgnoreCase ( arena_name ) ) {
-			Bukkit.getScheduler ( ).runTask (
-					BattleRoyale.getInstance ( ) ,
-					( ) -> Bukkit.dispatchCommand ( Bukkit.getConsoleSender ( ) , mode.getRestartCommand ( ) ) );
-		}
-	}
+	//	// this event handler restart the server when the
+	//	// only arena in the server ends.
+	//	@EventHandler ( priority = EventPriority.HIGHEST, ignoreCancelled = true )
+	//	public void onRestart ( ArenaStateChangeEvent event ) {
+	//		if ( mode == EnumMode.BUNGEE && event.getState ( ) == EnumArenaState.RESTARTING
+	//				&& event.getArena ( ).getName ( ).equalsIgnoreCase ( arena_name ) ) {
+	//			Bukkit.getScheduler ( ).runTask (
+	//					BattleRoyale.getInstance ( ) ,
+	//					( ) -> Bukkit.dispatchCommand ( Bukkit.getConsoleSender ( ) , mode.getRestartCommand ( ) ) );
+	//		}
+	//	}
 	
 	// ----- shared
 	

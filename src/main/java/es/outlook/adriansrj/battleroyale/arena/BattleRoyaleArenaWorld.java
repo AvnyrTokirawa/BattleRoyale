@@ -297,7 +297,6 @@ public class BattleRoyaleArenaWorld {
 	 */
 	protected void disposeWorld ( Runnable callback ) {
 		if ( world != null ) {
-			
 			// must create a final reference as the world field
 			// will be set to null before even unloading
 			// the world as we're switching thread.

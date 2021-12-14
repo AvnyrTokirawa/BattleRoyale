@@ -197,7 +197,7 @@ public class BattleRoyaleArena {
 	
 	/**
 	 * Gets the restarter responsible for
-	 * scheduling task to restart this arena
+	 * scheduling a task to restart this arena
 	 * with a defined delay.
 	 *
 	 * @return the restarter useful to restart this arena.
