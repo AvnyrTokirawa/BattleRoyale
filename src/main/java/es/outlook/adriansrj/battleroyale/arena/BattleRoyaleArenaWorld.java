@@ -26,6 +26,7 @@ import org.bukkit.util.Vector;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
@@ -41,20 +42,21 @@ public class BattleRoyaleArenaWorld {
 	 */
 	public static final String PREPARED_WORLD_FOLDER_NAME = "prepared";
 	
-	// this will lock the shape method as it would
+	// this will lock the prepare method as it would
 	// consume all the heap space if multiple arenas
-	// shape at the same time.
-	protected static final ReentrantLock SHAPE_LOCK = new ReentrantLock ( );
+	// prepare at the same time.
+	protected static final ReentrantLock PREPARE_LOCK = new ReentrantLock ( );
 	
 	// this executor will provide as with a thread
 	// which we can lock to prevent lacking of heap space.
 	protected static final ExecutorService EXECUTOR_SERVICE;
 	
 	static {
+		EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getNewSingleThreadScheduledExecutor ( );
 		// we will try by using a work stealing pool.
 		// if this result in problems, then we will have
 		// to use a single thread executor instead.
-		EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getWorkStealingPool ( );
+		//		EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getWorkStealingPool ( );
 	}
 	
 	protected final BattleRoyaleArena   arena;
@@ -153,7 +155,7 @@ public class BattleRoyaleArenaWorld {
 		prepared_folder.mkdirs ( );
 		
 		EXECUTOR_SERVICE.execute ( ( ) -> {
-			SHAPE_LOCK.lock ( );
+			PREPARE_LOCK.lock ( );
 			
 			try {
 				preparing = true;
@@ -196,6 +198,15 @@ public class BattleRoyaleArenaWorld {
 					try {
 						Clipboard contents = part.loadContent ( arena.battlefield.getFolder ( ) );
 						
+						try {
+							BattleRoyale.getInstance ( ).getLogger ( ).info (
+									"Inserting part (" + part_x + ", " + part_z + "). Size: "
+											+ Files.size ( new File ( arena.battlefield.getFolder ( )
+											, part.getFileName ( ) ).toPath ( ) ) );
+						} catch ( IOException e ) {
+							e.printStackTrace ( );
+						}
+						
 						generator.insert ( contents ,
 										   new Vector ( part_block_x , 0.0D , part_block_z ) ,
 										   true );
@@ -231,7 +242,7 @@ public class BattleRoyaleArenaWorld {
 					callback.run ( );
 				}
 			} finally {
-				SHAPE_LOCK.unlock ( );
+				PREPARE_LOCK.unlock ( );
 			}
 		} );
 	}
@@ -365,7 +376,7 @@ public class BattleRoyaleArenaWorld {
 		World world = Bukkit.getWorld ( world_folder.getName ( ) );
 		
 		if ( world == null && ( world = Bukkit.getWorld ( world_folder.getAbsolutePath ( ) ) ) == null ) {
-			world = es.outlook.adriansrj.battleroyale.util.WorldUtil.loadWorldEmpty ( world_folder );
+			world = es.outlook.adriansrj.battleroyale.util.world.WorldUtil.loadWorldEmpty ( world_folder );
 		}
 		
 		new GameRuleDisableDaylightCycle ( ).apply ( world );

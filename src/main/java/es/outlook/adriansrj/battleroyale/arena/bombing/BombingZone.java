@@ -3,7 +3,7 @@ package es.outlook.adriansrj.battleroyale.arena.bombing;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.util.WorldUtil;
+import es.outlook.adriansrj.battleroyale.util.world.WorldUtil;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;

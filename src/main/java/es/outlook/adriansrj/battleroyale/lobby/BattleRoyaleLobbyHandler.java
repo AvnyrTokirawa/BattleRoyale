@@ -4,7 +4,7 @@ import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
 import es.outlook.adriansrj.battleroyale.enums.EnumLobbyConfiguration;
 import es.outlook.adriansrj.battleroyale.enums.EnumWorldGenerator;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
-import es.outlook.adriansrj.battleroyale.util.WorldUtil;
+import es.outlook.adriansrj.battleroyale.util.world.WorldUtil;
 import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
 import es.outlook.adriansrj.battleroyale.world.data.WorldData;
 import es.outlook.adriansrj.core.handler.PluginHandler;

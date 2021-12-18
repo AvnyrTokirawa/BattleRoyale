@@ -239,6 +239,16 @@ public final class ParachutesConfigHandler extends ConfigurationHandler {
 	// ------- utils
 	
 	private void saveParachute ( Parachute parachute , File file ) {
+		if ( !file.exists ( ) ) {
+			file.getParentFile ( ).mkdirs ( );
+			
+			try {
+				file.createNewFile ( );
+			} catch ( IOException e ) {
+				e.printStackTrace ( );
+			}
+		}
+		
 		YamlConfigurationComments yaml = YamlConfigurationComments.loadConfiguration ( file );
 		
 		if ( parachute.save ( yaml ) > 0 ) {

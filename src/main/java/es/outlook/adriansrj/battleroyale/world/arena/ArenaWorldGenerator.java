@@ -18,31 +18,29 @@ import java.io.File;
  */
 public interface ArenaWorldGenerator {
 	
-	public static ArenaWorldGenerator createGenerator ( File world_folder ) {
+	static ArenaWorldGenerator createGenerator ( File world_folder ) {
 		EnumDataVersion data_version = EnumDataVersion.getServerDataVersion ( );
 		
 		if ( data_version.getId ( ) < EnumDataVersion.v1_13.getId ( ) ) {
-			return new ArenaWorldGenerator12 (
-					world_folder , data_version );
+			return new ArenaWorldGenerator12 ( world_folder , data_version );
 		} else {
-			return new ArenaWorldGenerator13 (
-					world_folder , data_version );
+			return new ArenaWorldGenerator13 ( world_folder , data_version );
 		}
 	}
 	
-	public File getWorldFolder ( );
+	File getWorldFolder ( );
 	
-	public WorldData getWorldData ( );
+	WorldData getWorldData ( );
 	
-	public Region getRegion ( Location2I location );
+	Region getRegion ( Location2I location );
 	
-	public Chunk getChunk ( ChunkLocation location );
+	Chunk getChunk ( ChunkLocation location );
 	
-	public Chunk getChunkAt ( Vector vector );
+	Chunk getChunkAt ( Vector vector );
 	
-	public void setBlockAtFromLegacyId ( int x , int y , int z , int id );
+	void setBlockAtFromLegacyId ( int x , int y , int z , int id );
 	
-	public void insert ( Clipboard schematic , Vector location , boolean ignore_air_blocks );
+	void insert ( Clipboard schematic , Vector location , boolean ignore_air_blocks );
 	
-	public void save ( );
+	void save ( );
 }

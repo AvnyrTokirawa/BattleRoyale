@@ -23,6 +23,7 @@ import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.util.schematic.SchematicUtil;
+import es.outlook.adriansrj.battleroyale.util.world.WorldUtil;
 import es.outlook.adriansrj.battleroyale.vehicle.VehiclesConfiguration;
 import es.outlook.adriansrj.battleroyale.vehicle.VehiclesConfigurationRegistry;
 import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
@@ -903,8 +904,7 @@ public class BattlefieldSetupSession {
 			// so we want to keep it asynchronously.
 			EXECUTOR_SERVICE.execute ( ( ) -> {
 				try {
-					SchematicUtil.generateBattlefieldShape (
-							world , bounds.toBoundingBox ( ) , folder );
+					SchematicUtil.generateBattlefieldShape ( world , bounds.toBoundingBox ( ) , folder );
 					
 					// callback
 					if ( callback != null ) {

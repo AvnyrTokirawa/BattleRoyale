@@ -4,9 +4,12 @@ import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
 import es.outlook.adriansrj.battleroyale.schematic.generator.SchematicGenerator;
+import es.outlook.adriansrj.battleroyale.util.file.filter.RegionFileFilter;
+import es.outlook.adriansrj.battleroyale.util.world.RegionUtil;
 import es.outlook.adriansrj.core.util.file.FilenameUtil;
 import es.outlook.adriansrj.core.util.math.collision.BoundingBox;
 import es.outlook.adriansrj.core.util.server.Version;
+import es.outlook.adriansrj.core.util.world.WorldUtil;
 import org.bukkit.World;
 
 import java.io.File;
@@ -14,6 +17,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.util.Objects;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -24,10 +29,8 @@ import java.util.zip.GZIPInputStream;
 public class SchematicUtil {
 	
 	public static void generateSchematic ( World world , BoundingBox bounds , File out ) throws Exception {
-		SchematicGenerator generator = SchematicGenerator.newSchematicGenerator (
-				EnumDataVersion.getServerDataVersion ( ) );
-		
-		generator.generate ( world , bounds , out );
+		SchematicGenerator.newSchematicGenerator ( getDataVersion ( world ) )
+				.generate ( world , bounds , out );
 	}
 	
 	/**
@@ -38,14 +41,37 @@ public class SchematicUtil {
 	 * @param folder the folder of the battlefield.
 	 */
 	public static void generateBattlefieldShape ( World world , BoundingBox bounds , File folder ) {
-		SchematicGenerator generator = SchematicGenerator.newSchematicGenerator (
-				EnumDataVersion.getServerDataVersion ( ) );
-		
 		try {
-			generator.generateBattlefieldShape ( world , bounds , folder );
+			SchematicGenerator.newSchematicGenerator ( getDataVersion ( world ) )
+					.generateBattlefieldShape ( world , bounds , folder );
 		} catch ( Exception e ) {
 			e.printStackTrace ( );
 		}
+	}
+	
+	private static EnumDataVersion getDataVersion ( World world ) {
+		File            world_folder  = world.getWorldFolder ( );
+		File            region_folder = new File ( world_folder , WorldUtil.REGION_FOLDER_NAME );
+		EnumDataVersion data_version  = EnumDataVersion.getServerDataVersion ( );
+		
+		if ( region_folder.exists ( ) ) {
+			for ( File region_file : Objects.requireNonNull (
+					region_folder.listFiles ( new RegionFileFilter ( ) ) ) ) {
+				try {
+					if ( region_file.exists ( ) && Files.size ( region_file.toPath ( ) ) > 0L ) {
+						EnumDataVersion region_version = RegionUtil.getRegionDataVersion ( region_file );
+						
+						if ( region_version != null ) {
+							data_version = region_version;
+							break;
+						}
+					}
+				} catch ( IOException e ) {
+					e.printStackTrace ( );
+				}
+			}
+		}
+		return data_version;
 	}
 	
 	public static Clipboard loadSchematic ( File file )

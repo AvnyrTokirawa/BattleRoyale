@@ -8,7 +8,7 @@ import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
 import es.outlook.adriansrj.battleroyale.util.Constants;
-import es.outlook.adriansrj.battleroyale.util.WorldUtil;
+import es.outlook.adriansrj.battleroyale.util.world.WorldUtil;
 import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
 import es.outlook.adriansrj.battleroyale.util.time.Delay;
 import es.outlook.adriansrj.battleroyale.util.time.DelayPool;
