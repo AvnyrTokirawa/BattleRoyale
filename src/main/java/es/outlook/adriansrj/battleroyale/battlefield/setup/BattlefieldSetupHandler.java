@@ -24,8 +24,8 @@ public final class BattlefieldSetupHandler extends PluginHandler {
 		return PluginHandler.getPluginHandler ( BattlefieldSetupHandler.class );
 	}
 	
-	protected final Map < UUID, BattlefieldSetupSession > session_map = new ConcurrentHashMap <> ( );
-	protected final Set < Player >                        locked      = new HashSet <> ( );
+	private final Map < UUID, BattlefieldSetupSession > session_map = new ConcurrentHashMap <> ( );
+	private final Set < Player >                        locked      = new HashSet <> ( );
 	
 	/**
 	 * Constructs the plugin handler.
@@ -51,18 +51,14 @@ public final class BattlefieldSetupHandler extends PluginHandler {
 	}
 	
 	public void startSession ( final Player configurator , Battlefield input ,
-			final Consumer < BattlefieldSetupSession > callback )  {
+			final Consumer < BattlefieldSetupSession > callback ) {
 		if ( locked.add ( configurator ) ) {
-			BattlefieldSetupSession.newSetupSession (
-					configurator , input , new Consumer < BattlefieldSetupSession > ( ) {
-				@Override
-				public void accept ( BattlefieldSetupSession session ) {
-					locked.remove ( configurator );
-					
-					startSession ( session );
-					
-					callback.accept ( session );
-				}
+			BattlefieldSetupSession.newSetupSession ( configurator , input , session -> {
+				locked.remove ( configurator );
+				
+				startSession ( session );
+				
+				callback.accept ( session );
 			} );
 		} else {
 			throw new IllegalStateException ( "another session is being started" );
@@ -80,24 +76,21 @@ public final class BattlefieldSetupHandler extends PluginHandler {
 	public void startSession ( final Player configurator , Clipboard input , String name ,
 			final Consumer < BattlefieldSetupSession > callback ) throws IllegalStateException {
 		if ( locked.add ( configurator ) ) {
-			BattlefieldSetupSession.newSetupSession ( configurator , input  , name, new Consumer < BattlefieldSetupSession > ( ) {
-				@Override
-				public void accept ( BattlefieldSetupSession session ) {
-					locked.remove ( configurator );
-					
-					startSession ( session );
-					
-					callback.accept ( session );
-				}
+			BattlefieldSetupSession.newSetupSession ( configurator , input , name , session -> {
+				locked.remove ( configurator );
+				
+				startSession ( session );
+				
+				callback.accept ( session );
 			} );
 		} else {
 			throw new IllegalStateException ( "another session is being started" );
 		}
 	}
 	
-	protected BattlefieldSetupSession startSession ( BattlefieldSetupSession session ) {
+	private BattlefieldSetupSession startSession ( BattlefieldSetupSession session ) {
 		// closing current session if any.
-		getSession ( session.getOwner ( ) ).ifPresent ( current -> closeSession ( current ) );
+		getSession ( session.getOwner ( ) ).ifPresent ( this :: closeSession );
 		
 		// then registering the new one
 		session_map.put ( session.getOwner ( ).getUniqueId ( ) , session );

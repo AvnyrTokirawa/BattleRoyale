@@ -1,16 +1,17 @@
 package es.outlook.adriansrj.battleroyale.schematic.generator.v12;
 
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.schematic.generator.SchematicGeneratorBase;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
 import es.outlook.adriansrj.battleroyale.world.block.BlockTileEntity;
-import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProvider;
-import es.outlook.adriansrj.battleroyale.world.chunk.provider.ChunkProviderWorldFolder;
 import es.outlook.adriansrj.battleroyale.world.chunk.v12.Chunk12;
 import es.outlook.adriansrj.battleroyale.world.chunk.v12.ChunkSection12;
+import es.outlook.adriansrj.core.util.console.ConsoleUtil;
 import es.outlook.adriansrj.core.util.math.collision.BoundingBox;
 import net.kyori.adventure.nbt.*;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
@@ -27,9 +28,20 @@ import java.util.stream.Collectors;
  */
 public class SchematicGenerator_v12 extends SchematicGeneratorBase {
 	
-	protected final EnumDataVersion data_version;
+	protected final EnumDataVersion       data_version;
+	protected final Set < ChunkLocation > corrupted        = new HashSet <> ( );
+	protected       boolean               corrupted_logged = false;
 	
-	public SchematicGenerator_v12 ( EnumDataVersion data_version ) {
+	public SchematicGenerator_v12 ( File world_folder , EnumDataVersion data_version ) {
+		super ( world_folder );
+		Validate.isTrue ( data_version.getId ( ) <= EnumDataVersion.v1_12.getId ( ) ,
+						  "unsupported data version" );
+		
+		this.data_version = data_version;
+	}
+	
+	public SchematicGenerator_v12 ( World world , EnumDataVersion data_version ) {
+		super ( world );
 		Validate.isTrue ( data_version.getId ( ) <= EnumDataVersion.v1_12.getId ( ) ,
 						  "unsupported data version" );
 		
@@ -37,24 +49,17 @@ public class SchematicGenerator_v12 extends SchematicGeneratorBase {
 	}
 	
 	@Override
-	public void generate ( World world , BoundingBox bounds , File out ) {
-		// we're disabling the auto-saving as we don't want
-		// the world to be saved while we're acceding its files
-		final boolean autosave = world.isAutoSave ( );
-		world.setAutoSave ( false );
-		
-		// extracting required data
-		File   folder = world.getWorldFolder ( );
+	public void generatePart ( BoundingBox bounds , File out ) {
 		Vector origin = bounds.getMinimum ( );
 		int    width  = ( int ) Math.round ( bounds.getWidth ( ) );
 		int    height = ( int ) Math.round ( bounds.getHeight ( ) );
 		int    depth  = ( int ) Math.round ( bounds.getDepth ( ) );
 		
-		byte[]                   blocks         = new byte[ width * height * depth ];
-		byte[]                   add_blocks     = null;
-		byte[]                   block_data     = new byte[ width * height * depth ];
-		List < BlockTileEntity > tile_entities  = new ArrayList <> ( );
-		ChunkProvider            chunk_provider = new ChunkProviderWorldFolder ( folder );
+		// extracting required data
+		byte[]                   blocks        = new byte[ width * height * depth ];
+		byte[]                   add_blocks    = null;
+		byte[]                   block_data    = new byte[ width * height * depth ];
+		List < BlockTileEntity > tile_entities = new ArrayList <> ( );
 		
 		for ( int y = 0 ; y < height ; y++ ) {
 			int yy = origin.getBlockY ( ) + y;
@@ -65,7 +70,30 @@ public class SchematicGenerator_v12 extends SchematicGeneratorBase {
 					
 					// reading chunk
 					ChunkLocation chunk_location = new ChunkLocation ( xx >> 4 , zz >> 4 );
-					Chunk12       chunk          = ( Chunk12 ) chunk_provider.getChunk ( chunk_location );
+					Chunk12       chunk          = null;
+					
+					if ( corrupted.contains ( chunk_location ) ) {
+						// corrupted chunks may slow the process as they
+						// will not be cached by the provider, so
+						// let's skip them.
+						continue;
+					}
+					
+					try {
+						chunk = ( Chunk12 ) chunk_provider.getChunk ( chunk_location );
+					} catch ( IOException | IllegalArgumentException e ) {
+						corrupted.add ( chunk_location );
+						
+						if ( !corrupted_logged ) {
+							ConsoleUtil.sendPluginMessage (
+									ChatColor.RED , "Schematic generation may take longer than " +
+											"expected as there are some chunks that appear to be corrupted." ,
+									BattleRoyale.getInstance ( ) );
+							
+							corrupted_logged = true;
+						}
+						continue;
+					}
 					
 					// extracting block id & data
 					ChunkSection12 section = chunk != null ? chunk.getSectionFromYCoordinate ( yy ) : null;
@@ -108,9 +136,6 @@ public class SchematicGenerator_v12 extends SchematicGeneratorBase {
 				}
 			}
 		}
-		
-		// re-enabling auto-save
-		world.setAutoSave ( autosave );
 		
 		// then generating
 		generate ( width , height , depth , blocks , add_blocks , block_data , tile_entities , out );
@@ -162,5 +187,13 @@ public class SchematicGenerator_v12 extends SchematicGeneratorBase {
 		} catch ( IOException e ) {
 			e.printStackTrace ( );
 		}
+	}
+	
+	@Override
+	public void dispose ( ) {
+		super.dispose ( );
+		
+		// disposing corrupted chunks
+		corrupted.clear ( );
 	}
 }

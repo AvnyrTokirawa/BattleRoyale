@@ -30,7 +30,6 @@ import java.util.*;
  */
 public class LootConfigurationEntry implements Configurable, Cloneable {
 	
-	protected static final String REQUIRED_KEY                     = "required";
 	protected static final char   INLINE_REQUIRED_FORMAT_SEPARATOR = ':';
 	protected static final String INLINE_REQUIRED_FORMAT           = "%s" + INLINE_REQUIRED_FORMAT_SEPARATOR + "%d";
 	
@@ -44,16 +43,16 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 	protected UniversalMaterial material;
 	@ConfigurableEntry ( key = "amount" )
 	protected int               amount;
-	@ConfigurableEntry ( key = "data" )
+	@ConfigurableEntry ( key = Constants.DATA_KEY )
 	protected int               data;
 	@ConfigurableEntry ( key = "plugin-object" )
 	protected String            plugin_object;
 	@ConfigurableEntry ( key = "lore" )
 	protected List < String >   lore;
-	@ConfigurableEntry ( key = "chance" )
+	@ConfigurableEntry ( key = Constants.CHANCE_KEY )
 	protected double            chance;
 	
-	@SavableCollectionEntry ( subsection = REQUIRED_KEY, subsectionprefix = "required-" )
+	@SavableCollectionEntry ( subsection = Constants.REQUIRED_KEY, subsectionprefix = "required-" )
 	protected final Set < LootConfigurationEntry > required = new HashSet <> ( );
 	protected       Object                         required_raw;
 	
@@ -323,7 +322,7 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 		loadEntries ( section );
 		
 		// required
-		this.required_raw = section.get ( REQUIRED_KEY );
+		this.required_raw = section.get ( Constants.REQUIRED_KEY );
 		return this;
 	}
 	
@@ -413,6 +412,24 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 		if ( display_name != null ) {
 			save += YamlUtil.setNotEqual ( section , Constants.NAME_KEY ,
 										   StringUtil.untranslateAlternateColorCodes ( display_name ) ) ? 1 : 0;
+		}
+		
+		// chance must be ignored if 0
+		if ( chance == 0.0D && section.isSet ( Constants.CHANCE_KEY ) ) {
+			section.set ( Constants.CHANCE_KEY , null );
+			save ++;
+		}
+		
+		// data must be ignored if 0
+		if ( data == 0 && section.isSet ( Constants.DATA_KEY ) ) {
+			section.set ( Constants.DATA_KEY , null );
+			save ++;
+		}
+		
+		// required must be ignored if empty
+		if ( required.isEmpty ( ) && section.isSet ( Constants.REQUIRED_KEY ) ) {
+			section.set ( Constants.REQUIRED_KEY , null );
+			save ++;
 		}
 		
 		return save;

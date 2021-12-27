@@ -5,6 +5,7 @@ import es.outlook.adriansrj.battleroyale.world.region.Region;
 import es.outlook.adriansrj.core.util.world.WorldUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +40,7 @@ public class RegionProviderWorldFolder implements RegionProvider {
 	 * @return null if the region doesn't exist in the world folder.
 	 */
 	@Override
-	public Region getRegion ( int x , int z ) {
+	public Region getRegion ( int x , int z ) throws IOException, IllegalArgumentException {
 		Location2I location = new Location2I ( x , z );
 		Region     region   = region_map.get ( location );
 		
@@ -58,12 +59,12 @@ public class RegionProviderWorldFolder implements RegionProvider {
 	}
 	
 	@Override
-	public Region getRegionAtChunkCoordinates ( int x , int z ) {
+	public Region getRegionAtChunkCoordinates ( int x , int z ) throws IOException, IllegalArgumentException {
 		return getRegion ( x >> 5 , z >> 5 );
 	}
 	
 	@Override
-	public Region getRegionAtBlockCoordinates ( int x , int z ) {
+	public Region getRegionAtBlockCoordinates ( int x , int z ) throws IOException, IllegalArgumentException {
 		return getRegionAtChunkCoordinates ( x >> 4 , z >> 4 );
 	}
 }

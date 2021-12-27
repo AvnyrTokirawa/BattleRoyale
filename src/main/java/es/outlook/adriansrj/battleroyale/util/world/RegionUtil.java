@@ -1,8 +1,10 @@
 package es.outlook.adriansrj.battleroyale.util.world;
 
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
+import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.nbt.NBTConstants;
 import es.outlook.adriansrj.battleroyale.world.RegionFile;
+import es.outlook.adriansrj.battleroyale.world.region.Region;
 import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.tag.CompoundTag;
@@ -17,7 +19,16 @@ import java.io.IOException;
  */
 public class RegionUtil {
 	
-	public static EnumDataVersion getRegionDataVersion ( File region_file ) {
+	public static String formatRegionFileName ( int region_x , int region_z ) {
+		return String.format ( Region.REGION_FILE_NAME_FORMAT , region_x , region_z );
+	}
+	
+	public static String formatRegionFileName ( Location2I region_location ) {
+		return formatRegionFileName ( region_location.getX ( ) , region_location.getZ ( ) );
+	}
+	
+	public static EnumDataVersion getRegionDataVersion ( File region_file )
+			throws IOException, IllegalArgumentException {
 		try ( RegionFile handler = new RegionFile ( region_file , true ) ) {
 			for ( int x = 0 ; x < 32 ; x++ ) {
 				for ( int z = 0 ; z < 32 ; z++ ) {
@@ -47,20 +58,20 @@ public class RegionUtil {
 											if ( section_tag.containsKey ( NBTConstants.Post13.CHUNK_SECTION_PALETTE_TAG ) ) {
 												return EnumDataVersion.v1_13;
 											} else {
-												return EnumDataVersion.v1_12;
+												if ( section_tag.containsKey ( NBTConstants.Pre13.CHUNK_SECTION_BLOCKS_TAG ) ) {
+													return EnumDataVersion.v1_12;
+												} else {
+													return EnumDataVersion.v1_13;
+												}
 											}
 										}
 									}
 								}
 							}
-						} catch ( IOException ex ) {
-							ex.printStackTrace ( );
 						}
 					}
 				}
 			}
-		} catch ( IOException ex ) {
-			ex.printStackTrace ( );
 		}
 		return null;
 	}

@@ -3,6 +3,8 @@ package es.outlook.adriansrj.battleroyale.world.chunk.provider;
 import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
 import es.outlook.adriansrj.battleroyale.world.chunk.Chunk;
 
+import java.io.IOException;
+
 /**
  * @author AdrianSR / 31/08/2021 / 02:55 p. m.
  */
@@ -16,7 +18,7 @@ public interface ChunkProvider {
 	 *
 	 * @return the chunk at the specified chunk coordinates.
 	 */
-	public Chunk getChunk ( int x , int z );
+	Chunk getChunk ( int x , int z ) throws IOException, IllegalArgumentException;
 	
 	/**
 	 * Gets the chunk at the specified chunk location.
@@ -25,7 +27,7 @@ public interface ChunkProvider {
 	 *
 	 * @return the chunk at the specified chunk location.
 	 */
-	default Chunk getChunk ( ChunkLocation chunk_location ) {
+	default Chunk getChunk ( ChunkLocation chunk_location ) throws IOException, IllegalArgumentException {
 		return getChunk ( chunk_location.getX ( ) , chunk_location.getZ ( ) );
 	}
 	
@@ -37,5 +39,5 @@ public interface ChunkProvider {
 	 *
 	 * @return the chunk at the specified block coordinates.
 	 */
-	public Chunk getChunkAtBlockCoordinates ( int x , int z );
+	Chunk getChunkAtBlockCoordinates ( int x , int z ) throws IOException, IllegalArgumentException;
 }

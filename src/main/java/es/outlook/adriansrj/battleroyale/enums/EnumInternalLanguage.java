@@ -51,8 +51,10 @@ public enum EnumInternalLanguage {
 											   + ChatColor.GOLD + "%s" ),
 	TOOL_PROMPT_BATTLEFIELD_BORDER_SET ( ChatColor.GREEN + "Battlefield border resizing succession set successfully!" ),
 	
-	TOOL_BOUNDS_MINIMAP_SET ( ChatColor.GREEN + "Battlefield minimap generated successfully!" ),
-	TOOL_BOUNDS_SCHEMATIC_SET ( ChatColor.GREEN + "Battlefield schematic exported successfully!" ),
+	TOOL_BOUNDS_MINIMAP_WAIT ( ChatColor.GOLD + "* Generating minimap..." ),
+	TOOL_BOUNDS_SCHEMATIC_WAIT ( ChatColor.GOLD + "* Generating schematic..." ),
+	TOOL_BOUNDS_MINIMAP_SET ( ChatColor.GREEN + "Minimap generated successfully!" ),
+	TOOL_BOUNDS_SCHEMATIC_SET ( ChatColor.GREEN + "Schematic generated successfully!" ),
 	
 	PARACHUTE_CREATOR_PROMPT ( ChatColor.GOLD + "Please enter the name for the new parachute." ),
 	PARACHUTE_CREATOR_PROMPT_NAME_USED ( ChatColor.RED + "Another parachute with the same name already exists!" ),

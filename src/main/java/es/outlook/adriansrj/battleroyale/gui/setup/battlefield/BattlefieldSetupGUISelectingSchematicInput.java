@@ -38,7 +38,7 @@ class BattlefieldSetupGUISelectingSchematicInput extends BookItemMenu {
 		File   folder     = EnumDirectory.BATTLEFIELD_INPUT_DIRECTORY.getDirectory ( );
 		File[] schematics = folder.listFiles ( FileUtil.GENERIC_SCHEMATIC_FILE_FILTER );
 		
-		if ( schematics.length > 0 ) {
+		if ( schematics != null && schematics.length > 0 ) {
 			for ( File file : schematics ) {
 				addItem ( new SchematicItem ( file ) );
 			}

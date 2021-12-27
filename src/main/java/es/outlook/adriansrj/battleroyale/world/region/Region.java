@@ -10,6 +10,7 @@ import es.outlook.adriansrj.battleroyale.world.region.v12.Region12;
 import es.outlook.adriansrj.battleroyale.world.region.v13.Region13;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author AdrianSR / 30/08/2021 / 07:25 p. m.
@@ -26,7 +27,8 @@ public interface Region {
 		}
 	}
 	
-	static Region newRegion ( Location2I location , File file ) {
+	static Region newRegion ( Location2I location , File file )
+			throws IOException , IllegalArgumentException {
 		EnumDataVersion server_data_version = EnumDataVersion.getServerDataVersion ( );
 		
 		if ( server_data_version.getId ( ) < EnumDataVersion.v1_13.getId ( ) ) {
@@ -96,7 +98,7 @@ public interface Region {
 	
 	Chunk[][] getChunks ( );
 	
-	Chunk getChunk ( ChunkLocation location );
+	Chunk getChunk ( ChunkLocation location ) throws IOException , IllegalArgumentException;
 	
 	boolean containsChunk ( ChunkLocation location );
 	

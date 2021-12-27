@@ -57,14 +57,14 @@ public class Region12 implements Region {
 	}
 	
 	@Override
-	public Chunk12 getChunk ( ChunkLocation location ) {
+	public Chunk12 getChunk ( ChunkLocation location ) throws IOException, IllegalArgumentException {
 		int     x     = location.getX ( ) & 31;
 		int     z     = location.getZ ( ) & 31;
 		Chunk12 chunk = chunks[ x ][ z ];
 		
 		if ( chunk == null ) {
 			// reading from file
-			if ( file != null ) {
+			if ( file != null && file.exists ( ) ) {
 				// adventure nbt is not working properly, so we will
 				// use querz nbt to load the chunk.
 				try ( RegionFile handler = new RegionFile ( file , true ) ;
@@ -79,19 +79,7 @@ public class Region12 implements Region {
 									"invalid data tag: " + ( tag == null ? "null" : tag.getClass ( ).getName ( ) ) );
 						}
 					}
-				} catch ( IOException ex ) {
-					ex.printStackTrace ( );
 				}
-				
-				//				try ( RegionFile handler = new RegionFile ( file , true ) ;
-				//						DataInputStream input = handler.getChunkDataInputStream ( x , z ) ) {
-				//					if ( input != null ) {
-				//						chunks[ x ][ z ] = ( chunk = new Chunk12 (
-				//								BinaryTagIO.reader ( ).read ( ( DataInput ) input ) ) );
-				//					}
-				//				} catch ( IOException ex ) {
-				//					ex.printStackTrace ( );
-				//				}
 			}
 			
 			// file not specified, or couldn't read it,

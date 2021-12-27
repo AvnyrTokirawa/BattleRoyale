@@ -12,6 +12,7 @@ import es.outlook.adriansrj.battleroyale.world.region.Region;
 import org.bukkit.util.Vector;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author AdrianSR / 25/08/2021 / Time: 11:06 a. m.
@@ -32,15 +33,17 @@ public interface ArenaWorldGenerator {
 	
 	WorldData getWorldData ( );
 	
-	Region getRegion ( Location2I location );
+	Region getRegion ( Location2I location ) throws IOException , IllegalArgumentException;
 	
-	Chunk getChunk ( ChunkLocation location );
+	Chunk getChunk ( ChunkLocation location ) throws IOException , IllegalArgumentException;
 	
-	Chunk getChunkAt ( Vector vector );
+	Chunk getChunkAt ( Vector vector ) throws IOException , IllegalArgumentException;
 	
 	void setBlockAtFromLegacyId ( int x , int y , int z , int id );
 	
 	void insert ( Clipboard schematic , Vector location , boolean ignore_air_blocks );
+	
+	void flush ( );
 	
 	void save ( );
 }

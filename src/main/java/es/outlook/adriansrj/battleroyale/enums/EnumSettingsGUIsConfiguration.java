@@ -6,7 +6,6 @@ import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
 import es.outlook.adriansrj.core.menu.size.ItemMenuSize;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -278,8 +277,8 @@ public enum EnumSettingsGUIsConfiguration implements ConfigurationEntry {
 	EnumSettingsGUIsConfiguration ( String key , String comment , Object default_value , Class < ? > type ) {
 		this.key           = key;
 		this.comment       = comment;
-		this.default_value = default_value instanceof String ? StringEscapeUtils.escapeJava (
-				StringUtil.untranslateAlternateColorCodes ( ( String ) default_value ) ) : default_value;
+		this.default_value = default_value instanceof String ? StringUtil
+				.untranslateAlternateColorCodes ( ( String ) default_value ) : default_value;
 		this.value         = default_value;
 		this.type          = type;
 	}
@@ -331,8 +330,8 @@ public enum EnumSettingsGUIsConfiguration implements ConfigurationEntry {
 	}
 	
 	public String getAsString ( Player player ) {
-		return PlaceholderHandler.getInstance ( ).setPlaceholders ( player , StringEscapeUtils.unescapeJava (
-				StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) ) ) );
+		return PlaceholderHandler.getInstance ( ).setPlaceholders (
+				player , StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) ) );
 	}
 	
 	@Override

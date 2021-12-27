@@ -154,7 +154,8 @@ public class RegionFile implements AutoCloseable {
 	 * gets an (uncompressed) stream representing the chunk data returns null if
 	 * the chunk is not found or an error occurs
 	 */
-	public synchronized DataInputStream getChunkDataInputStream ( int x , int z ) throws IOException {
+	public synchronized DataInputStream getChunkDataInputStream ( int x , int z )
+			throws IOException , IllegalArgumentException {
 		if ( outOfBounds ( x , z ) ) {
 			debugln ( "READ" , x , z , "out of bounds" );
 			return null;

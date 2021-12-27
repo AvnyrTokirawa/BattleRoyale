@@ -4,6 +4,7 @@ import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
 import es.outlook.adriansrj.battleroyale.util.WorldEditUtil;
+import es.outlook.adriansrj.battleroyale.util.file.FileUtil;
 import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
@@ -39,6 +40,7 @@ public class ArenaWorldGenerator12 implements ArenaWorldGenerator {
 	protected final Map < Location2I, Region12 > region_map = new ConcurrentHashMap <> ( );
 	protected final WorldData12                  world_data;
 	protected final File                         world_folder;
+	protected final File                         region_folder;
 	
 	public ArenaWorldGenerator12 ( File world_folder , EnumDataVersion data_version ) {
 		Validate.notNull ( world_folder , "world folder cannot be null" );
@@ -46,8 +48,9 @@ public class ArenaWorldGenerator12 implements ArenaWorldGenerator {
 		Validate.isTrue ( data_version.getId ( ) < EnumDataVersion.v1_13.getId ( ) ,
 						  "unsupported data version" );
 		
-		this.world_data   = new WorldData12 ( data_version );
-		this.world_folder = world_folder;
+		this.world_data    = new WorldData12 ( data_version );
+		this.world_folder  = world_folder;
+		this.region_folder = FileUtil.getRegionFolder ( world_folder );
 	}
 	
 	public ArenaWorldGenerator12 ( File world_folder ) {
@@ -65,23 +68,26 @@ public class ArenaWorldGenerator12 implements ArenaWorldGenerator {
 	}
 	
 	@Override
-	public Region12 getRegion ( Location2I location ) {
+	public Region12 getRegion ( Location2I location ) throws IllegalArgumentException {
 		Region12 region = region_map.get ( location );
 		
 		if ( region == null ) {
-			region_map.put ( location , region = new Region12 ( location ) );
+			region = new Region12 ( location , FileUtil.getRegionFile (
+					region_folder , location ) );
+			
+			region_map.put ( location , region );
 		}
 		
 		return region;
 	}
 	
 	@Override
-	public Chunk12 getChunk ( ChunkLocation location ) {
+	public Chunk12 getChunk ( ChunkLocation location ) throws IOException, IllegalArgumentException {
 		return getRegion ( new Location2I ( location.getRegionX ( ) , location.getRegionZ ( ) ) ).getChunk ( location );
 	}
 	
 	@Override
-	public Chunk getChunkAt ( Vector vector ) {
+	public Chunk getChunkAt ( Vector vector ) throws IOException, IllegalArgumentException {
 		return getChunk ( new ChunkLocation ( vector.getBlockX ( ) >> 4 , vector.getBlockZ ( ) >> 4 ) );
 	}
 	
@@ -91,23 +97,43 @@ public class ArenaWorldGenerator12 implements ArenaWorldGenerator {
 	}
 	
 	public byte getBlockAt ( int x , int y , int z ) {
-		return getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).getBlock ( x & 15 , y , z & 15 );
+		try {
+			return getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).getBlock ( x & 15 , y , z & 15 );
+		} catch ( IOException e ) {
+			return 0;
+		}
 	}
 	
 	public byte getBlockAddAt ( int x , int y , int z ) {
-		return getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).getBlockAdd ( x & 15 , y , z & 15 );
+		try {
+			return getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).getBlockAdd ( x & 15 , y , z & 15 );
+		} catch ( IOException e ) {
+			return 0;
+		}
 	}
 	
 	public int getBlockIdAt ( int x , int y , int z ) {
-		return getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).getBlockId ( x & 15 , y , z & 15 );
+		try {
+			return getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).getBlockId ( x & 15 , y , z & 15 );
+		} catch ( IOException e ) {
+			return 0;
+		}
 	}
 	
 	public int getBlockDataAt ( int x , int y , int z ) {
-		return getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).getBlockData ( x & 15 , y , z & 15 );
+		try {
+			return getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).getBlockData ( x & 15 , y , z & 15 );
+		} catch ( IOException e ) {
+			return 0;
+		}
 	}
 	
 	public void setBlockAt ( int x , int y , int z , byte block ) {
-		getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).setBlock ( x & 15 , y , z & 15 , block );
+		try {
+			getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).setBlock ( x & 15 , y , z & 15 , block );
+		} catch ( IOException e ) {
+			e.printStackTrace ( );
+		}
 	}
 	
 	public void setBlockAt ( int x , int y , int z , int id , byte data ) {
@@ -116,20 +142,36 @@ public class ArenaWorldGenerator12 implements ArenaWorldGenerator {
 	}
 	
 	public void setBlockIdAt ( int x , int y , int z , int id ) {
-		getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).setBlockId ( x & 15 , y , z & 15 , id );
+		try {
+			getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).setBlockId ( x & 15 , y , z & 15 , id );
+		} catch ( IOException e ) {
+			e.printStackTrace ( );
+		}
 	}
 	
 	public void setBlockAddAt ( int x , int y , int z , byte add ) {
-		getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).setBlockAdd ( x & 15 , y , z & 15 , add );
+		try {
+			getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).setBlockAdd ( x & 15 , y , z & 15 , add );
+		} catch ( IOException e ) {
+			e.printStackTrace ( );
+		}
 	}
 	
 	public void setBlockDataAt ( int x , int y , int z , byte data ) {
-		getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).setBlockData ( x & 15 , y , z & 15 , data );
+		try {
+			getChunk ( new ChunkLocation ( x >> 4 , z >> 4 ) ).setBlockData ( x & 15 , y , z & 15 , data );
+		} catch ( IOException e ) {
+			e.printStackTrace ( );
+		}
 	}
 	
 	public void addTileEntity ( BlockTileEntity tile_entity ) {
-		getChunk ( new ChunkLocation ( tile_entity.getX ( ) >> 4 , tile_entity.getZ ( ) >> 4 ) )
-				.getTileEntities ( ).add ( tile_entity );
+		try {
+			getChunk ( new ChunkLocation ( tile_entity.getX ( ) >> 4 , tile_entity.getZ ( ) >> 4 ) )
+					.getTileEntities ( ).add ( tile_entity );
+		} catch ( IOException e ) {
+			e.printStackTrace ( );
+		}
 	}
 	
 	@Override
@@ -192,6 +234,11 @@ public class ArenaWorldGenerator12 implements ArenaWorldGenerator {
 		} catch ( ClassNotFoundException ex ) {
 			ex.printStackTrace ( );
 		}
+	}
+	
+	@Override
+	public void flush ( ) {
+		this.region_map.clear ( );
 	}
 	
 	@Override

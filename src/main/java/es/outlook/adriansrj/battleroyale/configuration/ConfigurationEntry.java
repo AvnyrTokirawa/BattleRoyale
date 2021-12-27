@@ -8,24 +8,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO: Description
- * </p>
- *
  * @author AdrianSR / 22/08/2021 / Time: 09:19 p. m.
  */
 public interface ConfigurationEntry {
 	
-	public String getKey ( );
+	String getKey ( );
 	
-	public String getComment ( );
+	String getComment ( );
 	
-	public Object getDefaultValue ( );
+	Object getDefaultValue ( );
 	
-	public Object getValue ( );
+	Object getValue ( );
 	
-	public Class < ? > getValueType ( );
+	Class < ? > getValueType ( );
 	
-	public default String getAsString ( ) {
+	default String getAsString ( ) {
 		if ( String.class.isAssignableFrom ( getValueType ( ) ) ) {
 			return getValue ( ) instanceof String ? ( ( String ) getValue ( ) ) : ( ( String ) getDefaultValue ( ) );
 		} else {
@@ -33,7 +30,7 @@ public interface ConfigurationEntry {
 		}
 	}
 	
-	public default double getAsDouble ( ) {
+	default double getAsDouble ( ) {
 		if ( Number.class.isAssignableFrom ( getValueType ( ) ) ) {
 			return getValue ( ) instanceof Number ? ( ( Number ) getValue ( ) ).doubleValue ( )
 					: ( ( Number ) getDefaultValue ( ) ).doubleValue ( );
@@ -42,7 +39,7 @@ public interface ConfigurationEntry {
 		}
 	}
 	
-	public default int getAsInteger ( ) {
+	default int getAsInteger ( ) {
 		if ( Number.class.isAssignableFrom ( getValueType ( ) ) ) {
 			return getValue ( ) instanceof Number ? ( ( Number ) getValue ( ) ).intValue ( )
 					: ( ( Number ) getDefaultValue ( ) ).intValue ( );
@@ -51,7 +48,7 @@ public interface ConfigurationEntry {
 		}
 	}
 	
-	public default long getAsLong ( ) {
+	default long getAsLong ( ) {
 		if ( Number.class.isAssignableFrom ( getValueType ( ) ) ) {
 			return getValue ( ) instanceof Number ? ( ( Number ) getValue ( ) ).longValue ( )
 					: ( ( Number ) getDefaultValue ( ) ).longValue ( );
@@ -60,7 +57,7 @@ public interface ConfigurationEntry {
 		}
 	}
 	
-	public default boolean getAsBoolean ( ) {
+	default boolean getAsBoolean ( ) {
 		if ( Boolean.class.isAssignableFrom ( this.getValueType ( ) ) ) {
 			return getValue ( ) instanceof Boolean ? ( Boolean ) getValue ( ) : ( Boolean ) getDefaultValue ( );
 		} else {
@@ -68,7 +65,7 @@ public interface ConfigurationEntry {
 		}
 	}
 	
-	public default < T extends Enum < T > > T getAsEnum ( Class < T > clazz ) {
+	default < T extends Enum < T > > T getAsEnum ( Class < T > clazz ) {
 		Object value = getValue ( );
 		
 		if ( value != null ) {
@@ -86,7 +83,7 @@ public interface ConfigurationEntry {
 	//		return Enum.valueOf ( clazz , ( ( Enum < ? > ) getValue ( ) ).name ( ) );
 	//	}
 	
-	public default List < ? > getAsList ( ) {
+	default List < ? > getAsList ( ) {
 		if ( List.class.isAssignableFrom ( this.getValueType ( ) ) ) {
 			return ( List < ? > ) getValue ( );
 		} else {
@@ -94,7 +91,7 @@ public interface ConfigurationEntry {
 		}
 	}
 	
-	public default List < String > getAsStringList ( ) {
+	default List < String > getAsStringList ( ) {
 		List < ? >      raw    = getAsList ( );
 		List < String > result = new ArrayList <> ( );
 		
@@ -107,7 +104,7 @@ public interface ConfigurationEntry {
 		return result;
 	}
 	
-	public default List < Integer > getAsIntegerList ( ) {
+	default List < Integer > getAsIntegerList ( ) {
 		List < ? >       list   = getAsList ( );
 		List < Integer > result = new ArrayList < Integer > ( );
 		
@@ -129,7 +126,7 @@ public interface ConfigurationEntry {
 		return result;
 	}
 	
-	public default List < Boolean > getAsBooleanList ( ) {
+	default List < Boolean > getAsBooleanList ( ) {
 		List < ? >       list   = getAsList ( );
 		List < Boolean > result = new ArrayList < Boolean > ( );
 		
@@ -148,7 +145,7 @@ public interface ConfigurationEntry {
 		return result;
 	}
 	
-	public default List < Double > getAasDoubleList ( ) {
+	default List < Double > getAasDoubleList ( ) {
 		List < ? >      list   = getAsList ( );
 		List < Double > result = new ArrayList < Double > ( );
 		
@@ -170,7 +167,7 @@ public interface ConfigurationEntry {
 		return result;
 	}
 	
-	public default List < Float > getAsFloatList ( ) {
+	default List < Float > getAsFloatList ( ) {
 		List < ? >     list   = getAsList ( );
 		List < Float > result = new ArrayList < Float > ( );
 		
@@ -192,7 +189,7 @@ public interface ConfigurationEntry {
 		return result;
 	}
 	
-	public default List < Long > getAsLongList ( ) {
+	default List < Long > getAsLongList ( ) {
 		List < ? >    list   = getAsList ( );
 		List < Long > result = new ArrayList < Long > ( );
 		
@@ -214,7 +211,7 @@ public interface ConfigurationEntry {
 		return result;
 	}
 	
-	public default List < Byte > getAsByteList ( ) {
+	default List < Byte > getAsByteList ( ) {
 		List < ? >    list   = getAsList ( );
 		List < Byte > result = new ArrayList < Byte > ( );
 		
@@ -236,7 +233,7 @@ public interface ConfigurationEntry {
 		return result;
 	}
 	
-	public default List < Character > getAsCharacterList ( ) {
+	default List < Character > getAsCharacterList ( ) {
 		List < ? >         list   = getAsList ( );
 		List < Character > result = new ArrayList < Character > ( );
 		
@@ -257,7 +254,7 @@ public interface ConfigurationEntry {
 		return result;
 	}
 	
-	public default List < Short > getAsShortList ( ) {
+	default List < Short > getAsShortList ( ) {
 		List < ? >     list   = getAsList ( );
 		List < Short > result = new ArrayList < Short > ( );
 		
@@ -279,7 +276,7 @@ public interface ConfigurationEntry {
 		return result;
 	}
 	
-	public default List < Map < ?, ? > > getAsMapList ( ) {
+	default List < Map < ?, ? > > getAsMapList ( ) {
 		List < ? >            list   = getAsList ( );
 		List < Map < ?, ? > > result = new ArrayList < Map < ?, ? > > ( );
 		
@@ -296,5 +293,5 @@ public interface ConfigurationEntry {
 		return result;
 	}
 	
-	public void load ( ConfigurationSection section );
+	void load ( ConfigurationSection section );
 }

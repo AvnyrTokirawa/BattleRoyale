@@ -5,7 +5,6 @@ import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
 import es.outlook.adriansrj.core.util.StringUtil;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -305,8 +304,7 @@ public enum EnumLanguage implements ConfigurationEntry {
 	EnumLanguage ( String key , String comment , String default_value , Class < ? > type ) {
 		this.key           = key;
 		this.comment       = comment;
-		this.default_value = StringEscapeUtils.escapeJava (
-				StringUtil.untranslateAlternateColorCodes ( default_value ) );
+		this.default_value = StringUtil.untranslateAlternateColorCodes ( default_value );
 		this.value         = this.default_value;
 		this.type          = type;
 	}
@@ -342,16 +340,15 @@ public enum EnumLanguage implements ConfigurationEntry {
 	
 	@Override
 	public String getAsString ( ) {
-		return getAsString ( null );
-	}
-	
-	public String getAsString ( Player player ) {
-		return PlaceholderHandler.getInstance ( ).setPlaceholders ( player , StringEscapeUtils.unescapeJava (
-				StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) ) ) );
+		return StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) );
 	}
 	
 	public String getAsStringStripColors ( ) {
 		return StringUtil.stripColors ( getAsString ( ) );
+	}
+	
+	public String getAsStringSetPlaceholders ( Player player ) {
+		return PlaceholderHandler.getInstance ( ).setPlaceholders ( player , getAsString ( ) );
 	}
 	
 	@Override

@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.configuration.lang;
 
-import es.outlook.adriansrj.battleroyale.configuration.EnumConfigurationHandler;
+import es.outlook.adriansrj.battleroyale.configuration.LanguageEnumConfigurationHandler;
 import es.outlook.adriansrj.battleroyale.enums.EnumFile;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
@@ -10,7 +10,7 @@ import java.io.File;
 /**
  * @author AdrianSR / 04/09/2021 / 03:29 p. m.
  */
-public final class BattleRoyaleLanguageConfigHandler extends EnumConfigurationHandler < EnumLanguage > {
+public final class BattleRoyaleLanguageConfigHandler extends LanguageEnumConfigurationHandler < EnumLanguage > {
 	
 	/**
 	 * Constructs the configuration handler.

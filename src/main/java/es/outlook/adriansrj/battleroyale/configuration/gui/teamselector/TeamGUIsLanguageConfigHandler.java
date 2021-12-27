@@ -1,6 +1,6 @@
 package es.outlook.adriansrj.battleroyale.configuration.gui.teamselector;
 
-import es.outlook.adriansrj.battleroyale.configuration.EnumConfigurationHandler;
+import es.outlook.adriansrj.battleroyale.configuration.LanguageEnumConfigurationHandler;
 import es.outlook.adriansrj.battleroyale.enums.EnumFile;
 import es.outlook.adriansrj.battleroyale.enums.EnumTeamGUIsLanguage;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
@@ -11,7 +11,7 @@ import java.io.File;
  * @author AdrianSR / 02/10/2021 / 08:58 a. m.
  */
 public final class TeamGUIsLanguageConfigHandler
-		extends EnumConfigurationHandler < EnumTeamGUIsLanguage > {
+		extends LanguageEnumConfigurationHandler < EnumTeamGUIsLanguage > {
 	
 	/**
 	 * Constructs the configuration handler.

@@ -5,6 +5,8 @@ import es.outlook.adriansrj.battleroyale.enums.EnumDirectory;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -70,5 +72,21 @@ public class Battlefield {
 	
 	public BattlefieldConfiguration getConfiguration ( ) {
 		return configuration;
+	}
+	
+	@Override
+	public boolean equals ( Object o ) {
+		if ( this == o ) { return true; }
+		
+		if ( o == null || getClass ( ) != o.getClass ( ) ) { return false; }
+		
+		Battlefield that = ( Battlefield ) o;
+		
+		return new EqualsBuilder ( ).append ( folder , that.folder ).isEquals ( );
+	}
+	
+	@Override
+	public int hashCode ( ) {
+		return new HashCodeBuilder ( 17 , 37 ).append ( folder ).toHashCode ( );
 	}
 }

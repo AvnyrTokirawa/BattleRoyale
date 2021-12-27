@@ -57,18 +57,18 @@ public class Region13 implements Region {
 	}
 	
 	@Override
-	public Chunk13 getChunk ( ChunkLocation location ) {
+	public Chunk13 getChunk ( ChunkLocation location ) throws IOException, IllegalArgumentException {
 		int     x     = location.getX ( ) & 31;
 		int     z     = location.getZ ( ) & 31;
 		Chunk13 chunk = chunks[ x ][ z ];
 		
 		if ( chunk == null ) {
 			// reading from file
-			if ( file != null ) {
+			//			System.out.println ( ">>>>> " + x + ", " + z + " | file = " + file );
+			
+			if ( file != null && file.exists ( ) ) {
 				// adventure nbt is not working properly, so we will
 				// use querz nbt to load the chunk.
-//				System.out.println ( ">>>>> " + x + ", " + z );
-				
 				try ( RegionFile handler = new RegionFile ( file , true ) ;
 						DataInputStream input = handler.getChunkDataInputStream ( x , z ) ) {
 					if ( input != null ) {
@@ -83,12 +83,10 @@ public class Region13 implements Region {
 						//						chunks[ x ][ z ] = ( chunk = new Chunk13 (
 						//								BinaryTagIO.reader ( ).read ( ( DataInput ) input ) ) );
 					}
-				} catch ( IOException ex ) {
-					ex.printStackTrace ( );
 				}
 			}
 			
-			// file not specified, or couldn't read it,
+			// file doesn't exit, not specified, couldn't read it,
 			// or this chunk doesn't exist in the file.
 			if ( chunk == null ) {
 				chunks[ x ][ z ] = ( chunk = new Chunk13 ( location ) );
@@ -130,7 +128,6 @@ public class Region13 implements Region {
 				
 				// writing chunks
 				try ( RegionFile handler = new RegionFile ( file ) ) {
-					
 					for ( int x = 0 ; x < chunks.length ; x++ ) {
 						for ( int z = 0 ; z < chunks[ 0 ].length ; z++ ) {
 							ChunkLocation location = new ChunkLocation ( x , z );

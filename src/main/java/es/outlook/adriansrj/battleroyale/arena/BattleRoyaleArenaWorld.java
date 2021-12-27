@@ -26,7 +26,6 @@ import org.bukkit.util.Vector;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
@@ -45,14 +44,14 @@ public class BattleRoyaleArenaWorld {
 	// this will lock the prepare method as it would
 	// consume all the heap space if multiple arenas
 	// prepare at the same time.
-	protected static final ReentrantLock PREPARE_LOCK = new ReentrantLock ( );
+	public static final ReentrantLock PREPARE_LOCK = new ReentrantLock ( );
 	
-	// this executor will provide as with a thread
-	// which we can lock to prevent lacking of heap space.
-	protected static final ExecutorService EXECUTOR_SERVICE;
+	// this executor will provide a thread which
+	// we can lock to prevent lacking of heap space.
+	public static final ExecutorService PREPARE_EXECUTOR;
 	
 	static {
-		EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getNewSingleThreadScheduledExecutor ( );
+		PREPARE_EXECUTOR = ScheduledExecutorPool.getInstance ( ).getNewSingleThreadScheduledExecutor ( );
 		// we will try by using a work stealing pool.
 		// if this result in problems, then we will have
 		// to use a single thread executor instead.
@@ -154,7 +153,7 @@ public class BattleRoyaleArenaWorld {
 		
 		prepared_folder.mkdirs ( );
 		
-		EXECUTOR_SERVICE.execute ( ( ) -> {
+		PREPARE_EXECUTOR.execute ( ( ) -> {
 			PREPARE_LOCK.lock ( );
 			
 			try {
@@ -198,20 +197,13 @@ public class BattleRoyaleArenaWorld {
 					try {
 						Clipboard contents = part.loadContent ( arena.battlefield.getFolder ( ) );
 						
-						try {
-							BattleRoyale.getInstance ( ).getLogger ( ).info (
-									"Inserting part (" + part_x + ", " + part_z + "). Size: "
-											+ Files.size ( new File ( arena.battlefield.getFolder ( )
-											, part.getFileName ( ) ).toPath ( ) ) );
-						} catch ( IOException e ) {
-							e.printStackTrace ( );
-						}
-						
 						generator.insert ( contents ,
 										   new Vector ( part_block_x , 0.0D , part_block_z ) ,
 										   true );
 						
-						// disposing, we need that heap space.
+						// saving heap space.
+						generator.save ( );
+						generator.flush ( );
 						contents = null;
 						
 						// printing progress
@@ -235,6 +227,7 @@ public class BattleRoyaleArenaWorld {
 				
 				// saving and disposing, we need that heap space.
 				generator.save ( );
+				generator.flush ( );
 				generator = null;
 				
 				// callback

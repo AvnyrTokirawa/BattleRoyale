@@ -7,10 +7,12 @@ import es.outlook.adriansrj.battleroyale.bus.BusRegistry;
 import es.outlook.adriansrj.battleroyale.compass.CompassBar;
 import es.outlook.adriansrj.battleroyale.compass.CompassBarSimple;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
+import es.outlook.adriansrj.battleroyale.enums.EnumMode;
 import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaLeaveEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaPreLeaveEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaSetEvent;
+import es.outlook.adriansrj.battleroyale.mode.RunModeHandler;
 import es.outlook.adriansrj.battleroyale.parachute.Parachute;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteRegistry;
@@ -260,7 +262,7 @@ public final class Player extends PlayerWrapper {
 			if ( current != null ) {
 				if ( current.getState ( ) == EnumArenaState.RUNNING ) {
 					throw new UnsupportedOperationException (
-							"cannot set player arena while is in arena that is running" );
+							"cannot set player arena while in an arena that is running" );
 				}
 				
 				// must leave team too
@@ -277,10 +279,18 @@ public final class Player extends PlayerWrapper {
 		}
 	}
 	
+	/**
+	 * Makes the player leave the arena.
+	 * <br>
+	 * <b>Note that this will not have any effect if the
+	 * plugin is running in {@link EnumMode#BUNGEE} mode</b>.
+	 *
+	 * @return whether player left the arena.
+	 */
 	public synchronized boolean leaveArena ( ) {
 		final BattleRoyaleArena current = this.arena;
 		
-		if ( current != null ) {
+		if ( current != null && RunModeHandler.getInstance ( ).getMode ( ) != EnumMode.BUNGEE ) {
 			// firing pre-event
 			new PlayerArenaPreLeaveEvent ( this , current ).callSafe ( );
 			

@@ -12,6 +12,7 @@ import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.metrics.Metrics;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
+import es.outlook.adriansrj.battleroyale.util.file.FileUtil;
 import es.outlook.adriansrj.battleroyale.world.chunk.EmptyChunkGenerator;
 import es.outlook.adriansrj.core.dependency.MavenDependency;
 import es.outlook.adriansrj.core.dependency.MavenDependencyRepository;
@@ -20,7 +21,6 @@ import es.outlook.adriansrj.core.plugin.Plugin;
 import es.outlook.adriansrj.core.plugin.PluginAdapter;
 import es.outlook.adriansrj.core.util.console.ConsoleUtil;
 import es.outlook.adriansrj.core.util.server.Version;
-import org.apache.commons.io.FileDeleteStrategy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -43,7 +43,7 @@ public final class BattleRoyale extends PluginAdapter {
 	
 	@Override
 	public MavenDependencyRepository[] getLibraryRepositories ( ) {
-		if ( Version.getServerVersion ( ).isOlder ( Version.v1_17_R1 ) ) {
+		if ( Version.getServerVersion ( ).isOlder ( Version.v1_16_R3 ) ) {
 			return new MavenDependencyRepository[] {
 					new MavenDependencyRepository ( "jitpack" , "https://jitpack.io/" )
 			};
@@ -54,7 +54,7 @@ public final class BattleRoyale extends PluginAdapter {
 	
 	@Override
 	public MavenDependency[] getLibraries ( ) {
-		if ( Version.getServerVersion ( ).isOlder ( Version.v1_17_R1 ) ) {
+		if ( Version.getServerVersion ( ).isOlder ( Version.v1_16_R3 ) ) {
 			return new MavenDependency[] {
 					new MavenDependency ( "com.zaxxer:HikariCP:5.0.0" ) ,
 					new MavenDependency ( "org.mongodb:mongodb-driver-sync:4.2.1" ) ,
@@ -166,9 +166,9 @@ public final class BattleRoyale extends PluginAdapter {
 		
 		// shutting down scheduled executors
 		ScheduledExecutorPool.getInstance ( ).clear ( );
-		
-		// cleaning temp folder
-		deleteTempFolder ( );
+		//
+		//		// cleaning temp folder
+		//		deleteTempFolder ( );
 	}
 	
 	private void deleteTempFolder ( ) {
@@ -176,7 +176,7 @@ public final class BattleRoyale extends PluginAdapter {
 		
 		try {
 			if ( folder.exists ( ) ) {
-				FileDeleteStrategy.FORCE.delete ( folder );
+				FileUtil.deleteDirectory ( folder );
 			}
 		} catch ( Exception ex ) {
 			// ignored exception

@@ -28,29 +28,43 @@ import java.util.zip.GZIPInputStream;
  */
 public class SchematicUtil {
 	
-	public static void generateSchematic ( World world , BoundingBox bounds , File out ) throws Exception {
-		SchematicGenerator.newSchematicGenerator ( getDataVersion ( world ) )
-				.generate ( world , bounds , out );
-	}
-	
 	/**
 	 * Blocks until done.
+	 * <br>
+	 * World save method <b>should not</b> be called before
+	 * calling this method.
 	 *
-	 * @param world
-	 * @param bounds
+	 * @param world_folder world folder.
+	 * @param bounds the bounds of the area to generate the schematic from.
 	 * @param folder the folder of the battlefield.
 	 */
-	public static void generateBattlefieldShape ( World world , BoundingBox bounds , File folder ) {
+	public static void generateBattlefieldShape ( File world_folder , BoundingBox bounds , File folder ) {
+		SchematicGenerator generator = SchematicGenerator.newSchematicGenerator (
+				world_folder , getDataVersion ( world_folder ) );
+		
 		try {
-			SchematicGenerator.newSchematicGenerator ( getDataVersion ( world ) )
-					.generateBattlefieldShape ( world , bounds , folder );
+			generator.generateBattlefieldShape ( bounds , folder );
+			generator.dispose ( );
 		} catch ( Exception e ) {
 			e.printStackTrace ( );
 		}
 	}
 	
-	private static EnumDataVersion getDataVersion ( World world ) {
-		File            world_folder  = world.getWorldFolder ( );
+	/**
+	 * Blocks until done.
+	 * <br>
+	 * World save method <b>should not</b> be called before
+	 * calling this method.
+	 *
+	 * @param world world to extract data from.
+	 * @param bounds the bounds of the area to generate the schematic from.
+	 * @param folder the folder of the battlefield.
+	 */
+	public static void generateBattlefieldShape ( World world , BoundingBox bounds , File folder ) {
+		generateBattlefieldShape ( world.getWorldFolder ( ) , bounds , folder );
+	}
+	
+	private static EnumDataVersion getDataVersion ( File world_folder ) {
 		File            region_folder = new File ( world_folder , WorldUtil.REGION_FOLDER_NAME );
 		EnumDataVersion data_version  = EnumDataVersion.getServerDataVersion ( );
 		
@@ -59,11 +73,15 @@ public class SchematicUtil {
 					region_folder.listFiles ( new RegionFileFilter ( ) ) ) ) {
 				try {
 					if ( region_file.exists ( ) && Files.size ( region_file.toPath ( ) ) > 0L ) {
-						EnumDataVersion region_version = RegionUtil.getRegionDataVersion ( region_file );
-						
-						if ( region_version != null ) {
-							data_version = region_version;
-							break;
+						try {
+							EnumDataVersion region_version = RegionUtil.getRegionDataVersion ( region_file );
+							
+							if ( region_version != null ) {
+								data_version = region_version;
+								break;
+							}
+						} catch ( IOException | IllegalArgumentException ignored ) {
+							// ignoring corrupted region file
 						}
 					}
 				} catch ( IOException e ) {

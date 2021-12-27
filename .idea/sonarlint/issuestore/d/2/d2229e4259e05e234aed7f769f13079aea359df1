@@ -2,8 +2,12 @@
 f
 java:S1149*"PReplace the synchronized class "Stack" by an unsynchronized one such as "Deque".(μη«Ά
 P
+java:S1874"2Remove this use of "hidePlayer"; it is deprecated.(¥›ύ8Ξªύπέ/
+P
 java:S1874¤"4Remove this use of "setPassenger"; it is deprecated.(€ϋς»ώÿÿÿÿ
-H
-java:S1602Χ",Remove useless curly braces around statement(™κΖιÿÿÿÿÿ
+U
+java:S1874Ί"2Remove this use of "showPlayer"; it is deprecated.(ηΊ±³ψÿÿÿÿ8Ωªύπέ/
+R
+java:S1144ΰ"4Remove this unused private "displacePlayers" method.(°΅Σ8ίªύπέ/
 E
 java:S1121ψ".Extract the assignment out of this expression.(¤Ξ¦

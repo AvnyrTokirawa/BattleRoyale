@@ -3,6 +3,8 @@ package es.outlook.adriansrj.battleroyale.world.region.provider;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.world.region.Region;
 
+import java.io.IOException;
+
 /**
  * @author AdrianSR / 31/08/2021 / 02:59 p. m.
  */
@@ -15,8 +17,10 @@ public interface RegionProvider {
 	 * @param z region z coordinate.
 	 *
 	 * @return the region at the specified region coordinates.
+	 * @throws IOException if there was a problem loading the region.
+	 * @throws IllegalArgumentException if there was a problem processing the region.
 	 */
-	public Region getRegion ( int x , int z );
+	Region getRegion ( int x , int z ) throws IOException, IllegalArgumentException;
 	
 	/**
 	 * Gets the region at the specified location.
@@ -24,7 +28,7 @@ public interface RegionProvider {
 	 * @param location the region location.
 	 * @return the region at the specified location.
 	 */
-	default Region getRegion ( Location2I location ) {
+	default Region getRegion ( Location2I location ) throws IOException, IllegalArgumentException {
 		return getRegion ( location.getX ( ) , location.getZ ( ) );
 	}
 	
@@ -36,7 +40,7 @@ public interface RegionProvider {
 	 *
 	 * @return the region at the specified chunk coordinates.
 	 */
-	public Region getRegionAtChunkCoordinates ( int x , int z );
+	Region getRegionAtChunkCoordinates ( int x , int z ) throws IOException, IllegalArgumentException;
 	
 	/**
 	 * Gets the region at the specified block coordinates.
@@ -46,5 +50,5 @@ public interface RegionProvider {
 	 *
 	 * @return the region at the specified block coordinates.
 	 */
-	public Region getRegionAtBlockCoordinates ( int x , int z );
+	Region getRegionAtBlockCoordinates ( int x , int z ) throws IOException, IllegalArgumentException;
 }

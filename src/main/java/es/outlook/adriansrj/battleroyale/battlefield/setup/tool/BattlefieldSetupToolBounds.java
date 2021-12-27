@@ -80,7 +80,9 @@ public class BattlefieldSetupToolBounds extends BattlefieldSetupToolItem {
 		player.sendMessage ( ChatColor.GOLD + ( action.isLeftClick ( ) ? "First" : "Second" ) + " corner set." );
 		
 		if ( corner_a != null && corner_b != null ) {
-			player.sendMessage ( ChatColor.GOLD + "Bounds set successfully! Calculating stuff..." );
+			player.sendMessage ( ChatColor.GOLD + "Bounds set successfully!" );
+			player.sendMessage ( EnumInternalLanguage.TOOL_BOUNDS_MINIMAP_WAIT.toString ( ) );
+			player.sendMessage ( EnumInternalLanguage.TOOL_BOUNDS_SCHEMATIC_WAIT.toString ( ) );
 			
 			Consumer < Minimap > minimap_callback = minimap -> {
 				// we will give the minimap item to any

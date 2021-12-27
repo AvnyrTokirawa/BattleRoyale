@@ -4,7 +4,6 @@ import es.outlook.adriansrj.battleroyale.configuration.ConfigurationEntry;
 import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
 import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
 import es.outlook.adriansrj.core.util.StringUtil;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -92,8 +91,7 @@ public enum EnumTeamGUIsLanguage implements ConfigurationEntry {
 	EnumTeamGUIsLanguage ( String key , String comment , String default_value ) {
 		this.key           = key;
 		this.comment       = comment;
-		this.default_value = StringEscapeUtils.escapeJava (
-				StringUtil.untranslateAlternateColorCodes ( default_value ) );
+		this.default_value = StringUtil.untranslateAlternateColorCodes ( default_value );
 		this.value         = this.default_value;
 	}
 	
@@ -132,8 +130,8 @@ public enum EnumTeamGUIsLanguage implements ConfigurationEntry {
 	}
 	
 	public String getAsString ( Player player ) {
-		return PlaceholderHandler.getInstance ( ).setPlaceholders ( player , StringEscapeUtils.unescapeJava (
-				StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) ) ) );
+		return PlaceholderHandler.getInstance ( ).setPlaceholders (
+				player , StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) ) );
 	}
 	
 	public List < String > getAsStringList ( ) {

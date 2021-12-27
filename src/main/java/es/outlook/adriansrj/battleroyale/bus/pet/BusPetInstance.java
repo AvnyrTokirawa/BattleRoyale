@@ -136,6 +136,9 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 	protected void putPlayer0 ( org.bukkit.entity.Player player ) {
 		syncCheck ( );
 		
+		player.setAllowFlight ( true );
+		player.setFlying ( true );
+		
 		this.seat = arena.getWorld ( ).spawn (
 				getLocation ( ).toLocation ( arena.getWorld ( ) , spawn.getYaw ( ) , 0.0F ) ,
 				Chicken.class );
@@ -199,6 +202,8 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 			seat = null;
 		}
 		
+		player.setAllowFlight ( false );
+		player.setFlying ( false );
 		player.setCanOpenParachute ( true ); // parachute
 		player.getBukkitPlayerOptional ( ).ifPresent ( player -> {
 			// disabling fly

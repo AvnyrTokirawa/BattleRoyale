@@ -266,7 +266,8 @@ public class AirSupply {
 		for ( int y = arena.getWorld ( ).getMaxHeight ( ) - 1 ; y >= 0 ; y-- ) {
 			Block block = arena.getWorld ( ).getBlockAt ( location.getX ( ) , y , location.getZ ( ) );
 			
-			if ( block.getType ( ).isSolid ( ) || ( !block.isLiquid ( ) && !block.isEmpty ( ) ) ) {
+			if ( ( block.getType ( ).isSolid ( ) || ( !block.isLiquid ( ) && !block.isEmpty ( ) ) )
+					&& block.getRelative ( BlockFace.UP ).isEmpty ( ) ) {
 				ground = block;
 				break;
 			}

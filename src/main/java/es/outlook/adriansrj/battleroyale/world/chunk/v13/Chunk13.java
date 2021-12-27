@@ -7,13 +7,11 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import es.outlook.adriansrj.battleroyale.enums.EnumDataVersion;
-import es.outlook.adriansrj.battleroyale.util.ColorUtil;
 import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
 import es.outlook.adriansrj.battleroyale.util.nbt.NBTConstants;
 import es.outlook.adriansrj.battleroyale.world.Material;
 import es.outlook.adriansrj.battleroyale.world.RegionFile;
 import es.outlook.adriansrj.battleroyale.world.block.BlockColor;
-import es.outlook.adriansrj.battleroyale.world.block.BlockColorCustom;
 import es.outlook.adriansrj.battleroyale.world.block.BlockColorDefault;
 import es.outlook.adriansrj.battleroyale.world.block.BlockTileEntity;
 import es.outlook.adriansrj.battleroyale.world.block.v13.BlockColorMap13;
@@ -26,11 +24,9 @@ import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
 import org.apache.commons.lang.Validate;
 
-import java.awt.*;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -167,7 +163,7 @@ public class Chunk13 implements Chunk {
 	public void recalculateHeightmap ( ) {
 		for ( int x = 0 ; x < 16 ; x++ ) {
 			for ( int z = 0 ; z < 16 ; z++ ) {
-				for ( int y = 255 ; y > 0 ; y-- ) {
+				for ( int y = 255 ; y >= 0 ; y-- ) {
 					ChunkSection13 section  = getSectionFromYCoordinate ( y );
 					Material       material = section.getMaterial ( x , y & 15 , z );
 					
@@ -204,47 +200,51 @@ public class Chunk13 implements Chunk {
 					}
 					
 					if ( block_color != BlockColorDefault.AIR ) {
-						// depth effect on water surfaces.
-						if ( block_color == BlockColorDefault.WATER ) {
-							// here we're implementing a depth effect on water surfaces.
-							int depth = 1;
-							y -= 1;
-							
-							for ( ; y >= 0 ; y-- ) {
-								section = getSectionFromYCoordinate ( y );
-								
-								if ( ( block_color = BlockColorMap13.INSTANCE.getColor (
-										section.getMaterial ( x , y & 0xF , z )
-												.getNamespacedId ( ) ) ) != BlockColorDefault.WATER ) {
-									break;
-								}
-								
-								depth += 1;
-							}
-							
-							float   alpha  = Math.max ( 0.0F , Math.min ( depth / 32.0F , 1.0F ) );
-							float[] colors = block_color.getColor ( ).getRGBComponents ( null );
-							
-							Color background = new Color ( 100.0F / 255.0F , 0.8F , 1.0F );
-							Color color      = new Color ( colors[ 0 ] , colors[ 1 ] , colors[ 2 ] , alpha );
-							
-							int r = color.getRed ( ) * color.getAlpha ( ) + background.getRed ( )
-									* ( 255 - color.getAlpha ( ) );
-							int g = color.getGreen ( ) * color.getAlpha ( ) + background.getGreen ( )
-									* ( 255 - color.getAlpha ( ) );
-							int b = color.getBlue ( ) * color.getAlpha ( ) + background.getBlue ( )
-									* ( 255 - color.getAlpha ( ) );
-							
-							float[] blend = ColorUtil.blend (
-									new float[] { r / 255.0F , g / 255.0F , b / 255.0F , 1.0F } ,
-									new float[] { colors[ 0 ] , colors[ 1 ] , colors[ 2 ] , alpha } );
-							
-							surface.setColor ( x , z , new BlockColorCustom (
-									new Color ( blend[ 0 ] / 255 , blend[ 1 ] / 255 ,
-												blend[ 2 ] / 255 , blend[ 3 ] ).getRGB ( ) ) );
-						} else {
-							surface.setColor ( x , z , block_color );
-						}
+						surface.setColor ( x , z , block_color );
+						
+						// depth effect disabled for now as is not working properly
+						//						// depth effect on water surfaces.
+						//						if ( block_color == BlockColorDefault.WATER ) {
+						//							// here we're implementing a depth effect on water surfaces.
+						//							int depth = 1;
+						//							y -= 1;
+						//
+						//							for ( ; y >= 0 ; y-- ) {
+						//								section = getSectionFromYCoordinate ( y );
+						//
+						//								if ( ( block_color = BlockColorMap13.INSTANCE.getColor (
+						//										section.getMaterial ( x , y & 0xF , z )
+						//												.getNamespacedId ( ) ) ) != BlockColorDefault.WATER ) {
+						//									break;
+						//								}
+						//
+						//								depth += 1;
+						//							}
+						//
+						//							float   alpha  = Math.max ( 0.0F , Math.min ( depth / 32.0F , 1.0F ) );
+						//							float[] colors = block_color.getColor ( ).getRGBComponents ( null );
+						//
+						//							Color background = new Color ( 100.0F / 255.0F , 0.8F , 1.0F );
+						//							Color color      = new Color ( colors[ 0 ] , colors[ 1 ] , colors[ 2 ] ,
+						//							alpha );
+						//
+						//							int r = color.getRed ( ) * color.getAlpha ( ) + background.getRed ( )
+						//									* ( 255 - color.getAlpha ( ) );
+						//							int g = color.getGreen ( ) * color.getAlpha ( ) + background.getGreen ( )
+						//									* ( 255 - color.getAlpha ( ) );
+						//							int b = color.getBlue ( ) * color.getAlpha ( ) + background.getBlue ( )
+						//									* ( 255 - color.getAlpha ( ) );
+						//
+						//							float[] blend = ColorUtil.blend (
+						//									new float[] { r / 255.0F , g / 255.0F , b / 255.0F , 1.0F } ,
+						//									new float[] { colors[ 0 ] , colors[ 1 ] , colors[ 2 ] , alpha } );
+						//
+						//							surface.setColor ( x , z , new BlockColorCustom (
+						//									new Color ( blend[ 0 ] / 255 , blend[ 1 ] / 255 ,
+						//												blend[ 2 ] / 255 , blend[ 3 ] ).getRGB ( ) ) );
+						//						} else {
+						//							surface.setColor ( x , z , block_color );
+						//						}
 					} else {
 						// transparency
 						surface.setColor ( x , z , BlockColorDefault.AIR );
@@ -396,7 +396,6 @@ public class Chunk13 implements Chunk {
 		
 		level.put ( NBTConstants.Post13.CHUNK_STATUS_TAG , StringBinaryTag.of ( status.getName ( ) ) );
 		level.put ( NBTConstants.Post13.CHUNK_ENTITIES_TAG , ListBinaryTag.empty ( ) );
-		level.put ( NBTConstants.Post13.CHUNK_TILE_ENTITIES_TAG , ListBinaryTag.empty ( ) );
 		
 		root.put ( NBTConstants.Post13.CHUNK_LEVEL_TAG , CompoundBinaryTag.from ( level ) );
 		root.put ( NBTConstants.Post13.CHUNK_DATA_VERSION_TAG , IntBinaryTag.of ( data_version ) );

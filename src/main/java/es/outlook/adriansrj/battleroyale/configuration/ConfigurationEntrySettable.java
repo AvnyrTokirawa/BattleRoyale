@@ -5,5 +5,5 @@ package es.outlook.adriansrj.battleroyale.configuration;
  */
 public interface ConfigurationEntrySettable extends ConfigurationEntry {
 	
-	public void setValue ( Object value );
+	void setValue ( Object value );
 }

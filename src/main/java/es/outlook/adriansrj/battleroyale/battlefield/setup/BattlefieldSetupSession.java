@@ -1,6 +1,8 @@
 package es.outlook.adriansrj.battleroyale.battlefield.setup;
 
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
+import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaWorld;
 import es.outlook.adriansrj.battleroyale.battlefield.Battlefield;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldConfiguration;
 import es.outlook.adriansrj.battleroyale.battlefield.BattlefieldShape;
@@ -17,7 +19,10 @@ import es.outlook.adriansrj.battleroyale.game.loot.LootConfigurationRegistry;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.schedule.ScheduledExecutorPool;
-import es.outlook.adriansrj.battleroyale.util.*;
+import es.outlook.adriansrj.battleroyale.util.Constants;
+import es.outlook.adriansrj.battleroyale.util.MiniMapUtil;
+import es.outlook.adriansrj.battleroyale.util.StringUtil;
+import es.outlook.adriansrj.battleroyale.util.WorldEditUtil;
 import es.outlook.adriansrj.battleroyale.util.file.FileUtil;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
@@ -28,13 +33,11 @@ import es.outlook.adriansrj.battleroyale.vehicle.VehiclesConfiguration;
 import es.outlook.adriansrj.battleroyale.vehicle.VehiclesConfigurationRegistry;
 import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
 import es.outlook.adriansrj.battleroyale.world.data.WorldData;
-import es.outlook.adriansrj.core.util.AsyncCatcherUtil;
 import es.outlook.adriansrj.core.util.console.ConsoleUtil;
 import es.outlook.adriansrj.core.util.file.filter.FileExtensionFilter;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
 import es.outlook.adriansrj.core.util.math.Vector3D;
 import es.outlook.adriansrj.core.util.math.collision.BoundingBox;
-import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
 import es.outlook.adriansrj.core.util.server.Version;
 import es.outlook.adriansrj.core.util.world.GameRuleDisableDaylightCycle;
 import es.outlook.adriansrj.core.util.world.GameRuleType;
@@ -58,10 +61,15 @@ import java.util.function.Consumer;
  */
 public class BattlefieldSetupSession {
 	
-	protected static final ExecutorService EXECUTOR_SERVICE;
+	// executor service for starting new setup sessions
+	protected static final ExecutorService INITIALIZER_EXECUTOR_SERVICE;
+	// executor service in a single thread for calculating
+	// the battlefield schematic/minimap.
+	protected static final ExecutorService SHAPE_EXECUTOR_SERVICE;
 	
 	static {
-		EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getWorkStealingPool ( );
+		INITIALIZER_EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getSingleThreadScheduledExecutor ( );
+		SHAPE_EXECUTOR_SERVICE       = ScheduledExecutorPool.getInstance ( ).getSingleThreadScheduledExecutor ( );
 	}
 	
 	// this creator is for cases where the input is a battlefield.
@@ -70,86 +78,133 @@ public class BattlefieldSetupSession {
 	// will be recovered.
 	protected static void newSetupSession ( Player configurator , Battlefield battlefield ,
 			Consumer < BattlefieldSetupSession > callback ) {
-		File                     world_folder  = getNewTempWorldFolder ( );
-		BattlefieldConfiguration configuration = battlefield.getConfiguration ( );
-		String                   name          = battlefield.getName ( );
-		Minimap                  minimap       = battlefield.getMinimap ( );
-		BattlefieldShape         shape         = battlefield.getShape ( );
+		BattlefieldShape shape = battlefield.getShape ( );
 		
 		if ( shape != null && shape.getSize ( ) > 0 ) {
-			EXECUTOR_SERVICE.execute ( ( ) -> {
-				/* world generation */
-				ArenaWorldGenerator generator = createGenerator ( world_folder );
-				
-				// inserting and centering shape.
-				// the shape will be inserted in the 0,0,0
-				// coordinates, so we can save unit-locations
-				// that allows us to relocate them later.
-				int size_half = shape.getSize ( ) / 2;
-				int index     = 0;
-				
-				for ( BattlefieldShapePart part : shape.getParts ( ).values ( ) ) {
-					Location2I part_location = part.getLocation ( );
-					int        part_x        = part_location.getX ( );
-					int        part_z        = part_location.getZ ( );
-					int        part_block_x  = ( part_x << 7 ) - size_half;
-					int        part_block_z  = ( part_z << 7 ) - size_half;
-					
-					try {
-						// it will load the schematic of the part,
-						// and the garbage collector should dispose
-						// it, so we don't have to worry about heap space.
-						generator.insert ( part.loadContent ( battlefield.getFolder ( ) ) ,
-										   new Vector ( part_block_x , 0.0D , part_block_z ) ,
-										   true );
-						
-						// printing progress
-						BattleRoyale.getInstance ( ).getLogger ( ).info (
-								"Preparing battlefield for setup... " +
-										( 100.0D * ( ( double ) ++index / shape.getParts ( ).size ( ) ) ) + "%" );
-					} catch ( FileNotFoundException ex ) {
-						// we want to be able to load incomplete
-						// battlefield shapes as we don't want
-						// to lose a whole battlefield just for a missing part.
-						BattleRoyale.getInstance ( ).getLogger ( ).warning (
-								"Missing battlefield shape part file (" + part_x + ", " + part_z + ")" );
-					}
+			// we will load a copy of the prepared world to make
+			// this process faster. we will prepare it if
+			// never prepared before.
+			File prepared = new File ( battlefield.getFolder ( ) ,
+									   BattleRoyaleArenaWorld.PREPARED_WORLD_FOLDER_NAME );
+			
+			if ( prepared.exists ( ) && WorldUtil.worldFolderCheck ( prepared ) ) {
+				if ( BattleRoyaleArenaHandler.getInstance ( ).getArenas ( ).stream ( )
+						.anyMatch ( arena -> Objects.equals ( arena.getBattlefield ( ) , battlefield ) )
+						&& BattleRoyaleArenaWorld.PREPARE_LOCK.isLocked ( ) ) {
+					// battlefield world already being prepared. all we
+					// have to do as this point is schedule the start of
+					// the session from the preparation thread, so it will
+					// start the session once the world is prepared.
+					BattleRoyaleArenaWorld.PREPARE_EXECUTOR.execute ( ( ) -> newSetupSessionFromBattlefield (
+							configurator , battlefield , prepared , callback ) );
+				} else {
+					// battlefield world already prepared, no need to wait.
+					newSetupSessionFromBattlefield ( configurator , battlefield , prepared , callback );
 				}
-				
-				// generation done
-				generator.save ( );
-				
-				/* world generated, let's load it */
-				// we want to load the generated world asynchronously,
-				// so we temporarily disable the async-catcher of Spigot.
-				final boolean async_catcher = AsyncCatcherUtil.isEnabled ( );
-				AsyncCatcherUtil.disable ( );
-				
-				// setup session successfully created, let's call
-				// the callback from the bukkit thread.
-				SchedulerUtil.runTask ( ( ) -> {
+			} else {
+				if ( prepared.exists ( ) ) {
+					// prepared world exists but is invalid,
+					// lets generate it again.
 					try {
-						BattlefieldSetupSession result = newSetupSession ( configurator , world_folder , false );
-						
-						// recovering values
-						result.configuration = configuration;
-						result.name          = name;
-						result.minimap       = minimap;
-						result.result        = null;
-						result.setBounds ( new ZoneBounds (
-								-size_half , -size_half , size_half , size_half ) );
-						
-						callback.accept ( result );
+						FileUtil.deleteDirectory ( prepared );
 					} catch ( IOException e ) {
 						e.printStackTrace ( );
 					}
-				} );
+				}
 				
-				AsyncCatcherUtil.setEnabled ( async_catcher );
-			} );
+				if ( !prepared.mkdirs ( ) ) {
+					throw new IllegalStateException ( "couldn't create battlefield prepared world folder" );
+				}
+				
+				// world preparation. we will schedule the preparation
+				// from the arenas world preparation executor as we want
+				// to prevent having multiple world preparations at the
+				// same time, resulting in leak of heap space.
+				BattleRoyaleArenaWorld.PREPARE_EXECUTOR.execute ( ( ) -> {
+					BattleRoyaleArenaWorld.PREPARE_LOCK.lock ( );
+					
+					try {
+						ArenaWorldGenerator generator = createGenerator ( prepared );
+						
+						// inserting and centering shape.
+						// the shape will be inserted in the 0,0,0
+						// coordinates, so we can save unit-locations
+						// that allows us to relocate them later.
+						int size_half = shape.getSize ( ) / 2;
+						int index     = 0;
+						
+						for ( BattlefieldShapePart part : shape.getParts ( ).values ( ) ) {
+							Location2I part_location = part.getLocation ( );
+							int        part_x        = part_location.getX ( );
+							int        part_z        = part_location.getZ ( );
+							int        part_block_x  = ( part_x << 7 ) - size_half;
+							int        part_block_z  = ( part_z << 7 ) - size_half;
+							
+							try {
+								// it will load the schematic of the part,
+								// and the garbage collector should dispose it.
+								generator.insert ( part.loadContent ( battlefield.getFolder ( ) ) ,
+												   new Vector ( part_block_x , 0.0D , part_block_z ) ,
+												   true );
+								// saving heap space.
+								generator.save ( );
+								generator.flush ( );
+								
+								// printing progress
+								BattleRoyale.getInstance ( ).getLogger ( ).info (
+										"Preparing battlefield for setup... " +
+												( 100.0D * ( ( double ) ++index / shape.getParts ( ).size ( ) ) ) + "%" );
+							} catch ( FileNotFoundException ex ) {
+								// we want to be able to load incomplete
+								// battlefield shapes as we don't want
+								// to lose a whole battlefield just for a missing part.
+								BattleRoyale.getInstance ( ).getLogger ( ).warning (
+										"Missing battlefield shape part file (" + part_x + ", " + part_z + ")" );
+							}
+						}
+						
+						// generation done
+						generator.save ( );
+						generator.flush ( );
+						
+						// setup session stuff done.
+						newSetupSessionFromBattlefield ( configurator , battlefield , prepared , callback );
+					} finally {
+						BattleRoyaleArenaWorld.PREPARE_LOCK.unlock ( );
+					}
+				} );
+			}
 		} else {
 			throw new IllegalArgumentException ( "invalid battlefield shape" );
 		}
+	}
+	
+	private static void newSetupSessionFromBattlefield ( Player configurator , Battlefield battlefield ,
+			File prepared , Consumer < BattlefieldSetupSession > callback ) {
+		Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
+			try {
+				BattlefieldSetupSession result = newSetupSession (
+						configurator , prepared ,
+						// copy must be set to true as we
+						// don't want the plugin to load the
+						// world from the prepared folder.
+						true );
+				
+				// recovering values
+				int size_half = battlefield.getShape ( ).getSize ( ) / 2;
+				
+				result.configuration = battlefield.getConfiguration ( );
+				result.name          = battlefield.getName ( );
+				result.minimap       = battlefield.getMinimap ( );
+				result.result        = null;
+				result.setBounds ( new ZoneBounds ( -size_half , -size_half , size_half , size_half ) ,
+								   false , false );
+				
+				callback.accept ( result );
+			} catch ( IOException e ) {
+				e.printStackTrace ( );
+			}
+		} );
 	}
 	
 	protected static BattlefieldSetupSession newSetupSession ( Player configurator , File input_world_folder ,
@@ -203,7 +258,7 @@ public class BattlefieldSetupSession {
 		File world_folder = getNewTempWorldFolder ( );
 		
 		// let's generate it
-		EXECUTOR_SERVICE.execute ( ( ) -> {
+		INITIALIZER_EXECUTOR_SERVICE.execute ( ( ) -> {
 			/* world generation */
 			ArenaWorldGenerator generator = createGenerator ( world_folder );
 			
@@ -218,22 +273,60 @@ public class BattlefieldSetupSession {
 			
 			generator.insert ( input , new Vector ( -x_size_half , 0 , -z_size_half ) , true );
 			generator.save ( );
+			generator.flush ( );
 			
 			// setup session successfully created, let's call
 			// the callback from the bukkit thread.
-			SchedulerUtil.runTask ( ( ) -> {
+			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
 				try {
 					BattlefieldSetupSession result = newSetupSession ( configurator , world_folder , false );
 					
+					Consumer < Minimap > minimap_callback = minimap -> {
+						// we will give the minimap item to any
+						// player in the session once the minimap is
+						// successfully generated.
+						if ( minimap != null ) {
+							giveMinimap ( result.getOwner ( ) , result );
+							
+							for ( Player invited : result.getGuestList ( ) ) {
+								giveMinimap ( invited , result );
+							}
+						}
+					};
+					
+					Consumer < Boolean > schematic_callback = schematic -> {
+						// this will let the player know that schematic
+						// was successfully exported.
+						if ( schematic != null && schematic ) {
+							configurator.sendMessage ( ChatColor.GREEN + "Schematic generated successfully!" );
+						}
+					};
+					
+					configurator.sendMessage ( ChatColor.GOLD + "Bounds were automatically calculated!" );
+					configurator.sendMessage ( ChatColor.GOLD + "* Generating minimap..." );
+					configurator.sendMessage ( ChatColor.GOLD + "* Generating schematic..." );
+					
 					result.name = name;
-					result.setBounds ( new ZoneBounds (
-							-x_size_half , -z_size_half , x_size_half , z_size_half ) );
+					result.setBounds ( new ZoneBounds ( -x_size_half , -z_size_half , x_size_half , z_size_half ) ,
+									   minimap_callback , schematic_callback );
 					
 					callback.accept ( result );
 				} catch ( IOException e ) {
 					e.printStackTrace ( );
 				}
 			} );
+		} );
+	}
+	
+	protected static void giveMinimap ( Player br_player , BattlefieldSetupSession session ) {
+		br_player.getBukkitPlayerOptional ( ).ifPresent ( player -> {
+			player.getInventory ( ).addItem (
+					ItemStackUtil.createViewItemStack ( MiniMapUtil.createView (
+							new MinimapRendererSetupSession ( session ) , session.getWorld ( ) ) ) );
+			player.updateInventory ( );
+			
+			// letting know
+			player.sendMessage ( ChatColor.GREEN + "Minimap generated successfully!" );
 		} );
 	}
 	
@@ -261,6 +354,12 @@ public class BattlefieldSetupSession {
 		generator_data.setSpawnX ( 0 );
 		generator_data.setSpawnY ( 0 );
 		generator_data.setSpawnZ ( 0 );
+		// bukkit world loader must have something to load;
+		// in case the shape is empty, we set at least one block.
+		// if the region folder of the world is empty, bukkit
+		// will not load the world, so we have to give bukkit
+		// something to load.
+		generator.setBlockAtFromLegacyId ( 0 , 0 , 0 , 1 );
 		
 		return generator;
 	}
@@ -277,11 +376,11 @@ public class BattlefieldSetupSession {
 	protected final Map < UUID, BattlefieldSetupTool > tool_map   = new HashMap <> ( );
 	
 	// result
-	protected          String                   name;
-	protected          ZoneBounds               bounds;
-	protected          Minimap                  minimap;
-	protected          BattlefieldConfiguration configuration;
-	protected volatile BattlefieldSetupResult   result;
+	protected String                   name;
+	protected ZoneBounds               bounds;
+	protected Minimap                  minimap;
+	protected BattlefieldConfiguration configuration;
+	protected BattlefieldSetupResult   result;
 	
 	// this constructor is for cases where the input is an entire world.
 	// it will be a different world in a different folder.
@@ -817,9 +916,9 @@ public class BattlefieldSetupSession {
 		Validate.isTrue ( StringUtil.isNotBlank ( name ) , "name never set or invalid" );
 		Validate.notNull ( bounds , "bounds never set" );
 		
-		// the generation might take a while,
-		// so we want to keep it asynchronously.
-		EXECUTOR_SERVICE.execute ( ( ) -> {
+		// blocks until done so we must
+		// keep it asynchronous.
+		SHAPE_EXECUTOR_SERVICE.execute ( ( ) -> {
 			MinimapGenerator generator = new MinimapGenerator ( world );
 			
 			generator.generate ( bounds );
@@ -900,9 +999,9 @@ public class BattlefieldSetupSession {
 				}
 			}
 			
-			// the export process might take a while,
-			// so we want to keep it asynchronously.
-			EXECUTOR_SERVICE.execute ( ( ) -> {
+			// blocks until done so we must
+			// keep it asynchronous.
+			SHAPE_EXECUTOR_SERVICE.execute ( ( ) -> {
 				try {
 					SchematicUtil.generateBattlefieldShape ( world , bounds.toBoundingBox ( ) , folder );
 					

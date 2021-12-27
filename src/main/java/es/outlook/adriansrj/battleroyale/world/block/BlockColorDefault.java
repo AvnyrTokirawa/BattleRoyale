@@ -71,12 +71,17 @@ public enum BlockColorDefault implements BlockColor {
 	WARPED_NYLIUM ( 55 , 1474182 ),
 	WARPED_STEM ( 56 , 3837580 ),
 	WARPED_HYPHAE ( 57 , 5647422 ),
-	WARPED_WART_BLOCK ( 58 , 1356933 );
+	WARPED_WART_BLOCK ( 58 , 1356933 ),
+	DEEPSLATE ( 59 , 6579300 ),
+	RAW_IRON ( 60 , 14200723 ),
+	GLOW_LICHEN ( 61 , 8365974 ),
 	
-	protected final int   id;
-	protected final int   mc_rgb;
-	protected final Color color;
-	protected final int   rgb;
+	;
+	
+	private final int   id;
+	private final int   mc_rgb;
+	private final Color color;
+	private final int   rgb;
 	
 	BlockColorDefault ( int id , int mc_rgb ) {
 		this.id     = id;

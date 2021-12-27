@@ -5,6 +5,7 @@ import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.game.player.Team;
 import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderNode;
 import es.outlook.adriansrj.core.util.entity.EntityUtil;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.ChatColor;
 
 import java.util.Iterator;
@@ -126,7 +127,8 @@ public class TeamPlaceholderNode extends PlaceholderNode {
 				}
 			}
 			
-			return result.toString ( );
+			// must unscape in order to get special characters working.
+			return StringEscapeUtils.unescapeJava ( result.toString ( ) );
 		} else {
 			Stream < Player > members = team.getPlayers ( ).stream ( );
 			

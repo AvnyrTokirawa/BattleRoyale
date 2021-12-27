@@ -59,13 +59,16 @@ public class Constants {
 	public static final String DURATION_KEY = "duration";
 	public static final String SIZE_KEY     = "size";
 	public static final String STRENGTH_KEY = "strength";
+	public static final String DATA_KEY     = "data";
+	public static final String CHANCE_KEY   = "chance";
+	public static final String REQUIRED_KEY = "required";
 	
 	//	/** Update period of the displacement executor of the buses */
 	//	public static final long BUS_DISPLACEMENT_EXECUTOR_PERIOD    = 60L;
 	/** Parachute life-loop executor period */
 	public static final long PARACHUTE_LIFE_LOOP_EXECUTOR_PERIOD = 30L;
 	/** Bus life-loop executor period */
-	public static final long BUS_LIFE_LOOP_EXECUTOR_PERIOD = 30L;
+	public static final long BUS_LIFE_LOOP_EXECUTOR_PERIOD       = 30L;
 	
 	// ---------- plugin
 	

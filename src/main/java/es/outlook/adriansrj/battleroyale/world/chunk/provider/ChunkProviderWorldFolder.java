@@ -6,6 +6,7 @@ import es.outlook.adriansrj.battleroyale.world.region.Region;
 import es.outlook.adriansrj.battleroyale.world.region.provider.RegionProviderWorldFolder;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author AdrianSR / 31/08/2021 / 02:56 p. m.
@@ -37,14 +38,14 @@ public class ChunkProviderWorldFolder implements ChunkProvider {
 	 * @return null if the chunk doesn't exist in the world folder.
 	 */
 	@Override
-	public Chunk getChunk ( int x , int z ) {
+	public Chunk getChunk ( int x , int z ) throws IOException, IllegalArgumentException {
 		Region region = region_provider.getRegionAtChunkCoordinates ( x , z );
 		
 		return region != null ? region.getChunk ( new ChunkLocation ( x , z ) ) : null;
 	}
 	
 	@Override
-	public Chunk getChunkAtBlockCoordinates ( int x , int z ) {
+	public Chunk getChunkAtBlockCoordinates ( int x , int z ) throws IOException, IllegalArgumentException {
 		return getChunk ( x >> 4 , z >> 4 );
 	}
 }

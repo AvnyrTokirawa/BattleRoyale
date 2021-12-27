@@ -1,7 +1,15 @@
 package es.outlook.adriansrj.battleroyale.util.file;
 
+import es.outlook.adriansrj.battleroyale.util.math.Location2I;
+import es.outlook.adriansrj.battleroyale.world.region.Region;
 import es.outlook.adriansrj.core.util.file.filter.FileExtensionFilter;
 import es.outlook.adriansrj.core.util.server.Version;
+import es.outlook.adriansrj.core.util.world.WorldUtil;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * Useful class for dealing with files.
@@ -36,4 +44,37 @@ public class FileUtil extends es.outlook.adriansrj.core.util.file.FileUtil {
 			Version.getServerVersion ( ).isNewerEquals ( Version.v1_13_R1 )
 					? FileUtil.SPONGE_SCHEMATIC_PRIMARY_EXTENSION
 					: FileUtil.MCEDIT_SCHEMATIC_PRIMARY_EXTENSION;
+	
+	/**
+	 * Hacky method to check whether the provided
+	 * file is locked.
+	 *
+	 * @param file the file to check.
+	 * @return whether the provided file is locked.
+	 */
+	public static boolean isFileLocked ( File file ) {
+		try {
+			try ( FileInputStream in = new FileInputStream ( file ) ) {
+				in.read ( );
+				return false;
+			}
+		} catch ( FileNotFoundException e ) {
+			return file.exists ( );
+		} catch ( IOException ioe ) {
+			return true;
+		}
+	}
+	
+	public static File getRegionFolder ( File world_folder ) {
+		return new File ( world_folder , WorldUtil.REGION_FOLDER_NAME );
+	}
+	
+	public static File getRegionFileWorldFolder ( File world_folder , Location2I location ) {
+		return getRegionFile ( getRegionFolder ( world_folder ) , location );
+	}
+	
+	public static File getRegionFile ( File region_folder , Location2I location ) {
+		return new File ( region_folder , String.format (
+				Region.REGION_FILE_NAME_FORMAT , location.getX ( ) , location.getZ ( ) ) );
+	}
 }

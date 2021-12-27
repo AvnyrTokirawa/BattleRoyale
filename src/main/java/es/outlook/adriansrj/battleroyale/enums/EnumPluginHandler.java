@@ -14,6 +14,7 @@ import es.outlook.adriansrj.battleroyale.bus.BusHandler;
 import es.outlook.adriansrj.battleroyale.bus.BusRegistry;
 import es.outlook.adriansrj.battleroyale.command.BattleRoyaleCommandHandler;
 import es.outlook.adriansrj.battleroyale.compass.CompassBarHandler;
+import es.outlook.adriansrj.battleroyale.compatibility.crackshot.CrackShotCompatibilityHandler;
 import es.outlook.adriansrj.battleroyale.compatibility.qualityarmory.QualityArmoryCompatibilityHandler;
 import es.outlook.adriansrj.battleroyale.configuration.arena.BattleRoyaleArenaSignConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.arena.BattleRoyaleArenaSignContainerHandler;
@@ -177,6 +178,9 @@ public enum EnumPluginHandler {
 	
 	QUALITY_ARMORY_COMPATIBILITY_HANDLER (
 			QualityArmoryCompatibilityHandler.class , PluginUtil :: isQualityArmoryEnabled , false ),
+	
+	CRACK_SHOT_COMPATIBILITY_HANDLER (
+			CrackShotCompatibilityHandler.class , PluginUtil :: isCrackShotEnabled , false ),
 	
 	PLAYER_STUFF_CHEST_HANDLER ( PlayerStuffChestHandler.class , false ),
 	
