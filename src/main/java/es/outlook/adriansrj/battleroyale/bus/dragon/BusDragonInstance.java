@@ -95,7 +95,7 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 		return ( seat != null && seat.isValid ( ) ) || queue.contains ( player.getUniqueId ( ) );
 	}
 	
-	protected void putPlayer ( org.bukkit.entity.Player player ) {
+	private void putPlayer ( org.bukkit.entity.Player player ) {
 		if ( Bukkit.isPrimaryThread ( ) ) {
 			// player must be in the world of the arena, otherwise
 			// we will need to teleport them, and wait until the teleportation

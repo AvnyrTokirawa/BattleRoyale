@@ -8,16 +8,18 @@ import es.outlook.adriansrj.battleroyale.enums.EnumArenaBorderState;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.event.border.BorderResizeChangeEvent;
 import es.outlook.adriansrj.battleroyale.event.border.BorderStateChangeEvent;
-import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.math.Location2D;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.util.task.BukkitRunnableWrapper;
-import es.outlook.adriansrj.battleroyale.world.border.WorldBorder;
+import org.bukkit.WorldBorder;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
 
 /**
  * Battle royale arena border.
@@ -87,8 +89,8 @@ public class BattleRoyaleArenaBorder {
 						this.time       = System.currentTimeMillis ( );
 						this.end_time   = time + border.point.getTime ( ).toMillis ( );
 						this.start_size = border.handle.getSize ( );
-						this.start_x    = border.handle.getCenterX ( );
-						this.start_z    = border.handle.getCenterZ ( );
+						this.start_x    = border.handle.getCenter ( ).getX ( );
+						this.start_z    = border.handle.getCenter ( ).getZ ( );
 					}
 					
 					long time = System.currentTimeMillis ( ) - this.time;
@@ -109,8 +111,8 @@ public class BattleRoyaleArenaBorder {
 						double x              = point_location.getX ( );
 						double z              = point_location.getZ ( );
 						
-						if ( Double.compare ( x , border.handle.getCenterX ( ) ) != 0
-								|| Double.compare ( z , border.handle.getCenterZ ( ) ) != 0 ) {
+						if ( Double.compare ( x , border.handle.getCenter ( ).getX ( ) ) != 0
+								|| Double.compare ( z , border.handle.getCenter ( ).getZ ( ) ) != 0 ) {
 							border.handle.setCenter ( lerp ( start_x , x , factor ) ,
 													  lerp ( start_z , z , factor ) );
 						}
@@ -120,7 +122,7 @@ public class BattleRoyaleArenaBorder {
 						
 						setState ( EnumArenaBorderState.IDLE );
 					}
-				} else {
+				}/* else {
 					// the border is idle, but we need
 					// to regularly notify players about it.
 					if ( idle_last == 0L || System.currentTimeMillis ( ) - idle_last >= 1000L ) {
@@ -129,7 +131,7 @@ public class BattleRoyaleArenaBorder {
 						// notifying each 1000 milliseconds
 						border.handle.refresh ( );
 					}
-				}
+				}*/
 			} catch ( Exception ex ) {
 				ex.printStackTrace ( );
 			}
@@ -180,7 +182,7 @@ public class BattleRoyaleArenaBorder {
 	protected boolean                           started;
 	
 	public BattleRoyaleArenaBorder ( BattleRoyaleArena arena ) {
-		this.handle     = new WorldBorder ( arena.getWorld ( ) );
+		this.handle     = arena.getWorld ( ).getWorldBorder ( );
 		this.arena      = arena;
 		this.state      = EnumArenaBorderState.STOPPED;
 		this.state_time = System.currentTimeMillis ( );
@@ -192,9 +194,9 @@ public class BattleRoyaleArenaBorder {
 		return arena;
 	}
 	
-	public Set < Player > getPlayers ( ) {
-		return handle.getPlayers ( );
-	}
+	//	public Set < Player > getPlayers ( ) {
+	//		return handle.getPlayers ( );
+	//	}
 	
 	public EnumArenaBorderState getState ( ) {
 		return state;
@@ -234,7 +236,8 @@ public class BattleRoyaleArenaBorder {
 	}
 	
 	public ZoneBounds getCurrentBounds ( ) {
-		return new ZoneBounds ( new Location2I ( ( int ) handle.getCenterX ( ) , ( int ) handle.getCenterZ ( ) ) ,
+		return new ZoneBounds ( new Location2I ( ( int ) handle.getCenter ( ).getX ( ) ,
+												 ( int ) handle.getCenter ( ).getZ ( ) ) ,
 								( int ) Math.round ( handle.getSize ( ) ) );
 	}
 	
@@ -265,8 +268,8 @@ public class BattleRoyaleArenaBorder {
 		// schedule resizing
 		if ( points != null && points.size ( ) > 0 ) {
 			update_task = new BorderResizeTask ( this );
-			update_task.runTaskTimerAsynchronously ( BattleRoyale.getInstance ( ) , 0L , 0L );
-		} else {
+			update_task.runTaskTimer ( BattleRoyale.getInstance ( ) , 0L , 0L );
+		} /*else {
 			// resize succession invalid or not set. we need
 			// to regularly notify players about world border,
 			// so lets schedule a task for that.
@@ -277,7 +280,7 @@ public class BattleRoyaleArenaBorder {
 				}
 			};
 			update_task.runTaskTimerAsynchronously ( BattleRoyale.getInstance ( ) , 20L , 20L );
-		}
+		}*/
 	}
 	
 	public void restart ( ) {
@@ -292,15 +295,15 @@ public class BattleRoyaleArenaBorder {
 			update_task.cancel ( );
 		}
 		
-		handle.getPlayers ( ).clear ( );
-		handle.refresh ( );
+		//		handle.getPlayers ( ).clear ( );
+		//		handle.refresh ( );
 		
 		// recalculating succession
 		recalculatePoints ( );
 	}
 	
 	public void refresh ( ) {
-		handle.refresh ( );
+		//		handle.refresh ( );
 	}
 	
 	protected void recalculatePoints ( ) {

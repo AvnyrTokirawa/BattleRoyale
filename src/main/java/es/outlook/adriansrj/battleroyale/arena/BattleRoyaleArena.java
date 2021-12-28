@@ -486,9 +486,9 @@ public class BattleRoyaleArena {
 				}
 			}
 			
-			// world border
-			border.getPlayers ( ).add ( br_player );
-			border.refresh ( );
+//			// world border
+//			border.getPlayers ( ).add ( br_player );
+//			border.refresh ( );
 			
 			// making sure scoreboard is visible
 			Scoreboard scoreboard = br_player.getBRScoreboard ( );
@@ -538,9 +538,9 @@ public class BattleRoyaleArena {
 	protected void remove ( Player br_player ) {
 		Validate.notNull ( br_player , "br_player cannot be null" );
 		
-		// un-showing border
-		border.getPlayers ( ).remove ( br_player );
-		border.refresh ( );
+//		// un-showing border
+//		border.getPlayers ( ).remove ( br_player );
+//		border.refresh ( );
 	}
 	
 	public synchronized void start ( ) {

@@ -9,13 +9,16 @@ import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.core.handler.PluginHandler;
+import es.outlook.adriansrj.core.util.math.collision.BoundingBox;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
+import org.bukkit.WorldBorder;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.Objects;
@@ -38,6 +41,30 @@ public final class BattleRoyaleArenaBorderHandler extends PluginHandler implemen
 		// this executor will schedule a task that will
 		// keep track of the players outside bounds
 		Bukkit.getScheduler ( ).runTaskTimerAsynchronously ( plugin , this , 20L , 20L );
+	}
+	
+	// here we're cancelling the default border damage.
+	@EventHandler ( priority = EventPriority.HIGH )
+	public void onDamage ( EntityDamageEvent event ) {
+		if ( event.getEntity ( ) instanceof org.bukkit.entity.Player
+				&& event.getCause ( ) == EntityDamageEvent.DamageCause.SUFFOCATION ) {
+			org.bukkit.entity.Player player    = ( org.bukkit.entity.Player ) event.getEntity ( );
+			Player                   br_player = Player.getPlayer ( player );
+			
+			if ( br_player.isPlaying ( ) && Objects.equals ( player.getWorld ( ) , br_player.getArena ( ).getWorld ( ) )
+					&& isInside ( player , player.getWorld ( ).getWorldBorder ( ) ) ) {
+				event.setCancelled ( true );
+			}
+		}
+	}
+	
+	private boolean isInside ( org.bukkit.entity.Player player , WorldBorder border ) {
+		double size      = border.getSize ( );
+		double half_size = size / 2.0D;
+		
+		return new BoundingBox ( border.getCenter ( ).subtract ( half_size , half_size , half_size ).toVector ( ) ,
+								 border.getCenter ( ).add ( half_size , half_size , half_size ).toVector ( ) )
+				.contains ( player.getLocation ( ).toVector ( ) );
 	}
 	
 	// responsible for changing the player weather depending

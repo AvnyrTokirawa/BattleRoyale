@@ -143,6 +143,11 @@ public enum EnumPluginHandler {
 	
 	BATTLEFIELD_HANDLER ( BattlefieldRegistry.class , false ),
 	
+	BUS_HANDLER ( BusHandler.class , false ),
+	BUS_REGISTRY ( BusRegistry.class , false ),
+	BUS_CONFIGURATION_HANDLER ( BusConfigHandler.class , false ),
+	BUSES_CONFIGURATION_HANDLER ( BusesConfigHandler.class , false ),
+	
 	ARENA_HANDLER ( BattleRoyaleArenaHandler.class , false ),
 	ARENA_CONFIGURATION_HANDLER ( BattleRoyaleArenasConfigHandler.class , false ),
 	ARENA_GUI_HANDLER ( ArenaSelectorGUIHandler.class , false ),
@@ -157,11 +162,6 @@ public enum EnumPluginHandler {
 	ARENA_ITEM_DROP_HANDLER ( ItemDropHandler.class , false ),
 	
 	MINIMAP_HANDLER ( MinimapHandler.class , false ),
-	
-	BUS_HANDLER ( BusHandler.class , false ),
-	BUS_REGISTRY ( BusRegistry.class , false ),
-	BUS_CONFIGURATION_HANDLER ( BusConfigHandler.class , false ),
-	BUSES_CONFIGURATION_HANDLER ( BusesConfigHandler.class , false ),
 	
 	PARACHUTE_HANDLER ( ParachuteHandler.class , false ),
 	PARACHUTE_REGISTRY ( ParachuteRegistry.class , false ),

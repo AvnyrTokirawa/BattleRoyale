@@ -64,6 +64,8 @@ public enum EnumBusConfiguration implements ConfigurationEntry {
 	public void load ( ConfigurationSection section ) {
 		Object raw = section.get ( getKey ( ) );
 		
+		System.out.println ( ">>> load: " + getKey ( ) + " raw = " + raw );
+		
 		if ( raw != null && ClassReflection.compatibleTypes ( this.type , raw ) ) {
 			this.value = raw;
 		}
