@@ -120,9 +120,10 @@ public class ArenaSelectorGUIButtonArenaInstance extends GUIIconInstance {
 		Player br_player = Player.getPlayer ( action.getPlayer ( ) );
 		
 		if ( arena != null ) {
-			if ( arena.getState ( ) == EnumArenaState.RUNNING ) {
+			/*if ( arena.getState ( ) == EnumArenaState.RUNNING ) {
 				action.getPlayer ( ).sendMessage ( EnumLanguage.ARENA_MESSAGE_RUNNING.getAsString ( ) );
-			} else if ( arena.getState ( ) == EnumArenaState.RESTARTING ) {
+			} else*/
+			if ( arena.getState ( ) == EnumArenaState.RESTARTING ) {
 				action.getPlayer ( ).sendMessage ( EnumLanguage.ARENA_MESSAGE_RESTARTING.getAsString ( ) );
 			} else if ( arena.getState ( ) == EnumArenaState.STOPPED ) {
 				action.getPlayer ( ).sendMessage ( EnumLanguage.ARENA_MESSAGE_STOPPED.getAsString ( ) );

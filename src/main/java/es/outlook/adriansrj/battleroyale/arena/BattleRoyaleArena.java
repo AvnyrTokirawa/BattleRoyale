@@ -402,13 +402,7 @@ public class BattleRoyaleArena {
 		Validate.isTrue ( getState ( ) == EnumArenaState.RUNNING ,
 						  "must be running to introduce a player" );
 		
-		// player must be in a team
-		// to be introduced.
 		Player br_player = Player.getPlayer ( player );
-		
-		if ( !br_player.hasTeam ( ) ) {
-			throw new UnsupportedOperationException ( "player must be in a team" );
-		}
 		
 		// then introducing
 		if ( Bukkit.isPrimaryThread ( ) ) {
@@ -419,6 +413,11 @@ public class BattleRoyaleArena {
 				new PlayerArenaIntroducedEvent (
 						br_player , this , true ).callSafe ( );
 			} else {
+				// player must be in a team to be introduced.
+				if ( !br_player.hasTeam ( ) ) {
+					throw new UnsupportedOperationException ( "player must be in a team" );
+				}
+				
 				player.setGameMode ( GameMode.SURVIVAL );
 				player.setTotalExperience ( 0 );
 				player.setLevel ( 0 );

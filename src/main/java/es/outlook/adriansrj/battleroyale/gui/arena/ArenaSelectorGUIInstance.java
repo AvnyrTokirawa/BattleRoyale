@@ -28,6 +28,9 @@ public class ArenaSelectorGUIInstance extends GUIInstance {
 		BattleRoyaleArena          current = player.getArena ( );
 		List < BattleRoyaleArena > arenas  = new ArrayList <> ( BattleRoyaleArenaHandler.getInstance ( ).getArenas ( ) );
 		
+		// sorted
+		arenas.sort ( null );
+		
 		// the arena the player is currently
 		// in will be skipped.
 		if ( current != null ) {

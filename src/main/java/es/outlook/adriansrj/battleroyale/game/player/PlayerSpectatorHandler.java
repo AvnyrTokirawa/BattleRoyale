@@ -18,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -142,6 +143,18 @@ public final class PlayerSpectatorHandler extends PluginHandler implements Packe
 					br_player.getBukkitPlayerOptional ( ).ifPresent ( this :: toggleCamera );
 				}
 			}
+		}
+	}
+	
+	// this event handler is responsible for toggling the
+	// camera of the spectator that rejoins.
+	@EventHandler ( priority = EventPriority.MONITOR )
+	public void onRejoin ( PlayerJoinEvent event ) {
+		org.bukkit.entity.Player player    = event.getPlayer ( );
+		Player                   br_player = Player.getPlayer ( player );
+		
+		if ( br_player.isSpectator ( ) && br_player.isInArena ( ) ) {
+			toggleCamera ( player );
 		}
 	}
 	

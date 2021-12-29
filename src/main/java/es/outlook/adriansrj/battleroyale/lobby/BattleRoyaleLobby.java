@@ -99,8 +99,7 @@ public class BattleRoyaleLobby implements Listener {
 			BattleRoyaleArena arena = EnumMode.BUNGEE.getArena ( );
 			
 			if ( arena != null ) {
-				if ( arena.getState ( ) != EnumArenaState.RUNNING
-						&& arena.getState ( ) != EnumArenaState.STOPPED ) {
+				if ( arena.getState ( ) != EnumArenaState.STOPPED ) {
 					br_player.setArena ( arena );
 					
 					if ( arena.getMode ( ).isTeamSelectionEnabled ( ) ) {
@@ -148,6 +147,7 @@ public class BattleRoyaleLobby implements Listener {
 		}
 	}
 	
+	// responsible for sending players to custom spawn
 	@EventHandler ( priority = EventPriority.MONITOR )
 	public void onJoin ( PlayerJoinEvent event ) {
 		if ( EnumLobbyConfiguration.SPAWN_JOIN.getAsBoolean ( ) && isCustomSpawnEnabled ( ) ) {

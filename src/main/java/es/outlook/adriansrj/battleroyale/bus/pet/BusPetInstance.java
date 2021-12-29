@@ -202,25 +202,17 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 			seat = null;
 		}
 		
-		player.setAllowFlight ( false );
+		player.setAllowFlight ( player.getGameMode ( ) == GameMode.CREATIVE );
 		player.setFlying ( false );
 		player.setCanOpenParachute ( true ); // parachute
-		player.getBukkitPlayerOptional ( ).ifPresent ( player -> {
-			// disabling fly
-			if ( player.getGameMode ( ) != GameMode.CREATIVE ) {
-				player.setAllowFlight ( false );
-				player.setFlying ( false );
-			}
-			
-			// showing player for others
-			if ( arena != null ) {
-				arena.getPlayers ( false ).stream ( ).map ( Player :: getBukkitPlayer )
+		
+		// showing player for others
+		player.getBukkitPlayerOptional ( ).ifPresent (
+				player -> arena.getPlayers ( false ).stream ( ).map ( Player :: getBukkitPlayer )
 						.filter ( Objects :: nonNull )
 						.filter ( other -> !Objects.equals ( player.getUniqueId ( ) , other.getUniqueId ( ) )
 								&& !other.canSee ( player ) )
-						.forEach ( other -> Player.getPlayer ( other ).showPlayer ( player ) );
-			}
-		} );
+						.forEach ( other -> Player.getPlayer ( other ).showPlayer ( player ) ) );
 		
 		// firing event
 		new PlayerJumpOffBusEvent ( player , this ).call ( );

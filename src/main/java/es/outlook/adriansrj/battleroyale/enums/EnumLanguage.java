@@ -56,9 +56,9 @@ public enum EnumLanguage implements ConfigurationEntry {
 							   "message players will receive when trying to\njoin an arena that is being restarted" ,
 							   ChatColor.DARK_RED + "This arena is restarting!" ),
 	
-	ARENA_MESSAGE_RUNNING ( "arena.message.running" ,
-							"message players will receive when trying to\njoin an arena that is running/in-game" ,
-							ChatColor.DARK_RED + "You cannot join an arena that has already started!" ),
+//	ARENA_MESSAGE_RUNNING ( "arena.message.running" ,
+//							"message players will receive when trying to\njoin an arena that is running/in-game" ,
+//							ChatColor.DARK_RED + "You cannot join an arena that has already started!" ),
 	
 	ARENA_MESSAGE_STOPPED ( "arena.message.stopped" ,
 							"message players will receive when trying to\njoin an arena that is stopped" ,

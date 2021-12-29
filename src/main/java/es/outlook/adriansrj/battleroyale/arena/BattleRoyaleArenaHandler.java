@@ -164,6 +164,10 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 					player.removePotionEffect ( PotionEffectType.SLOW );
 					player.removePotionEffect ( PotionEffectType.BLINDNESS );
 				} , 6 );
+			} else if ( arena.getState ( ) == EnumArenaState.RUNNING ) {
+				// player is to be introduced as spectator
+				// if the arena is already running.
+				arena.introduce ( player , true );
 			}
 		} );
 	}
@@ -182,6 +186,20 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 	@Override
 	protected boolean isAllowMultipleInstances ( ) {
 		return false;
+	}
+	
+	// ---------------------------------------------------------------
+	
+	// this event handler is responsible for introducing the
+	// player as spectator at the moment of joining an arena
+	// that has already been started.
+	@EventHandler ( priority = EventPriority.MONITOR )
+	public void onSpectatorJoinArena ( PlayerArenaSetEvent event ) {
+		BattleRoyaleArena arena = event.getArena ( );
+		
+		if ( arena.getState ( ) == EnumArenaState.RUNNING ) {
+			arena.introduce ( event.getPlayer ( ) , true );
+		}
 	}
 	
 	// ---------------------------------------------------------------
