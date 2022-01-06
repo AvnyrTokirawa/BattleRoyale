@@ -8,10 +8,7 @@ import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.math.RandomUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author AdrianSR / 14/10/2021 / 07:15 p. m.
@@ -20,6 +17,7 @@ public class BombingZoneGenerator {
 	
 	protected final BattleRoyaleArena       arena;
 	protected final List < BombingZone >    next;
+	protected final Set < BombingZone >     generated;
 	protected       BattlefieldBorderResize point;
 	
 	// configuration
@@ -27,8 +25,9 @@ public class BombingZoneGenerator {
 	protected final int max;
 	
 	public BombingZoneGenerator ( BattleRoyaleArena arena ) {
-		this.arena = arena;
-		this.next  = new ArrayList <> ( );
+		this.arena     = arena;
+		this.next      = new ArrayList <> ( );
+		this.generated = new HashSet <> ( );
 		
 		// configuration
 		BattlefieldConfiguration configuration = arena.getBattlefield ( ).getConfiguration ( );
@@ -88,6 +87,15 @@ public class BombingZoneGenerator {
 	public void restart ( ) {
 		this.point = null;
 		this.next.clear ( );
+		
+		// stopping active bombing zones
+		for ( BombingZone generated : this.generated ) {
+			if ( generated.isActive ( ) ) {
+				generated.stop ( );
+			}
+		}
+		
+		this.generated.clear ( );
 	}
 	
 	/**
@@ -106,6 +114,7 @@ public class BombingZoneGenerator {
 				min.getZ ( ) + RandomUtil.nextInt ( range + 1 ) ) );
 		
 		if ( result.isValidPlace ( ) ) {
+			this.generated.add ( result );
 			return result;
 		} else {
 			return null;

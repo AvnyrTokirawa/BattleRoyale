@@ -178,8 +178,8 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 	
 	public void leaveArena ( Player br_player ) {
 		if ( br_player.leaveArena ( ) ) {
-			br_player.getBukkitPlayerOptional ( ).ifPresent (
-					player -> BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( ).introduce ( player ) );
+			br_player.getBukkitPlayerOptional ( )
+					.ifPresent ( BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( ) :: introduce );
 		}
 	}
 	
@@ -197,7 +197,8 @@ public final class BattleRoyaleArenaHandler extends PluginHandler {
 	public void onSpectatorJoinArena ( PlayerArenaSetEvent event ) {
 		BattleRoyaleArena arena = event.getArena ( );
 		
-		if ( arena.getState ( ) == EnumArenaState.RUNNING ) {
+		if ( arena.getState ( ) == EnumArenaState.RUNNING
+				&& !arena.getRestarter ( ).isStarted ( ) ) {
 			arena.introduce ( event.getPlayer ( ) , true );
 		}
 	}

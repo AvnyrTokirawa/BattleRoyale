@@ -12,7 +12,7 @@ import es.outlook.adriansrj.battleroyale.enums.EnumPlayerSetting;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaLeaveEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaPreLeaveEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerArenaSetEvent;
-import es.outlook.adriansrj.battleroyale.mode.RunModeHandler;
+import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.parachute.Parachute;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteRegistry;
@@ -21,7 +21,9 @@ import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardSimple;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.core.player.PlayerWrapper;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -105,18 +107,33 @@ public final class Player extends PlayerWrapper {
 		this.last_handle  = last_handle;
 		this.data_storage = new PlayerDataStorage ( id , name );
 		
+		// initializing
+		this.init ( );
+	}
+	
+	private void init ( ) {
 		// unset rank
 		this.rank = -1;
-		
-		// default scoreboard
-		this.scoreboard = new ScoreboardSimple ( this );
-		// it will be visible whn the player joins an arena.
-		this.scoreboard.setVisible ( false );
 		
 		// default compass
 		this.compass = new CompassBarSimple ( this );
 		// we would like to set it visible when the arena starts
 		this.compass.setVisible ( false );
+		
+		// initializing sensitives
+		if ( Bukkit.isPrimaryThread ( ) ) {
+			initThreadSensitives ( );
+		} else {
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , this :: initThreadSensitives );
+		}
+	}
+	
+	private void initThreadSensitives ( ) {
+		// default scoreboard
+		this.scoreboard = new ScoreboardSimple ( this );
+		// it will be visible whn the player joins an arena.
+		this.scoreboard.setVisible ( false );
 	}
 	
 	public PlayerDataStorage getDataStorage ( ) {
@@ -160,6 +177,15 @@ public final class Player extends PlayerWrapper {
 		return compass;
 	}
 	
+	/**
+	 * Gets the battle royale scoreboard for this player.
+	 * <br>
+	 * <b>Note that <code>null</code> might be returned
+	 * if the player is being initialized asynchronously.</b>
+	 *
+	 * @return the respective battle royale scoreboard.
+	 */
+	@Nullable
 	public Scoreboard getBRScoreboard ( ) {
 		return scoreboard;
 	}
@@ -290,9 +316,14 @@ public final class Player extends PlayerWrapper {
 	public synchronized boolean leaveArena ( ) {
 		final BattleRoyaleArena current = this.arena;
 		
-		if ( current != null && RunModeHandler.getInstance ( ).getMode ( ) != EnumMode.BUNGEE ) {
+		if ( current != null ) {
 			// firing pre-event
 			new PlayerArenaPreLeaveEvent ( this , current ).callSafe ( );
+			
+			// leaving spectator mode
+			if ( spectator ) {
+				setSpectator ( false );
+			}
 			
 			// resetting values
 			resetValues ( );

@@ -155,6 +155,10 @@ public final class BattleRoyaleArenaBusRegistry implements Iterable < BusInstanc
 	
 	public void start ( ) {
 		if ( dragon_bus != null ) {
+			if ( dragon_bus.isStarted ( ) ) {
+				dragon_bus.restart ( );
+			}
+			
 			dragon_bus.start ( arena , spawn );
 		} else {
 			// starting individual buses

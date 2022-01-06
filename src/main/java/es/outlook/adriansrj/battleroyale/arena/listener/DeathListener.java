@@ -2,6 +2,7 @@ package es.outlook.adriansrj.battleroyale.arena.listener;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaTeamRegistry;
+import es.outlook.adriansrj.battleroyale.bus.BusInstance;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaStat;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
@@ -398,17 +399,23 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 				? PlayerDeathEvent.Cause.of ( last_damage.getCause ( ) ) : null;
 		boolean headshot = false;
 		
+		// for any reason sometimes the server registers a
+		// player as the killer of himself wo we will make
+		// sure to avoid that.
 		if ( last_damage instanceof EntityDamageByEntityEvent ) {
 			// the player was killed by another player
 			Entity uncast_killer = ( ( EntityDamageByEntityEvent ) last_damage ).getDamager ( );
 			
 			if ( uncast_killer instanceof org.bukkit.entity.Player ) {
-				br_killer = Player.getPlayer ( uncast_killer.getUniqueId ( ) );
+				if ( !Objects.equals ( uncast_killer.getUniqueId ( ) , player.getUniqueId ( ) ) ) {
+					br_killer = Player.getPlayer ( uncast_killer.getUniqueId ( ) );
+				}
 			} else if ( uncast_killer instanceof Projectile ) {
 				Projectile       projectile = ( Projectile ) uncast_killer;
 				ProjectileSource shooter    = projectile.getShooter ( );
 				
-				if ( shooter instanceof org.bukkit.entity.Player ) {
+				if ( shooter instanceof org.bukkit.entity.Player && !Objects.equals (
+						( ( org.bukkit.entity.Player ) shooter ).getUniqueId ( ) , player.getUniqueId ( ) ) ) {
 					br_killer = Player.getPlayer ( ( org.bukkit.entity.Player ) shooter );
 					
 					// checking headshot
@@ -434,8 +441,11 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		if ( br_killer == null && cause == PlayerDeathEvent.Cause.CUSTOM ) {
 			// died bleeding out
 			if ( br_player.isKnocked ( ) ) {
-				cause     = PlayerDeathEvent.Cause.BLEEDING_OUT;
-				br_killer = br_player.getKnocker ( );
+				cause = PlayerDeathEvent.Cause.BLEEDING_OUT;
+				
+				if ( !Objects.equals ( br_player , br_player.getKnocker ( ) ) ) {
+					br_killer = br_player.getKnocker ( );
+				}
 			}
 			// died out of bounds
 			else if ( !arena.getBorder ( ).getCurrentBounds ( ).contains ( player.getLocation ( ) ) ) {
@@ -517,7 +527,7 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 								winning_player = arena.getPlayers ( ).stream ( )
 										.filter ( other -> !Objects.equals ( other , br_player ) )
 										.filter ( Player :: isPlaying )
-										.findFirst ( ).orElse ( null );
+										.findAny ( ).orElse ( null );
 							}
 							
 							if ( winning_player != null ) {
@@ -525,8 +535,16 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 								winning_player.setRank ( 0 );
 								sendRankTitle ( winning_player , 0 );
 								
-								// incrementing stat
+								// incrementing win stat
 								incrementWinStat ( winning_player );
+								// incrementing lose stat
+								for ( Team losing_team : arena.getTeamRegistry ( ) ) {
+									if ( !Objects.equals ( losing_team , winning_player.getTeam ( ) ) ) {
+										incrementLoseStat ( losing_team );
+									}
+								}
+								// closing parachute & restarting bus
+								closeParachuteRestartBus ( winning_player );
 							} else {
 								error_message = "The winning player could not be determined";
 							}
@@ -540,7 +558,7 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 								winning_team = arena.getTeamRegistry ( ).stream ( )
 										.filter ( other -> !Objects.equals ( other , br_player.getTeam ( ) ) )
 										.filter ( Team :: isAlive )
-										.findFirst ( ).orElse ( null );
+										.findAny ( ).orElse ( null );
 							}
 							
 							if ( winning_team != null ) {
@@ -551,9 +569,18 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 									member.setRank ( 0 );
 									sendRankTitle ( member , 0 );
 									
-									// incrementing stat
+									// incrementing win stat
 									incrementWinStat ( member );
+									// closing parachute & restarting bus
+									closeParachuteRestartBus ( member );
 								} );
+								
+								// incrementing lose stat
+								for ( Team losing_team : arena.getTeamRegistry ( ) ) {
+									if ( !Objects.equals ( losing_team , winning_team ) ) {
+										incrementLoseStat ( losing_team );
+									}
+								}
 							} else {
 								error_message = "The winning team could not be determined";
 							}
@@ -589,8 +616,16 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 					winner.setRank ( 0 );
 					sendRankTitle ( winner , 0 );
 					
-					// incrementing stat
+					// incrementing win stat
 					incrementWinStat ( winner );
+					// incrementing lose stat
+					for ( Team losing_team : arena.getTeamRegistry ( ) ) {
+						if ( !Objects.equals ( losing_team , winner.getTeam ( ) ) ) {
+							incrementLoseStat ( losing_team );
+						}
+					}
+					// closing parachute & restarting bus
+					closeParachuteRestartBus ( winner );
 					
 					// ranking rest of players
 					List < Player > rest = arena.getPlayers ( false ).stream ( )
@@ -607,6 +642,8 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 						
 						// incrementing stat
 						incrementWinStat ( other );
+						// closing parachute & restarting bus
+						closeParachuteRestartBus ( other );
 					}
 				} else {
 					ConsoleUtil.sendPluginMessage (
@@ -666,16 +703,33 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 						member.setRank ( 0 );
 						sendRankTitle ( member , 0 );
 						
-						// incrementing stat
+						// incrementing win stat
 						incrementWinStat ( member );
+						// closing parachute & restarting bus
+						closeParachuteRestartBus ( member );
 					} );
+					
+					// incrementing lose stat
+					for ( Team losing_team : arena.getTeamRegistry ( ) ) {
+						if ( !Objects.equals ( losing_team , winning_team ) ) {
+							incrementLoseStat ( losing_team );
+						}
+					}
 				} else if ( winning_player != null ) {
 					// best rank for the winner
 					winning_player.setRank ( 0 );
 					sendRankTitle ( winning_player , 0 );
 					
-					// incrementing stat
+					// incrementing win stat
 					incrementWinStat ( winning_player );
+					// incrementing lose stat
+					for ( Team losing_team : arena.getTeamRegistry ( ) ) {
+						if ( !Objects.equals ( losing_team , winning_player.getTeam ( ) ) ) {
+							incrementLoseStat ( losing_team );
+						}
+					}
+					// closing parachute & restarting bus
+					closeParachuteRestartBus ( winning_player );
 				}
 			} else {
 				if ( mode.isSolo ( ) ) {
@@ -702,11 +756,41 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 	 * Increments the {@link EnumStat#WINS} for the
 	 * provided player.
 	 *
-	 * @param player the player to benefit.
+	 * @param player the player to increment.
 	 */
 	private void incrementWinStat ( Player player ) {
-		player.getDataStorage ( ).incrementStat ( EnumStat.WINS , 1 , true );
-		player.getDataStorage ( ).incrementTempStat ( EnumStat.WINS , 1 );
+		incrementStat ( player , EnumStat.WINS );
+	}
+	
+	/**
+	 * Increments the {@link EnumStat#LOSSES} for the
+	 * provided player.
+	 *
+	 * @param player the player to increment.
+	 */
+	private void incrementLoseStat ( Player player ) {
+		incrementStat ( player , EnumStat.LOSSES );
+	}
+	
+	/**
+	 * Increments the {@link EnumStat#LOSSES} for the
+	 * all the player in the provided team.
+	 *
+	 * @param team the team to increment.
+	 */
+	private void incrementLoseStat ( Team team ) {
+		team.getPlayers ( ).forEach ( this :: incrementLoseStat );
+	}
+	
+	/**
+	 * Increments the provided stat for the
+	 * provided player.
+	 *
+	 * @param player the player to increment.
+	 */
+	private void incrementStat ( Player player , EnumStat stat ) {
+		player.getDataStorage ( ).incrementStat ( stat , 1 , true );
+		player.getDataStorage ( ).incrementTempStat ( stat , 1 );
 	}
 	
 	/**
@@ -813,5 +897,21 @@ public final class DeathListener extends BattleRoyaleArenaListener {
 		// will send respawn packet in the next tick
 		SchedulerUtil.scheduleSyncDelayedTask ( ( ) -> player.getBukkitPlayerOptional ( ).ifPresent (
 				PacketSenderService.getInstance ( ) :: sendRespawnPacket ) );
+	}
+	
+	private void closeParachuteRestartBus ( Player player ) {
+		// closing parachute
+		ParachuteInstance parachute = player.getParachute ( );
+		
+		if ( parachute.isOpen ( ) ) {
+			parachute.close ( );
+		}
+		
+		// restarting bus
+		BusInstance < ? > bus = player.getBus ( );
+		
+		if ( bus.isStarted ( ) ) {
+			bus.restart ( );
+		}
 	}
 }

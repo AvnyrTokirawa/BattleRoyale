@@ -63,7 +63,7 @@ dependencies {
                     'CrackShot.jar',
                     'CrackShotPlus.jar',
                     'MythicLib-1.1.5.jar',
-                    'MMOItems-6.6.3.jar',
+                    'MMOItems-6.6.5.jar',
 //                    'MMOItems-4.7.3/MMOItems Legacy.jar',
             ])
 
@@ -91,6 +91,11 @@ dependencies {
 //            [
 //                    'MVdWPlaceholderAPI.jar',
 //            ])
+    // FeatherBoard
+    implementation fileTree(dir: 'D:/Documentos/Librerias', include:
+            [
+                    'FeatherBoard.jar',
+            ])
 
     // nbt
     // implementation 'se.llbit:jo-nbt:1.3.0'
@@ -116,7 +121,7 @@ bukkit {
     apiVersion = '1.13'
 
     softDepend = ['AdrianSRCore', 'WorldEdit', 'ProtocolSupport', 'ViaVersion',
-                  'Vault', 'QualityArmory', 'QualityArmoryVehicles',
+                  'Vault', 'QualityArmory', 'QualityArmoryVehicles', 'MMOItems',
                   'CrackShot', 'CrackShotPlus', 'PlaceholderAPI', 'MVdWPlaceholderAPI', 'ProtocolLib']
 
     commands {

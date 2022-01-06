@@ -127,6 +127,19 @@ public class DataStorageSQLite implements DataStorage {
 				UID_COLUMN , PLAYER_ID_TABLE_NAME , UID_COLUMN ) ) ) {
 			statement.executeUpdate ( );
 		}
+		
+		// creating balances table
+		try ( PreparedStatement statement = connection.prepareStatement ( String.format (
+				"CREATE TABLE IF NOT EXISTS %s (" +
+						"%s VARCHAR(36) NOT NULL, " +
+						"%s INTEGER NOT NULL, " +
+						"PRIMARY KEY(%s), " +
+						"FOREIGN KEY (%s) REFERENCES %s(%s))" ,
+				BALANCES_TABLE_NAME , UID_COLUMN , VALUE_COLUMN ,
+				UID_COLUMN ,
+				UID_COLUMN , PLAYER_ID_TABLE_NAME , UID_COLUMN ) ) ) {
+			statement.executeUpdate ( );
+		}
 	}
 	
 	protected void tablesStructureCheck ( ) throws SQLException {
@@ -640,12 +653,11 @@ public class DataStorageSQLite implements DataStorage {
 	
 	protected void idCheck ( UUID uuid , String name ) throws SQLException {
 		try ( PreparedStatement statement = connection.prepareStatement ( String.format (
-				"INSERT INTO %s (%s, %s) VALUES (?, ?) ON CONFLICT (%s) DO UPDATE SET %s = ?" ,
-				PLAYER_ID_TABLE_NAME , UID_COLUMN , NAME_COLUMN , UID_COLUMN , NAME_COLUMN ) ) ) {
+				"INSERT OR IGNORE INTO %s (%s, %s) VALUES (?, ?)" ,
+				PLAYER_ID_TABLE_NAME , UID_COLUMN , NAME_COLUMN ) ) ) {
 			
 			statement.setString ( 1 , uuid.toString ( ) );
 			statement.setString ( 2 , name );
-			statement.setString ( 3 , name );
 			
 			statement.executeUpdate ( );
 		}

@@ -1,6 +1,7 @@
 package es.outlook.adriansrj.battleroyale.util.mmoitems;
 
 import net.Indyuce.mmoitems.MMOItems;
+import net.Indyuce.mmoitems.api.Type;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -11,6 +12,13 @@ import org.bukkit.inventory.ItemStack;
 public class MMOItemsUtil {
 	
 	public static ItemStack getItemInstance ( String type_name , String id ) {
-		return MMOItems.plugin.getItem ( type_name , id );
+		MMOItems plugin = MMOItems.plugin;
+		Type     type   = plugin.getTypes ( ).get ( type_name );
+		
+		if ( type != null ) {
+			return MMOItems.plugin.getItem ( type , id );
+		} else {
+			return null;
+		}
 	}
 }

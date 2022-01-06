@@ -25,7 +25,7 @@ public final class StatRewardConfigHandler extends ScalableConfigurationHandler 
 	public StatRewardConfigHandler ( BattleRoyale plugin ) {
 		super ( plugin );
 		
-		//
+		// put 0 so it will never return null
 		for ( EnumStat stat : EnumStat.values ( ) ) {
 			reward_map.put ( stat , 0 );
 		}

@@ -1,5 +1,6 @@
 package es.outlook.adriansrj.battleroyale.game.mode;
 
+import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 
 /**
@@ -11,6 +12,12 @@ public abstract class BattleRoyaleModeAdapter extends BattleRoyaleMode {
 	
 	@Override
 	public boolean introduce ( Player player ) {
+		// nothing to do by default
+		return true;
+	}
+	
+	@Override
+	public boolean end ( BattleRoyaleArena arena ) {
 		// nothing to do by default
 		return true;
 	}

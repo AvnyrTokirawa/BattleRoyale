@@ -15,6 +15,7 @@ import es.outlook.adriansrj.battleroyale.bus.BusRegistry;
 import es.outlook.adriansrj.battleroyale.command.BattleRoyaleCommandHandler;
 import es.outlook.adriansrj.battleroyale.compass.CompassBarHandler;
 import es.outlook.adriansrj.battleroyale.compatibility.crackshot.CrackShotCompatibilityHandler;
+import es.outlook.adriansrj.battleroyale.compatibility.featherboard.FeatherBoardCompatibilityHandler;
 import es.outlook.adriansrj.battleroyale.compatibility.qualityarmory.QualityArmoryCompatibilityHandler;
 import es.outlook.adriansrj.battleroyale.configuration.arena.BattleRoyaleArenaSignConfigHandler;
 import es.outlook.adriansrj.battleroyale.configuration.arena.BattleRoyaleArenaSignContainerHandler;
@@ -175,6 +176,9 @@ public enum EnumPluginHandler {
 	SCOREBOARD_CONFIGURATION_REGISTRY ( ScoreboardConfigurationRegistry.class , false ),
 	SCOREBOARD_HANDLER ( ScoreboardHandler.class , false ),
 	SCOREBOARD_CONFIGURATION_HANDLER ( ScoreboardConfigHandler.class , false ),
+	
+	FEATHERBOARD_COMPATIBILITY_HANDLER (
+			FeatherBoardCompatibilityHandler.class , PluginUtil :: isFeatherBoardEnabled , false ),
 	
 	QUALITY_ARMORY_COMPATIBILITY_HANDLER (
 			QualityArmoryCompatibilityHandler.class , PluginUtil :: isQualityArmoryEnabled , false ),

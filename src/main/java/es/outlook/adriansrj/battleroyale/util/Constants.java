@@ -53,15 +53,16 @@ public class Constants {
 	public static final String SCHEMATIC_HEIGHT_KEY = "Height";
 	public static final String SCHEMATIC_LENGTH_KEY = "Length";
 	
-	public static final String NAME_KEY     = "name";
-	public static final String LIMIT_KEY    = "limit";
-	public static final String DELAY_KEY    = "delay";
-	public static final String DURATION_KEY = "duration";
-	public static final String SIZE_KEY     = "size";
-	public static final String STRENGTH_KEY = "strength";
-	public static final String DATA_KEY     = "data";
-	public static final String CHANCE_KEY   = "chance";
-	public static final String REQUIRED_KEY = "required";
+	public static final String NAME_KEY      = "name";
+	public static final String LIMIT_KEY     = "limit";
+	public static final String DELAY_KEY     = "delay";
+	public static final String DURATION_KEY  = "duration";
+	public static final String SIZE_KEY      = "size";
+	public static final String STRENGTH_KEY  = "strength";
+	public static final String DATA_KEY      = "data";
+	public static final String CHANCE_KEY    = "chance";
+	public static final String REQUIRED_KEY  = "required";
+	public static final String DIRECTION_KEY = "direction";
 	
 	//	/** Update period of the displacement executor of the buses */
 	//	public static final long BUS_DISPLACEMENT_EXECUTOR_PERIOD    = 60L;
@@ -75,6 +76,7 @@ public class Constants {
 	public static final String PROTOCOL_LIB_PLUGIN_NAME            = "ProtocolLib";
 	public static final String PLACEHOLDER_API_PLUGIN_NAME         = "PlaceholderAPI";
 	public static final String VAULT_PLUGIN_NAME                   = "Vault";
+	public static final String FEATHERBOARD_PLUGIN_NAME            = "FeatherBoard";
 	public static final String QUALITY_ARMORY_PLUGIN_NAME          = "QualityArmory";
 	public static final String QUALITY_ARMORY_VEHICLES_PLUGIN_NAME = "QualityArmoryVehicles2";
 	public static final String CRACK_SHOT_PLUGIN_NAME              = "CrackShot";

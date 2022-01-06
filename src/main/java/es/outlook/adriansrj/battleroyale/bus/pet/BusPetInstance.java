@@ -27,9 +27,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * {@link BusPet} instance.
@@ -319,12 +316,6 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 	//		}
 	//	}
 	
-	protected Set < org.bukkit.entity.Player > getPlayersInArena ( ) {
-		return arena.getPlayers ( true ).stream ( ).map ( Player :: getBukkitPlayerOptional )
-				.filter ( Optional :: isPresent ).map ( Optional :: get )
-				.collect ( Collectors.toSet ( ) );
-	}
-	
 	@Override
 	protected void jumpTutorial ( ) {
 		// don't need to check if the player
@@ -339,9 +330,8 @@ public class BusPetInstance extends BusInstanceBase < BusPet > implements Listen
 	@Override
 	public synchronized void finish ( ) {
 		syncCheck ( );
-		this.eject ( );
 		
-		// then finishing
+		this.eject ( );
 		super.finish ( );
 		this.dispose ( );
 	}

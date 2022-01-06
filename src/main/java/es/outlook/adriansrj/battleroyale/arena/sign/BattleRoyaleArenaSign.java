@@ -5,6 +5,7 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.core.util.StringUtil;
 import es.outlook.adriansrj.core.util.configurable.Configurable;
+import es.outlook.adriansrj.core.util.configurable.ConfigurableEntry;
 import es.outlook.adriansrj.core.util.math.Vector3I;
 import es.outlook.adriansrj.core.util.reflection.general.EnumReflection;
 import es.outlook.adriansrj.core.util.yaml.YamlUtil;
@@ -15,8 +16,6 @@ import org.bukkit.configuration.ConfigurationSection;
  * @author AdrianSR / 04/09/2021 / 11:22 a. m.
  */
 public class BattleRoyaleArenaSign implements Configurable {
-	
-	protected static final String DIRECTION_KEY = "direction";
 	
 	/**
 	 * Loads a {@link BattleRoyaleArenaSign} from the provided {@link ConfigurationSection}.
@@ -31,6 +30,8 @@ public class BattleRoyaleArenaSign implements Configurable {
 	protected String    arena_name;
 	protected Vector3I  location;
 	protected BlockFace facing_direction;
+	@ConfigurableEntry ( key = "status-block.disable" )
+	protected boolean   disable_status_block;
 	
 	public BattleRoyaleArenaSign ( Vector3I location , BlockFace facing_direction , BattleRoyaleArena arena ) {
 		this.arena_name       = arena.getName ( );
@@ -50,6 +51,10 @@ public class BattleRoyaleArenaSign implements Configurable {
 		return facing_direction;
 	}
 	
+	public boolean isDisableStatusBlock ( ) {
+		return disable_status_block;
+	}
+	
 	public String getArenaName ( ) {
 		return arena_name;
 	}
@@ -61,6 +66,7 @@ public class BattleRoyaleArenaSign implements Configurable {
 	
 	@Override
 	public BattleRoyaleArenaSign load ( ConfigurationSection section ) {
+		this.loadEntries ( section );
 		this.arena_name = section.getString ( Constants.ARENA_KEY , "" ).trim ( );
 		
 		if ( section.isConfigurationSection ( Constants.LOCATION_KEY ) ) {
@@ -72,14 +78,17 @@ public class BattleRoyaleArenaSign implements Configurable {
 		}
 		
 		this.facing_direction = EnumReflection.getEnumConstant (
-				BlockFace.class , section.getString ( DIRECTION_KEY , "" ) );
+				BlockFace.class , section.getString ( Constants.DIRECTION_KEY , "" ) );
 		return this;
 	}
 	
 	@Override
 	public int save ( ConfigurationSection section ) {
-		int save = ( arena_name != null && YamlUtil.setNotEqual (
-				section , Constants.ARENA_KEY , arena_name ) ) ? 1 : 0;
+		int save = saveEntries ( section );
+		
+		if ( arena_name != null ) {
+			save += YamlUtil.setNotEqual ( section , Constants.ARENA_KEY , arena_name ) ? 1 : 0;
+		}
 		
 		if ( location != null ) {
 			ConfigurationSection location_section = section.createSection ( Constants.LOCATION_KEY );
@@ -90,7 +99,7 @@ public class BattleRoyaleArenaSign implements Configurable {
 		}
 		
 		if ( facing_direction != null ) {
-			save += YamlUtil.setNotEqual ( section , DIRECTION_KEY , facing_direction.name ( ) ) ? 1 : 0;
+			save += YamlUtil.setNotEqual ( section , Constants.DIRECTION_KEY , facing_direction.name ( ) ) ? 1 : 0;
 		}
 		
 		return save;
@@ -103,6 +112,6 @@ public class BattleRoyaleArenaSign implements Configurable {
 	
 	@Override
 	public boolean isInvalid ( ) {
-		return ! isValid ( );
+		return !isValid ( );
 	}
 }

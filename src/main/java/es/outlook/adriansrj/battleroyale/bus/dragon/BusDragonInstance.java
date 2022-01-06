@@ -8,8 +8,11 @@ import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.reflection.bukkit.EntityReflection;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.entity.EntityUtil;
+import es.outlook.adriansrj.core.util.math.Vector2D;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
@@ -35,11 +38,13 @@ import java.util.stream.Collectors;
  */
 public final class BusDragonInstance extends BusInstanceBase < BusDragon > implements Listener {
 	
-	private static final double DRAGON_HEIGHT = 2.85D;
+	//	private static final double DRAGON_HEIGHT = 2.85D;
+	//	private static final double DRAGON_HEIGHT = 1.0D;
 	
 	private final Map < UUID, Chicken > seat_map = new ConcurrentHashMap <> ( );
 	private final Stack < UUID >        queue    = new Stack <> ( );
 	
+	private Vector      start_location;
 	private Vector      velocity;
 	// bus dragon shape
 	private EnderDragon shape;
@@ -68,22 +73,31 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 	}
 	
 	private void putPlayer ( org.bukkit.entity.Player player ) {
-		if ( Bukkit.isPrimaryThread ( ) ) {
-			// player must be in the world of the arena, otherwise
-			// we will need to teleport them, and wait until the teleportation
-			// process is finished to actually put the player on the dragon.
-			if ( Objects.equals ( player.getWorld ( ) , arena.getWorld ( ) ) ) {
-				Bukkit.getScheduler ( ).scheduleSyncDelayedTask (
-						BattleRoyale.getInstance ( ) , ( ) -> putPlayer0 ( player ) );
-			} else {
-				if ( !queue.contains ( player.getUniqueId ( ) ) ) {
-					queue.add ( player.getUniqueId ( ) );
-				}
-				
-				player.teleport ( getLocation ( ).toLocation ( arena.getWorld ( ) ) );
-			}
+		syncCheck ( );
+		
+		// player must be in the world of the arena, otherwise
+		// we will need to teleport them, and wait until the teleportation
+		// process is finished to actually put the player on the dragon.
+		if ( Objects.equals ( player.getWorld ( ) , arena.getWorld ( ) ) ) {
+			Bukkit.getScheduler ( ).scheduleSyncDelayedTask (
+					BattleRoyale.getInstance ( ) , ( ) -> putPlayer0 ( player ) );
 		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> putPlayer ( player ) );
+			// adding to put queue
+			if ( !queue.contains ( player.getUniqueId ( ) ) ) {
+				queue.add ( player.getUniqueId ( ) );
+			}
+			
+			// making sure chunk is loaded
+			Location location = getLocation ( ).toLocation (
+					arena.getWorld ( ) , getSpawn ( ).getYaw ( ) , 0.0F );
+			Chunk chunk = location.getChunk ( );
+			
+			if ( !chunk.isLoaded ( ) ) {
+				chunk.load ( true );
+			}
+			
+			// changing world
+			player.teleport ( location );
 		}
 	}
 	
@@ -96,7 +110,7 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 		// then putting
 		if ( queue.remove ( player.getUniqueId ( ) ) ) {
 			Bukkit.getScheduler ( ).scheduleSyncDelayedTask (
-					BattleRoyale.getInstance ( ) , ( ) -> putPlayer0 ( player ) );
+					BattleRoyale.getInstance ( ) , ( ) -> putPlayer0 ( player ) , 2L );
 		}
 	}
 	
@@ -126,9 +140,12 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 		player.setAllowFlight ( true );
 		player.setFlying ( true );
 		
-		Chicken seat = arena.getWorld ( ).spawn (
-				shape_seat.getLocation ( ).clone ( ).add ( 0.0D , DRAGON_HEIGHT , 0.0D ) ,
-				Chicken.class );
+		//		Chicken seat = arena.getWorld ( ).spawn (
+		//				shape_seat.getLocation ( ).clone ( ).add ( 0.0D , DRAGON_HEIGHT , 0.0D ) ,
+		//				Chicken.class );
+		
+		Chicken seat = arena.getWorld ( ).spawn ( getLocation ( ).toLocation (
+				arena.getWorld ( ) , spawn.getYaw ( ) , 0.0F ) , Chicken.class );
 		
 		seat.setRemoveWhenFarAway ( false );
 		seat.setAdult ( );
@@ -161,17 +178,16 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 	@SuppressWarnings ( "deprecation" )
 	@Override
 	protected void start ( ) {
+		syncCheck ( );
 		super.start ( );
 		
+		start_location = location.clone ( );
 		// velocity can be calculated only once.
-		velocity = direction.clone ( ).multiply ( spawn.getSpeed ( ) );
+		velocity = direction.clone ( ).multiply ( spawn.getSpeed ( ) ).setY ( 0.0D );
 		
 		// we must listen for PlayerChangeWorldEvent
-		Bukkit.getPluginManager ( ).registerEvents ( this , BattleRoyale.getInstance ( ) );
-		
-		// putting players
-		arena.getPlayers ( false ).stream ( ).filter ( Player :: hasTeam ).map (
-				Player :: getBukkitPlayer ).filter ( Objects :: nonNull ).forEach ( this :: putPlayer );
+		Bukkit.getPluginManager ( ).registerEvents (
+				this , BattleRoyale.getInstance ( ) );
 		
 		// spawning dragon
 		shape_seat = arena.getWorld ( ).spawn ( getLocation ( ).toLocation (
@@ -186,20 +202,30 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 		shape.setRemoveWhenFarAway ( false );
 		
 		try {
+			shape_seat.setCollidable ( false );
+			shape.setCollidable ( false );
+		} catch ( NoSuchMethodError ex ) {
+			// legacy version
+		}
+		
+		try {
 			shape_seat.addPassenger ( shape );
 		} catch ( NoSuchMethodError ex ) {
 			// legacy versions
 			shape_seat.setPassenger ( shape );
 		}
+		
+		// putting players
+		arena.getPlayers ( false ).stream ( ).filter ( Player :: hasTeam ).map (
+				Player :: getBukkitPlayer ).filter ( Objects :: nonNull ).forEach ( this :: putPlayer );
 	}
 	
 	@Override
 	protected void lifeLoop ( ) {
+		syncCheck ( );
+		
 		// updating location
 		location.add ( velocity );
-		
-		// displacing dragon
-		shape_seat.setVelocity ( velocity );
 		
 		// displacing seats
 		Iterator < Map.Entry < UUID, Chicken > > iterator = seat_map.entrySet ( ).iterator ( );
@@ -210,12 +236,23 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 			Chicken                     seat   = entry.getValue ( );
 			
 			if ( player != null && player.isOnline ( ) && seat != null ) {
-				if ( seat.getLocation ( ).distance ( shape_seat.getLocation ( ) ) < 1.0D ) {
-					seat.setVelocity ( velocity );
-				} else {
-					EntityReflection.setPositionDirty ( seat , shape_seat.getLocation ( ).add (
-							0.0D , DRAGON_HEIGHT , 0.0D ).toVector ( ) );
+				Location seat_location       = seat.getLocation ( );
+				Location shape_seat_location = shape_seat.getLocation ( );
+				double distance = new Vector2D ( seat_location.getX ( ) , seat_location.getZ ( ) ).distance (
+						new Vector2D ( shape_seat_location.getX ( ) , shape_seat_location.getZ ( ) ) );
+				
+				Vector velocity = this.velocity.clone ( );
+				
+				if ( distance > 0.5D ) {
+					if ( seat_location.toVector ( ).distance ( start_location )
+							< shape_seat_location.toVector ( ).distance ( start_location ) ) {
+						velocity = direction.clone ( ).multiply ( spawn.getSpeed ( ) + 0.05D );
+					} else {
+						velocity = direction.clone ( ).multiply ( spawn.getSpeed ( ) / 2.0D );
+					}
 				}
+				
+				seat.setVelocity ( velocity.setY ( 0.0D ) );
 			} else {
 				iterator.remove ( );
 				
@@ -224,8 +261,19 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 					seat.eject ( );
 					seat.remove ( );
 				}
+				
+				// showing player for others
+				if ( player != null ) {
+					arena.getPlayers ( false ).stream ( ).map ( Player :: getBukkitPlayer )
+							.filter ( Objects :: nonNull )
+							.filter ( other -> !Objects.equals ( player.getUniqueId ( ) , other.getUniqueId ( ) ) )
+							.forEach ( other -> Player.getPlayer ( other ).showPlayer ( player ) );
+				}
 			}
 		}
+		
+		// displacing dragon
+		shape_seat.setVelocity ( velocity );
 		
 		// then life loop
 		super.lifeLoop ( );
@@ -244,83 +292,66 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 		}
 	}
 	
-	@SuppressWarnings ( "deprecation" )
 	public synchronized void ejectPlayer ( Player br_player ) {
-		if ( Bukkit.isPrimaryThread ( ) ) {
-			queue.remove ( br_player.getUniqueId ( ) );
-			
-			// then disposing
-			Chicken seat = seat_map.remove ( br_player.getUniqueId ( ) );
-			
-			if ( seat != null ) {
-				seat.eject ( );
-				seat.remove ( );
-			}
-			
-			br_player.getBukkitPlayerOptional ( ).ifPresent ( player -> {
-				// we will update the last location in the server
-				EntityReflection.setLocation (
-						player , location.getX ( ) , location.getY ( ) , location.getZ ( ) ,
-						player.getLocation ( ).getYaw ( ) , player.getLocation ( ).getPitch ( ) );
-				
-				// disabling fly
-				player.setAllowFlight ( player.getGameMode ( ) == GameMode.CREATIVE );
-				player.setFlying ( false );
-				
-				// showing player for others
-				arena.getPlayers ( false ).stream ( ).map ( Player :: getBukkitPlayer ).filter (
-						Objects :: nonNull ).forEach ( other -> {
-					try {
-						other.showPlayer ( BattleRoyale.getInstance ( ) , player );
-					} catch ( NoSuchMethodError ex ) {
-						// legacy versions
-						other.showPlayer ( player );
-					}
-				} );
-			} );
-			
-			// firing event
-			new PlayerJumpOffBusEvent ( br_player , this ).call ( );
-		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> ejectPlayer ( br_player ) );
+		syncCheck ( );
+		
+		// player is probably in the put queue
+		queue.remove ( br_player.getUniqueId ( ) );
+		
+		// then disposing
+		Chicken seat = seat_map.remove ( br_player.getUniqueId ( ) );
+		
+		if ( seat != null ) {
+			seat.eject ( );
+			seat.remove ( );
 		}
+		
+		br_player.getBukkitPlayerOptional ( ).ifPresent ( player -> {
+			// we will update the last location in the server
+			EntityReflection.setLocation (
+					player , location.getX ( ) , location.getY ( ) , location.getZ ( ) ,
+					player.getLocation ( ).getYaw ( ) , player.getLocation ( ).getPitch ( ) );
+			
+			// disabling fly
+			player.setAllowFlight ( player.getGameMode ( ) == GameMode.CREATIVE );
+			player.setFlying ( false );
+		} );
+		
+		// showing player for others
+		br_player.getBukkitPlayerOptional ( ).ifPresent (
+				player -> arena.getPlayers ( false ).stream ( ).map ( Player :: getBukkitPlayer )
+						.filter ( Objects :: nonNull )
+						.filter ( other -> !Objects.equals ( player.getUniqueId ( ) , other.getUniqueId ( ) ) )
+						.forEach ( other -> Player.getPlayer ( other ).showPlayer ( player ) ) );
+		
+		// firing event
+		new PlayerJumpOffBusEvent ( br_player , this ).call ( );
 	}
 	
 	private void ejectPlayers ( ) {
-		seat_map.keySet ( ).stream ( ).map ( Player :: getPlayer ).forEach ( this :: ejectPlayer );
+		getPlayers ( ).forEach ( this :: ejectPlayer );
 	}
 	
 	@Override
 	public synchronized void finish ( ) {
-		if ( Bukkit.isPrimaryThread ( ) ) {
-			// ejecting
-			this.ejectPlayers ( );
-			
-			// then finishing
-			super.finish ( );
-			this.dispose ( );
-		} else {
-			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
-				// we will have to make sure that it is not already
-				// finished as we are switching threads; this can
-				// result in a desynchronization problem.
-				if ( !isFinished ( ) ) {
-					finish ( );
-				}
-			} );
-		}
+		syncCheck ( );
+		
+		this.ejectPlayers ( );
+		super.finish ( );
+		this.dispose ( );
 	}
 	
 	@Override
 	public synchronized void restart ( ) {
-		// ejecting
-		this.ejectPlayers ( );
+		syncCheck ( );
 		
+		this.ejectPlayers ( );
 		super.restart ( );
 		this.dispose ( );
 	}
 	
 	private void dispose ( ) {
+		syncCheck ( );
 		HandlerList.unregisterAll ( this );
 		
 		if ( shape_seat != null ) {
@@ -333,6 +364,7 @@ public final class BusDragonInstance extends BusInstanceBase < BusDragon > imple
 			shape = null;
 		}
 		
+		queue.clear ( );
 		seat_map.values ( ).stream ( ).filter ( Objects :: nonNull ).forEach ( Entity :: remove );
 		seat_map.clear ( );
 	}

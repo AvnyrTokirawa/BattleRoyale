@@ -485,9 +485,9 @@ public class BattleRoyaleArena {
 				}
 			}
 			
-//			// world border
-//			border.getPlayers ( ).add ( br_player );
-//			border.refresh ( );
+			//			// world border
+			//			border.getPlayers ( ).add ( br_player );
+			//			border.refresh ( );
 			
 			// making sure scoreboard is visible
 			Scoreboard scoreboard = br_player.getBRScoreboard ( );
@@ -537,9 +537,9 @@ public class BattleRoyaleArena {
 	protected void remove ( Player br_player ) {
 		Validate.notNull ( br_player , "br_player cannot be null" );
 		
-//		// un-showing border
-//		border.getPlayers ( ).remove ( br_player );
-//		border.refresh ( );
+		//		// un-showing border
+		//		border.getPlayers ( ).remove ( br_player );
+		//		border.refresh ( );
 	}
 	
 	public synchronized void start ( ) {
@@ -604,12 +604,13 @@ public class BattleRoyaleArena {
 		}
 	}
 	
-	public synchronized void end ( Player winning_player , Team winning_team ) {
+	public synchronized boolean end ( Player winning_player , Team winning_team ) {
+		Validate.isTrue ( Bukkit.isPrimaryThread ( ) , "must run in server thread" );
 		Validate.isTrue ( getState ( ) == EnumArenaState.RUNNING ,
 						  "must be running to end the arena" );
 		Validate.isTrue ( !over , "arena is already over" );
 		
-		if ( Bukkit.isPrimaryThread ( ) ) {
+		if ( mode.end ( this ) ) {
 			this.over = true;
 			
 			// firing event
@@ -624,18 +625,18 @@ public class BattleRoyaleArena {
 			}
 			
 			event.callSafe ( );
+			return true;
 		} else {
-			Bukkit.getScheduler ( ).runTask (
-					BattleRoyale.getInstance ( ) , ( ) -> end ( winning_player , winning_team ) );
+			return false;
 		}
 	}
 	
-	public synchronized void end ( Player winner ) {
-		end ( winner , null );
+	public synchronized boolean end ( Player winner ) {
+		return end ( winner , null );
 	}
 	
-	public synchronized void end ( Team winner ) {
-		end ( null , winner );
+	public synchronized boolean end ( Team winner ) {
+		return end ( null , winner );
 	}
 	
 	public synchronized void restart ( ) {
@@ -761,6 +762,7 @@ public class BattleRoyaleArena {
 		
 		this.world.restart ( );
 		this.border.restart ( );
+		this.bombing_zones.restart ( );
 		
 		if ( auto_starter != null ) {
 			this.auto_starter.restart ( );

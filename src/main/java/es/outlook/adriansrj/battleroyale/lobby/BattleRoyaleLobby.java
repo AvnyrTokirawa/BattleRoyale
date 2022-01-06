@@ -74,10 +74,22 @@ public class BattleRoyaleLobby implements Listener {
 		}
 	}
 	
-	public void introduce ( org.bukkit.entity.Player player ) {
+	public void introduce ( final org.bukkit.entity.Player player ) {
 		Player br_player = Player.getPlayer ( player );
 		
 		introduce0 ( br_player );
+		
+		// making sure is visible for others
+		for ( org.bukkit.entity.Player other : Bukkit.getOnlinePlayers ( ) ) {
+			if ( !Objects.equals ( other , player ) ) {
+				Player br_other = Player.getPlayer ( other );
+				
+				if ( !br_other.isInArena ( ) ) {
+					br_other.showPlayer ( player );
+					br_player.showPlayer ( other );
+				}
+			}
+		}
 		
 		player.setGameMode ( GameMode.ADVENTURE );
 		player.setFlying ( false );
@@ -176,7 +188,7 @@ public class BattleRoyaleLobby implements Listener {
 		}
 	}
 	
-	public void sendToSpawn ( org.bukkit.entity.Player player ) {
+	public void sendToSpawn ( final org.bukkit.entity.Player player ) {
 		Location spawn = isCustomSpawnEnabled ( ) ? getCustomSpawn ( ) : null;
 		
 		if ( spawn == null ) {

@@ -247,7 +247,7 @@ class ParachuteCustomInstanceHandle implements Listener {
 	
 	// responsible for closing the parachute when
 	// the player is teleported to avoid bugs.
-	@EventHandler ( priority = EventPriority.MONITOR, ignoreCancelled = true )
+	@EventHandler ( priority = EventPriority.HIGHEST, ignoreCancelled = true )
 	public void onTeleport ( PlayerTeleportEvent event ) {
 		Player            br_player = Player.getPlayer ( event.getPlayer ( ) );
 		ParachuteInstance parachute = br_player.getParachute ( );

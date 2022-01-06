@@ -3,7 +3,10 @@ package es.outlook.adriansrj.battleroyale.arena.sign;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArenaHandler;
 import es.outlook.adriansrj.battleroyale.configuration.arena.BattleRoyaleArenaSignContainerHandler;
+import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
+import es.outlook.adriansrj.battleroyale.enums.EnumSignConfiguration;
+import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import es.outlook.adriansrj.battleroyale.util.Constants;
@@ -27,6 +30,7 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -34,8 +38,6 @@ import java.util.stream.Stream;
  * @author AdrianSR / 04/09/2021 / 12:25 p. m.
  */
 public final class BattleRoyaleArenaSignHandler extends PluginHandler {
-	
-	// TODO: status block
 	
 	public static BattleRoyaleArenaSignHandler getInstance ( ) {
 		return getPluginHandler ( BattleRoyaleArenaSignHandler.class );
@@ -49,7 +51,8 @@ public final class BattleRoyaleArenaSignHandler extends PluginHandler {
 	 * @param plugin the plugin to handle.
 	 */
 	public BattleRoyaleArenaSignHandler ( BattleRoyale plugin ) {
-		super ( plugin ); register ( );
+		super ( plugin );
+		register ( );
 	}
 	
 	public Collection < BattleRoyaleArenaSign > getSigns ( ) {
@@ -98,83 +101,13 @@ public final class BattleRoyaleArenaSignHandler extends PluginHandler {
 		return sign_map.remove ( location );
 	}
 	
-	private void placeSign ( BattleRoyaleArenaSign sign ) {
-		// signs are placed only in the lobby at the moment, and unless
-		// people ask for a change in this system, the lobby will be
-		// the only place for the signs.
-		if ( Bukkit.isPrimaryThread ( ) ) {
-			World     world     = BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( ).getWorld ( );
-			Vector3I  location  = sign.getLocation ( );
-			BlockFace direction = sign.getFacingDirection ( );
-			Block     block     = world.getBlockAt ( location.getX ( ) , location.getY ( ) , location.getZ ( ) );
-			boolean   wall      = block.getRelative ( direction.getOppositeFace ( ) ).getType ( ).isBlock ( );
-			
-			// we will have to make direct reference to
-			// WALL_SIGN/SIGN materials as the UniversalMaterial
-			// returns a LEGACY material which doesn't actually work,
-			// as the backwards compatibility system of Spigot is a disaster
-			Material sign_material = null;
-			
-			for ( Material other : Material.values ( ) ) {
-				if ( !other.name ( ).contains ( "LEGACY" )
-						&& other.name ( ).endsWith ( wall ? "WALL_SIGN" : "SIGN" ) ) {
-					sign_material = other;
-					break;
-				}
-			}
-			
-			if ( sign_material != null && wall ) {
-				block.setType ( sign_material );
-			} else if ( sign_material != null && block.getRelative ( BlockFace.DOWN ).getType ( ).isBlock ( ) ) {
-				block.setType ( sign_material );
-			} else {
-				// cannot place as there is not a wall behind,
-				// and there is not a solid ground below.
-				return;
-			}
-			
-			Sign handle = ( Sign ) block.getState ( );
-			
-			// facing direction
-			if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_13_R1 ) ) {
-				org.bukkit.block.data.BlockData data = block.getBlockData ( );
-				
-				if ( data instanceof org.bukkit.block.data.type.WallSign ) {
-					( ( org.bukkit.block.data.type.WallSign ) data ).setFacing ( direction );
-				} else if ( data instanceof org.bukkit.block.data.type.Sign ) {
-					( ( org.bukkit.block.data.type.Sign ) data ).setRotation ( direction );
-				}
-			} else {
-				// legacy versions
-				org.bukkit.material.Sign material = new org.bukkit.material.Sign ( block.getType ( ) );
-				
-				material.setFacingDirection ( sign.getFacingDirection ( ) );
-				handle.setData ( material );
-				handle.update ( true );
-			}
-			
-			// display text
-			String[] text_lines = EnumLanguage.ARENA_SIGN_WAITING_TEXT.getAsString ( ).split ( "\n" );
-			
-			for ( int i = 0 ; i < handle.getLines ( ).length ; i++ ) {
-				if ( i < text_lines.length ) {
-					handle.setLine ( i , String.format ( text_lines[ i ] , sign.getArenaName ( ) ) );
-				} else {
-					handle.setLine ( i , StringUtil.EMPTY );
-				}
-			}
-			
-			handle.update ( true );
-		} else {
-			Bukkit.getScheduler ( ).runTask ( plugin , ( ) -> placeSign ( sign ) );
-		}
-	}
-	
 	@Override
 	protected boolean isAllowMultipleInstances ( ) {
 		return false;
 	}
 	
+	// handler responsible for handling the interaction
+	// of player with battle royale signs.
 	@EventHandler ( priority = EventPriority.HIGHEST )
 	public void onSignClick ( PlayerInteractEvent event ) {
 		Block      block  = event.getClickedBlock ( );
@@ -202,6 +135,16 @@ public final class BattleRoyaleArenaSignHandler extends PluginHandler {
 		}
 	}
 	
+	// handler responsible updating the signs the
+	// arena tha changes its state.
+	@EventHandler ( priority = EventPriority.MONITOR )
+	public void onUpdate ( ArenaStateChangeEvent event ) {
+		Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> getSignsByArena (
+				event.getArena ( ) ).forEach ( sign -> updateSign ( sign , event.getState ( ) ) ) );
+	}
+	
+	// handler responsible for the creation of new
+	// battle royale signs.
 	@EventHandler ( priority = EventPriority.HIGHEST )
 	public void onSetupSign ( SignChangeEvent event ) {
 		Block             block   = event.getBlock ( );
@@ -236,12 +179,13 @@ public final class BattleRoyaleArenaSignHandler extends PluginHandler {
 				// otherwise, the SignChangeEvent will override
 				// the changes.
 				BattleRoyaleArena final_arena = arena;
-				Bukkit.getScheduler ( ).scheduleSyncDelayedTask (
-						BattleRoyale.getInstance ( ) ,
-						( ) -> createSign ( block.getLocation ( ).toVector ( ) , facing , final_arena ) );
 				
-				// saving
-				BattleRoyaleArenaSignContainerHandler.getInstance ( ).save ( );
+				Bukkit.getScheduler ( ).scheduleSyncDelayedTask ( BattleRoyale.getInstance ( ) , ( ) -> {
+					createSign ( block.getLocation ( ).toVector ( ) , facing , final_arena );
+					
+					// saving
+					BattleRoyaleArenaSignContainerHandler.getInstance ( ).save ( );
+				} );
 			} else {
 				// unknown arena
 				Arrays.fill ( event.getLines ( ) , StringUtil.EMPTY );
@@ -261,5 +205,189 @@ public final class BattleRoyaleArenaSignHandler extends PluginHandler {
 				} , 20L );
 			}
 		}
+	}
+	
+	// ---- utils
+	
+	@SuppressWarnings ( "deprecation" )
+	private void placeSign ( BattleRoyaleArenaSign sign ) {
+		// signs are placed only in the lobby at the moment, and unless
+		// people ask for a change in this system, the lobby will be
+		// the only place for the signs.
+		Block     block     = getSignBlock ( sign );
+		BlockFace direction = sign.getFacingDirection ( );
+		boolean   wall      = block.getRelative ( direction.getOppositeFace ( ) ).getType ( ).isBlock ( );
+		
+		// we will have to make direct reference to
+		// WALL_SIGN/SIGN materials as the UniversalMaterial
+		// returns a LEGACY material which doesn't actually work,
+		// as the backwards compatibility system of Spigot is a disaster
+		Material sign_material = null;
+		
+		for ( Material other : Material.values ( ) ) {
+			if ( !other.name ( ).contains ( "LEGACY" )
+					&& other.name ( ).endsWith ( wall ? "WALL_SIGN" : "SIGN" ) ) {
+				sign_material = other;
+				break;
+			}
+		}
+		
+		if ( sign_material != null && wall ) {
+			block.setType ( sign_material );
+		} else if ( sign_material != null && block.getRelative ( BlockFace.DOWN ).getType ( ).isBlock ( ) ) {
+			block.setType ( sign_material );
+		} else {
+			// cannot place as there is not a wall behind,
+			// and there is not a solid ground below.
+			return;
+		}
+		
+		Sign handle = ( Sign ) block.getState ( );
+		
+		// facing direction
+		if ( Version.getServerVersion ( ).isNewerEquals ( Version.v1_13_R1 ) ) {
+			org.bukkit.block.data.BlockData data = block.getBlockData ( );
+			
+			if ( data instanceof org.bukkit.block.data.type.WallSign ) {
+				( ( org.bukkit.block.data.type.WallSign ) data ).setFacing ( direction );
+			} else if ( data instanceof org.bukkit.block.data.type.Sign ) {
+				( ( org.bukkit.block.data.type.Sign ) data ).setRotation ( direction );
+			}
+		} else {
+			// legacy versions
+			org.bukkit.material.Sign material = new org.bukkit.material.Sign ( block.getType ( ) );
+			
+			material.setFacingDirection ( sign.getFacingDirection ( ) );
+			handle.setData ( material );
+			handle.update ( true );
+		}
+		
+		// display text
+		setFormattedText ( handle , sign.getArenaName ( ) , getSignStateText ( sign.getArena ( ).getState ( ) ) );
+	}
+	
+	private void updateSign ( BattleRoyaleArenaSign sign , EnumArenaState state ) {
+		Block block = getSignBlock ( sign );
+		
+		if ( block.getState ( ) instanceof Sign ) {
+			setFormattedText ( ( Sign ) block.getState ( ) , sign.getArenaName ( ) , getSignStateText ( state ) );
+		} else {
+			placeSign ( sign );
+		}
+		
+		if ( EnumSignConfiguration.STATUS_BLOCK_ENABLE.getAsBoolean ( )
+				&& !sign.isDisableStatusBlock ( ) ) {
+			updateStatusBlock ( sign , state );
+		}
+	}
+	
+	private void updateStatusBlock ( BattleRoyaleArenaSign sign , EnumArenaState state ) {
+		Block block  = getSignBlock ( sign );
+		Block status = block.getRelative ( sign.getFacingDirection ( ).getOppositeFace ( ) );
+		
+		if ( !( block.getState ( ) instanceof Sign ) ) {
+			placeSign ( sign );
+		}
+		
+		status.setType ( getSignStateMaterial ( state ).getMaterial ( ) );
+		
+		if ( Version.getServerVersion ( ).isOlder ( Version.v1_13_R1 ) ) {
+			try {
+				Block.class.getMethod ( "setData" , byte.class )
+						.invoke ( status , ( byte ) getSignStateData ( state ) );
+			} catch ( NoSuchMethodException | InvocationTargetException | IllegalAccessException e ) {
+				e.printStackTrace ( );
+			}
+		}
+		
+		status.getState ( ).update ( );
+	}
+	
+	private Block getSignBlock ( BattleRoyaleArenaSign sign ) {
+		Validate.isTrue ( Bukkit.isPrimaryThread ( ) , "must run on server thread" );
+		
+		Vector3I location = sign.getLocation ( );
+		
+		return BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( ).getWorld ( )
+				.getBlockAt ( location.getX ( ) , location.getY ( ) , location.getZ ( ) );
+	}
+	
+	private void setFormattedText ( Sign handle , String arena_name , EnumLanguage text ) {
+		String[] text_lines = text.getAsString ( ).split ( "\n" );
+		
+		for ( int i = 0 ; i < text_lines.length ; i++ ) {
+			String line = text_lines[ i ];
+			
+			if ( line != null ) {
+				text_lines[ i ] = String.format ( line , arena_name );
+			}
+		}
+		
+		setText ( handle , text_lines );
+	}
+	
+	private void setText ( Sign handle , String[] text ) {
+		for ( int i = 0 ; i < handle.getLines ( ).length ; i++ ) {
+			if ( i < text.length ) {
+				handle.setLine ( i , text[ i ] );
+			} else {
+				handle.setLine ( i , StringUtil.EMPTY );
+			}
+		}
+		
+		handle.update ( true );
+	}
+	
+	private EnumLanguage getSignStateText ( EnumArenaState state ) {
+		switch ( state ) {
+			case WAITING:
+				return EnumLanguage.ARENA_SIGN_WAITING_TEXT;
+			case RUNNING:
+				return EnumLanguage.ARENA_SIGN_RUNNING_TEXT;
+			case RESTARTING:
+				return EnumLanguage.ARENA_SIGN_RESTARTING_TEXT;
+			case STOPPED:
+				return EnumLanguage.ARENA_STATE_STOPPED_WORD;
+		}
+		
+		throw new IllegalStateException ( );
+	}
+	
+	private UniversalMaterial getSignStateMaterial ( EnumArenaState state ) {
+		String material_name;
+		
+		switch ( state ) {
+			case WAITING:
+				material_name = EnumSignConfiguration.STATUS_BLOCK_WAITING_MATERIAL.getAsString ( );
+				break;
+			case RUNNING:
+				material_name = EnumSignConfiguration.STATUS_BLOCK_RUNNING_MATERIAL.getAsString ( );
+				break;
+			case RESTARTING:
+				material_name = EnumSignConfiguration.STATUS_BLOCK_RESTARTING_MATERIAL.getAsString ( );
+				break;
+			case STOPPED:
+				material_name = EnumSignConfiguration.STATUS_BLOCK_STOPPED_MATERIAL.getAsString ( );
+				break;
+			default:
+				throw new IllegalStateException ( );
+		}
+		
+		return StringUtil.isBlank ( material_name ) ? null : UniversalMaterial.match ( material_name );
+	}
+	
+	private int getSignStateData ( EnumArenaState state ) {
+		switch ( state ) {
+			case WAITING:
+				return EnumSignConfiguration.STATUS_BLOCK_WAITING_DATA.getAsInteger ( );
+			case RUNNING:
+				return EnumSignConfiguration.STATUS_BLOCK_RUNNING_DATA.getAsInteger ( );
+			case RESTARTING:
+				return EnumSignConfiguration.STATUS_BLOCK_RESTARTING_DATA.getAsInteger ( );
+			case STOPPED:
+				return EnumSignConfiguration.STATUS_BLOCK_STOPPED_DATA.getAsInteger ( );
+		}
+		
+		throw new IllegalStateException ( );
 	}
 }

@@ -114,10 +114,12 @@ public class TeamPlaceholderNode extends PlaceholderNode {
 				}
 				
 				// list limit
-				if ( limit != null && limit > 0 ) {
-					limit--;
-				} else {
-					break;
+				if ( limit != null ) {
+					if ( limit > 0 ) {
+						limit--;
+					} else {
+						break;
+					}
 				}
 				
 				// there is another one, so let's
@@ -127,7 +129,8 @@ public class TeamPlaceholderNode extends PlaceholderNode {
 				}
 			}
 			
-			// must unscape in order to get special characters working.
+			// making sure is unscaped to make sure
+			// special characters will work.
 			return StringEscapeUtils.unescapeJava ( result.toString ( ) );
 		} else {
 			Stream < Player > members = team.getPlayers ( ).stream ( );

@@ -1,5 +1,6 @@
 package es.outlook.adriansrj.battleroyale.game.mode;
 
+import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.core.util.Duration;
 import es.outlook.adriansrj.core.util.Validable;
@@ -28,6 +29,16 @@ public abstract class BattleRoyaleMode implements Validable {
 	 * @return whether conditions to be introduced are met or not.
 	 */
 	public abstract boolean introduce ( Player player );
+	
+	/**
+	 * Called whenever the plugin is going to end and arena.
+	 * <br>
+	 * Note that <b>false</b> will be returned if the arena
+	 * should not end.
+	 * <br>
+	 * @return whether conditions to end the arena are met or not.
+	 */
+	public abstract boolean end ( BattleRoyaleArena arena );
 	
 	/**
 	 * Gets the initial health (health players will have when the game starts).

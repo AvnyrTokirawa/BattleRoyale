@@ -1,5 +1,6 @@
 package es.outlook.adriansrj.battleroyale.game.mode.complex;
 
+import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleMode;
 import es.outlook.adriansrj.battleroyale.game.mode.BattleRoyaleModeAdapter;
 
@@ -20,7 +21,7 @@ public abstract class ComplexBattleRoyaleMode extends BattleRoyaleModeAdapter {
 	 * <p>
 	 * @return whether the conditions to start the game are met or not.
 	 */
-	public abstract boolean canStart ( );
+	public abstract boolean canStart ( BattleRoyaleArena arena );
 	
 	/**
 	 * Gets the description of this battle mode.

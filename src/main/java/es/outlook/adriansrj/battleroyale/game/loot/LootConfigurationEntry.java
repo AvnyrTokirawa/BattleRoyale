@@ -417,19 +417,19 @@ public class LootConfigurationEntry implements Configurable, Cloneable {
 		// chance must be ignored if 0
 		if ( chance == 0.0D && section.isSet ( Constants.CHANCE_KEY ) ) {
 			section.set ( Constants.CHANCE_KEY , null );
-			save ++;
+			save++;
 		}
 		
 		// data must be ignored if 0
 		if ( data == 0 && section.isSet ( Constants.DATA_KEY ) ) {
 			section.set ( Constants.DATA_KEY , null );
-			save ++;
+			save++;
 		}
 		
 		// required must be ignored if empty
 		if ( required.isEmpty ( ) && section.isSet ( Constants.REQUIRED_KEY ) ) {
 			section.set ( Constants.REQUIRED_KEY , null );
-			save ++;
+			save++;
 		}
 		
 		return save;

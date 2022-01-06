@@ -416,6 +416,13 @@ public final class PlayerDataStorage {
 			} catch ( Exception e ) {
 				e.printStackTrace ( );
 			}
+			
+			// fetching balance
+			try {
+				this.balance = database.getBalance ( getUniqueId ( ) );
+			} catch ( Exception e ) {
+				e.printStackTrace ( );
+			}
 		}
 	}
 	
@@ -458,6 +465,13 @@ public final class PlayerDataStorage {
 					e.printStackTrace ( );
 				}
 			} );
+			
+			// uploading balance
+			try {
+				database.setBalance ( this , balance );
+			} catch ( Exception e ) {
+				e.printStackTrace ( );
+			}
 		}
 	}
 	
@@ -469,6 +483,7 @@ public final class PlayerDataStorage {
 				", stat_values=" + stat_values +
 				", setting_values=" + setting_values +
 				", cosmetics=" + cosmetics +
+				", balance=" + balance +
 				'}';
 	}
 	

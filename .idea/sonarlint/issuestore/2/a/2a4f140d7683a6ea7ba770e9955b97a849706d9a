@@ -1,3 +1,5 @@
 
 i
 java:S2975V"SRemove this "clone" implementation; use a copy constructor or copy factory instead.(¾šíÎ
+s
+java:S1128"QRemove this unused import 'es.outlook.adriansrj.battleroyale.game.player.Player'.(‚È€£ýÿÿÿÿ8„‡µÑá/

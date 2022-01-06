@@ -28,12 +28,20 @@ public class ScoreboardSimple extends ScoreboardBase {
 					arena != null ? arena.getConfiguration ( ).getScoreboardConfiguration ( ) : null;
 			
 			if ( configuration != null ) {
-				String          title    = configuration.getLobbyTitle ( );
-				List < String > elements = configuration.getLobbyElements ( );
+				String          title;
+				List < String > elements;
 				
 				if ( arena.getState ( ) == EnumArenaState.RUNNING ) {
-					title    = configuration.getGameTitle ( );
-					elements = configuration.getGameElements ( );
+					if ( player.isPlaying ( ) ) {
+						title    = configuration.getGameTitle ( );
+						elements = configuration.getGameElements ( );
+					} else {
+						title    = configuration.getSpectatorTitle ( );
+						elements = configuration.getSpectatorElements ( );
+					}
+				} else {
+					title    = configuration.getLobbyTitle ( );
+					elements = configuration.getLobbyElements ( );
 				}
 				
 				// setting title

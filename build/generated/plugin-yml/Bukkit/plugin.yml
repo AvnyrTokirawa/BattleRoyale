@@ -32,6 +32,7 @@ softdepend:
  - Vault
  - QualityArmory
  - QualityArmoryVehicles
+ - MMOItems
  - CrackShot
  - CrackShotPlus
  - PlaceholderAPI

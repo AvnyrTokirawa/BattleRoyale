@@ -1,12 +1,14 @@
 package es.outlook.adriansrj.battleroyale.game.player;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
+import es.outlook.adriansrj.battleroyale.bus.BusInstance;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.event.arena.ArenaStateChangeEvent;
 import es.outlook.adriansrj.battleroyale.gui.spectator.SpectatorGUI;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobby;
 import es.outlook.adriansrj.battleroyale.lobby.BattleRoyaleLobbyHandler;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
+import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.core.handler.PluginHandler;
 import es.outlook.adriansrj.core.util.function.FunctionUtil;
@@ -108,8 +110,18 @@ public final class PlayerSpectatorHandler extends PluginHandler implements Packe
 			BattleRoyaleArena arena = br_player.getArena ( );
 			BattleRoyaleLobby lobby = BattleRoyaleLobbyHandler.getInstance ( ).getLobby ( );
 			
-			if ( br_player.getParachute ( ).isOpen ( ) ) {
-				br_player.getParachute ( ).close ( );
+			// closing parachute
+			ParachuteInstance parachute = br_player.getParachute ( );
+			
+			if ( parachute.isOpen ( ) ) {
+				parachute.close ( );
+			}
+			
+			// restarting bus
+			BusInstance < ? > bus = br_player.getBus ( );
+			
+			if ( bus.isStarted ( ) ) {
+				bus.restart ( );
 			}
 			
 			br_player.getBukkitPlayerOptional ( ).ifPresent ( player -> {

@@ -5,6 +5,7 @@ import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
 import es.outlook.adriansrj.battleroyale.util.Constants;
 import es.outlook.adriansrj.battleroyale.util.reflection.ClassReflection;
 import es.outlook.adriansrj.core.util.StringUtil;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -56,9 +57,9 @@ public enum EnumLanguage implements ConfigurationEntry {
 							   "message players will receive when trying to\njoin an arena that is being restarted" ,
 							   ChatColor.DARK_RED + "This arena is restarting!" ),
 	
-//	ARENA_MESSAGE_RUNNING ( "arena.message.running" ,
-//							"message players will receive when trying to\njoin an arena that is running/in-game" ,
-//							ChatColor.DARK_RED + "You cannot join an arena that has already started!" ),
+	//	ARENA_MESSAGE_RUNNING ( "arena.message.running" ,
+	//							"message players will receive when trying to\njoin an arena that is running/in-game" ,
+	//							ChatColor.DARK_RED + "You cannot join an arena that has already started!" ),
 	
 	ARENA_MESSAGE_STOPPED ( "arena.message.stopped" ,
 							"message players will receive when trying to\njoin an arena that is stopped" ,
@@ -68,7 +69,7 @@ public enum EnumLanguage implements ConfigurationEntry {
 								 ChatColor.DARK_RED + "Battle Royale\n%s\n\n" + ChatColor.DARK_RED + "Restarting" ),
 	ARENA_SIGN_RUNNING_TEXT ( "arena.sign.running-text" , "arena signs running/in-game text format. '\\n' supported" ,
 							  ChatColor.DARK_RED + "Battle Royale\n%s\n\n" + ChatColor.DARK_RED + "In Game" ),
-	
+
 	ARENA_SIGN_WAITING_TEXT ( "arena.sign.waiting-text" , "arena signs waiting text format. '\\n' supported" ,
 							  ChatColor.DARK_RED + "Battle Royale\n%s\n\n" + ChatColor.DARK_GREEN + "Waiting" ),
 	
@@ -340,7 +341,8 @@ public enum EnumLanguage implements ConfigurationEntry {
 	
 	@Override
 	public String getAsString ( ) {
-		return StringUtil.translateAlternateColorCodes ( ConfigurationEntry.super.getAsString ( ) );
+		return StringUtil.translateAlternateColorCodes ( StringEscapeUtils.unescapeJava (
+				ConfigurationEntry.super.getAsString ( ) ) );
 	}
 	
 	public String getAsStringStripColors ( ) {

@@ -23,10 +23,13 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.spigotmc.event.entity.EntityDismountEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,9 +82,40 @@ public final class ParachuteHandler extends PluginHandler implements PacketListe
 		Player                   br_player = Player.getPlayer ( player );
 		ParachuteInstance        parachute = br_player.getParachute ( );
 		
-		if ( parachute != null && parachute.isOpen ( ) && VehicleUtil.isSneaking ( packet ) ) {
+		if ( VehicleUtil.isSneaking ( packet ) && parachute.isOpen ( ) ) {
 			event.setCancelled ( true );
+			
+			//			// closing parachute
+			//			Bukkit.getScheduler ( ).runTask ( BattleRoyale.getInstance ( ) , ( ) -> {
+			//				if ( parachute.isOpen ( ) ) {
+			//					parachute.close ( );
+			//				}
+			//			} );
 		}
+	}
+	
+	// it should not reach this point as the dismount
+	// packets are cancelled, but for some reason it
+	// is possible so we will make sure to cancel it.
+	@EventHandler ( priority = EventPriority.LOWEST )
+	public void onDismount ( EntityDismountEvent event ) {
+		Entity entity = event.getEntity ( );
+		
+		// EntityDismountEvent is not Cancellable in some server versions.
+		if ( Cancellable.class.isAssignableFrom ( event.getClass ( ) )
+				&& entity instanceof org.bukkit.entity.Player ) {
+			org.bukkit.entity.Player player    = ( org.bukkit.entity.Player ) entity;
+			Player                   br_player = Player.getPlayer ( player );
+			
+			if ( br_player.getParachute ( ).isOpen ( ) ) {
+				event.setCancelled ( true );
+			}
+		}
+	}
+	
+	@Override
+	public void onSending ( PacketEvent event ) {
+		// nothing to do here.
 	}
 	
 	public void openParachute ( Player player ) {
@@ -273,11 +307,6 @@ public final class ParachuteHandler extends PluginHandler implements PacketListe
 					|| ( System.currentTimeMillis ( ) - ( Long ) uncast ) >= OPEN_COOLDOWN_CLOSING_ANOTHER.toMillis ( );
 		}
 		return true;
-	}
-	
-	@Override
-	public void onSending ( PacketEvent event ) {
-		// nothing to do here.
 	}
 	
 	@Override

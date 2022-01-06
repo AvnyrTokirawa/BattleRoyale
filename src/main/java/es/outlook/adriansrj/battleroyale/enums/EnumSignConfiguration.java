@@ -16,7 +16,7 @@ public enum EnumSignConfiguration implements ConfigurationEntry {
 	STATUS_BLOCK_WAITING_MATERIAL ( "status-block.waiting.material" , "waiting status block material" ,
 									UniversalMaterial.LIME_WOOL.name ( ) ),
 	STATUS_BLOCK_WAITING_DATA ( "status-block.waiting.data" , "waiting status block data" ,
-								0 ),
+								WoolColor.GREEN.getShortValue ( ) ),
 	
 	STATUS_BLOCK_RUNNING_MATERIAL ( "status-block.running.material" , "running status block material" ,
 									UniversalMaterial.RED_WOOL.name ( ) ),
@@ -27,6 +27,11 @@ public enum EnumSignConfiguration implements ConfigurationEntry {
 									   UniversalMaterial.YELLOW_WOOL.name ( ) ),
 	STATUS_BLOCK_RESTARTING_DATA ( "status-block.restarting.data" , "restarting status block data" ,
 								   ( int ) WoolColor.YELLOW.getShortValue ( ) ),
+	
+	STATUS_BLOCK_STOPPED_MATERIAL ( "status-block.restarting.material" , "restarting status block material" ,
+									UniversalMaterial.BLACK_WOOL.name ( ) ),
+	STATUS_BLOCK_STOPPED_DATA ( "status-block.restarting.data" , "restarting status block data" ,
+								( int ) WoolColor.BLACK.getShortValue ( ) ),
 	
 	;
 	

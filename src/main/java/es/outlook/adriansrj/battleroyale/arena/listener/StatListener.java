@@ -3,16 +3,12 @@ package es.outlook.adriansrj.battleroyale.arena.listener;
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaStat;
 import es.outlook.adriansrj.battleroyale.enums.EnumStat;
-import es.outlook.adriansrj.battleroyale.event.arena.ArenaEndEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerDeathEvent;
 import es.outlook.adriansrj.battleroyale.event.player.PlayerKnockedOutEvent;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
-import es.outlook.adriansrj.battleroyale.game.player.Team;
 import es.outlook.adriansrj.battleroyale.main.BattleRoyale;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-
-import java.util.Objects;
 
 /**
  * Class responsible for keeping track of the stats of
@@ -21,6 +17,9 @@ import java.util.Objects;
  * @author AdrianSR / 20/09/2021 / 04:16 p. m.
  */
 public final class StatListener extends BattleRoyaleArenaListener {
+	
+	// WINS & LOSSES stats are already handled by the DeathListener,
+	// so it's implementation here will result in doubled stats.
 	
 	public StatListener ( BattleRoyale plugin ) {
 		super ( plugin );
@@ -65,28 +64,28 @@ public final class StatListener extends BattleRoyaleArenaListener {
 		}
 	}
 	
-	// event handler responsible for
-	// handling the wins/losses-related stats.
-	@EventHandler ( priority = EventPriority.MONITOR )
-	public void onWinLose ( ArenaEndEvent event ) {
-		Player winner_player = event.getWinnerPlayer ( );
-		Team   winner_team   = event.getWinnerTeam ( );
-		
-		if ( winner_player != null || winner_team != null ) {
-			for ( Team team : event.getArena ( ).getTeamRegistry ( ) ) {
-				boolean winner = Objects.equals (
-						team , winner_team != null ? winner_team : winner_player.getTeam ( ) );
-				
-				for ( Player member : team.getPlayers ( ) ) {
-					if ( winner && member.isOnline ( ) ) {
-						incrementStat ( member , EnumStat.WINS );
-					} else {
-						incrementStat ( member , EnumStat.LOSSES );
-					}
-				}
-			}
-		}
-	}
+	//	// event handler responsible for
+	//	// handling the wins/losses-related stats.
+	//	@EventHandler ( priority = EventPriority.MONITOR )
+	//	public void onWinLose ( ArenaEndEvent event ) {
+	//		Player winner_player = event.getWinnerPlayer ( );
+	//		Team   winner_team   = event.getWinnerTeam ( );
+	//
+	//		if ( winner_player != null || winner_team != null ) {
+	//			for ( Team team : event.getArena ( ).getTeamRegistry ( ) ) {
+	//				boolean winner = Objects.equals (
+	//						team , winner_team != null ? winner_team : winner_player.getTeam ( ) );
+	//
+	//				for ( Player member : team.getPlayers ( ) ) {
+	//					if ( winner && member.isOnline ( ) ) {
+	//						incrementStat ( member , EnumStat.WINS );
+	//					} else {
+	//						incrementStat ( member , EnumStat.LOSSES );
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
 	
 	private void incrementStat ( Player player , EnumStat stat ) {
 		player.getDataStorage ( ).incrementStat ( stat , 1 , true );

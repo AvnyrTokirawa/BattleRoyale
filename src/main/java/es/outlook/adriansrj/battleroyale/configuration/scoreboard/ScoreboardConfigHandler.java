@@ -49,6 +49,18 @@ public final class ScoreboardConfigHandler extends ConfigurationHandler {
 					"%br_team_members_formatted%" ,
 					"" ,
 					ChatColor.YELLOW + "www.SpigotMC.org"
+			) ,
+			
+			// spectator
+			StringUtil.concatenate ( ChatColor.GOLD , ChatColor.BOLD ) + "Arena %br_arena_name%" ,
+			Arrays.asList (
+					ChatColor.GRAY + "%br_date%" ,
+					"" ,
+					"%br_arena_border_state%" ,
+					"" ,
+					"%br_arena_left%/%br_arena_limit%" ,
+					"" ,
+					ChatColor.YELLOW + "www.SpigotMC.org"
 			)
 	);
 	
