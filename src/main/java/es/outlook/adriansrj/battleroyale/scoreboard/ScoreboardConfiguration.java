@@ -134,6 +134,7 @@ public class ScoreboardConfiguration implements Configurable {
 		this.spectator_title = loadTitle ( section , SPECTATOR_TITLE_KEY );
 		this.spectator_elements.clear ( );
 		this.spectator_elements.addAll ( loadElements ( section , SPECTATOR_ELEMENTS_KEY ) );
+		
 		return this;
 	}
 	
@@ -152,6 +153,7 @@ public class ScoreboardConfiguration implements Configurable {
 		// spectator
 		save += saveTitle ( section , SPECTATOR_TITLE_KEY , spectator_title );
 		save += saveElements ( section , SPECTATOR_ELEMENTS_KEY , spectator_elements );
+		
 		return save;
 	}
 	

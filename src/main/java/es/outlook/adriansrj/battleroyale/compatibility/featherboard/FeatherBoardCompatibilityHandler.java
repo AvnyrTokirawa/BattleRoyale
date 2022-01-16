@@ -39,6 +39,17 @@ public final class FeatherBoardCompatibilityHandler extends PluginCompatibilityH
 		player.getBukkitPlayerOptional ( ).ifPresent ( bukkit -> hideScoreboard ( bukkit , scoreboard_name ) );
 	}
 	
+	public boolean isWatching ( org.bukkit.entity.Player player , String scoreboard_name ) {
+		return FeatherBoardAPI.getScoreboardByName ( scoreboard_name ).getPlayers ( ).contains ( player );
+	}
+	
+	public boolean isWatching ( Player player , String scoreboard_name ) {
+		org.bukkit.entity.Player bukkit = player.getBukkitPlayer ( );
+		
+		return bukkit != null && FeatherBoardAPI.getScoreboardByName ( scoreboard_name )
+				.getPlayers ( ).contains ( bukkit );
+	}
+	
 	@Override
 	protected boolean isAllowMultipleInstances ( ) {
 		return false;

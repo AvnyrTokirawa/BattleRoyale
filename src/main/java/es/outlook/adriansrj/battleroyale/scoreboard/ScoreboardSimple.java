@@ -4,6 +4,8 @@ import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.placeholder.PlaceholderHandler;
+import es.outlook.adriansrj.core.scoreboard.ScoreScoreboard;
+import es.outlook.adriansrj.core.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,10 +16,34 @@ import java.util.List;
  *
  * @author AdrianSR / 08/10/2021 / 09:32 a. m.
  */
-public class ScoreboardSimple extends ScoreboardBase {
+public class ScoreboardSimple extends Scoreboard {
+	
+	protected ScoreScoreboard handle;
 	
 	public ScoreboardSimple ( Player player ) {
 		super ( player );
+		
+		// initializing handle
+		this.handle = new ScoreScoreboard ( StringUtil.EMPTY );
+		
+		// visible by default
+		this.setVisible ( true );
+	}
+	
+	@Override
+	public boolean isVisible ( ) {
+		return handle != null && handle.isViewer ( player.getUniqueId ( ) );
+	}
+	
+	@Override
+	public void setVisible ( boolean visible ) {
+		if ( handle != null ) {
+			if ( visible ) {
+				handle.addViewersByUniqueId ( player.getUniqueId ( ) );
+			} else {
+				handle.removeViewerByUniqueId ( player.getUniqueId ( ) );
+			}
+		}
 	}
 	
 	@Override
@@ -66,7 +92,15 @@ public class ScoreboardSimple extends ScoreboardBase {
 				handle.addAll ( resulting_elements.toArray ( new String[ 0 ] ) );
 			}
 			
-			super.update ( );
+			handle.update ( );
+		}
+	}
+	
+	@Override
+	public void destroy ( ) {
+		if ( handle != null ) {
+			this.handle.clearViewers ( );
+			this.handle = null;
 		}
 	}
 	

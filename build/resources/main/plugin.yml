@@ -1,21 +1,21 @@
 name: BattleRoyale
-version: 2.0.3
+version: '2.0.4'
 main: es.outlook.adriansrj.battleroyale.main.BattleRoyale
 description: A battle royale minigame plugin
 author: AdrianSR
 libraries:
- - com.zaxxer:HikariCP:5.0.0
- - org.mongodb:mongodb-driver-sync:4.2.1
- - net.kyori:adventure-nbt:4.9.2
- - xyz.xenondevs:particle:1.6.6
+  - com.zaxxer:HikariCP:5.0.0
+  - org.mongodb:mongodb-driver-sync:4.2.1
+  - net.kyori:adventure-nbt:4.9.2
+  - xyz.xenondevs:particle:1.6.6
 commands:
   battleroyale:
     description: Plugin base command
     aliases:
-     - br
-     - brl
-     - btr
-     - btrl
+      - br
+      - brl
+      - btr
+      - btrl
     permission: br.br-op
     usage: "/battleroyale [arguments]"
     permission-message: You do not have permission to use this command.
@@ -25,16 +25,17 @@ permissions:
     default: op
 api-version: 1.13
 softdepend:
- - AdrianSRCore
- - WorldEdit
- - ProtocolSupport
- - ViaVersion
- - Vault
- - QualityArmory
- - QualityArmoryVehicles
- - MMOItems
- - CrackShot
- - CrackShotPlus
- - PlaceholderAPI
- - MVdWPlaceholderAPI
- - ProtocolLib
+  - AdrianSRCore
+  - WorldEdit
+  - ProtocolSupport
+  - ViaVersion
+  - Vault
+  - QualityArmory
+  - QualityArmoryVehicles
+  - MMOItems
+  - CrackShot
+  - CrackShotPlus
+  - PlaceholderAPI
+  - MVdWPlaceholderAPI
+  - ProtocolLib
+  - FeatherBoard

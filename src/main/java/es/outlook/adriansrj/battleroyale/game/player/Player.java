@@ -17,7 +17,7 @@ import es.outlook.adriansrj.battleroyale.parachute.Parachute;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteInstance;
 import es.outlook.adriansrj.battleroyale.parachute.ParachuteRegistry;
 import es.outlook.adriansrj.battleroyale.scoreboard.Scoreboard;
-import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardSimple;
+import es.outlook.adriansrj.battleroyale.scoreboard.ScoreboardBase;
 import es.outlook.adriansrj.battleroyale.util.Validate;
 import es.outlook.adriansrj.core.player.PlayerWrapper;
 import es.outlook.adriansrj.core.util.scheduler.SchedulerUtil;
@@ -131,7 +131,7 @@ public final class Player extends PlayerWrapper {
 	
 	private void initThreadSensitives ( ) {
 		// default scoreboard
-		this.scoreboard = new ScoreboardSimple ( this );
+		this.scoreboard = new ScoreboardBase ( this );
 		// it will be visible whn the player joins an arena.
 		this.scoreboard.setVisible ( false );
 	}
@@ -188,6 +188,14 @@ public final class Player extends PlayerWrapper {
 	@Nullable
 	public Scoreboard getBRScoreboard ( ) {
 		return scoreboard;
+	}
+	
+	public void setBRScoreboard ( @Nullable Scoreboard scoreboard ) {
+		if ( scoreboard != null && !Objects.equals ( this , scoreboard.getPlayer ( ) ) ) {
+			throw new IllegalArgumentException ( "this player and scoreboard owner must match" );
+		}
+		
+		this.scoreboard = scoreboard;
 	}
 	
 	public synchronized BusInstance < ? > getBus ( ) {

@@ -25,6 +25,7 @@ import es.outlook.adriansrj.battleroyale.util.StringUtil;
 import es.outlook.adriansrj.battleroyale.util.WorldEditUtil;
 import es.outlook.adriansrj.battleroyale.util.file.FileUtil;
 import es.outlook.adriansrj.battleroyale.util.itemstack.ItemStackUtil;
+import es.outlook.adriansrj.battleroyale.util.math.ChunkLocation;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
 import es.outlook.adriansrj.battleroyale.util.schematic.SchematicUtil;
@@ -33,6 +34,7 @@ import es.outlook.adriansrj.battleroyale.vehicle.VehiclesConfiguration;
 import es.outlook.adriansrj.battleroyale.vehicle.VehiclesConfigurationRegistry;
 import es.outlook.adriansrj.battleroyale.world.arena.ArenaWorldGenerator;
 import es.outlook.adriansrj.battleroyale.world.data.WorldData;
+import es.outlook.adriansrj.battleroyale.world.region.Region;
 import es.outlook.adriansrj.core.util.console.ConsoleUtil;
 import es.outlook.adriansrj.core.util.file.filter.FileExtensionFilter;
 import es.outlook.adriansrj.core.util.material.UniversalMaterial;
@@ -44,12 +46,18 @@ import es.outlook.adriansrj.core.util.world.GameRuleType;
 import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
@@ -374,6 +382,138 @@ public class BattlefieldSetupSession {
 	protected final Set < Player >                     guest_list = new HashSet <> ( );
 	/** stores the current tool of each configurator */
 	protected final Map < UUID, BattlefieldSetupTool > tool_map   = new HashMap <> ( );
+	/** world modification monitor */
+	protected final WorldModificationMonitor           worldMonitor;
+	
+	/**
+	 * @author AdrianSR / 16/01/2022 / 07:48 a. m.
+	 */
+	protected static class WorldModificationMonitor implements Listener {
+		
+		protected static final ExecutorService EXECUTOR_SERVICE;
+		
+		static {
+			EXECUTOR_SERVICE = ScheduledExecutorPool.getInstance ( ).getNewWorkStealingPool ( );
+		}
+		
+		protected final BattlefieldSetupSession session;
+		// stores the location of the modified regions.
+		protected final Set < Location2I >      modified;
+		
+		public WorldModificationMonitor ( BattlefieldSetupSession session ) {
+			this.session  = session;
+			this.modified = new HashSet <> ( );
+			
+			Bukkit.getPluginManager ( ).registerEvents ( this , BattleRoyale.getInstance ( ) );
+			
+			// region files watcher
+			EXECUTOR_SERVICE.execute ( ( ) -> {
+				boolean poll = BattleRoyale.getInstance ( ).isEnabled ( ) && session.isActive ( );
+				
+				try {
+					WatchService watch_service = FileSystems.getDefault ( ).newWatchService ( );
+					Path directory_path = new File ( session.world.getWorldFolder ( ) ,
+													 WorldUtil.REGION_FOLDER_NAME ).toPath ( );
+					
+					directory_path.register ( watch_service , StandardWatchEventKinds.ENTRY_MODIFY ,
+											  StandardWatchEventKinds.ENTRY_DELETE ,
+											  StandardWatchEventKinds.ENTRY_CREATE );
+					
+					while ( poll ) {
+						WatchKey key  = watch_service.take ( );
+						Path     path = ( Path ) key.watchable ( );
+						
+						for ( WatchEvent < ? > event : key.pollEvents ( ) ) {
+							File eventFile = path.resolve ( ( Path ) event.context ( ) ).toFile ( );
+							
+							// marking as not modified
+							synchronized ( modified ) {
+								Iterator < Location2I > iterator = modified.iterator ( );
+								
+								while ( iterator.hasNext ( ) ) {
+									Location2I next = iterator.next ( );
+									String fileName = String.format (
+											Region.REGION_FILE_NAME_FORMAT , next.getX ( ) , next.getZ ( ) );
+									
+									if ( fileName.equals ( eventFile.getName ( ) ) ) {
+										iterator.remove ( );
+									}
+								}
+							}
+						}
+						
+						poll = key.reset ( );
+					}
+				} catch ( IOException e ) {
+					e.printStackTrace ( );
+				} catch ( InterruptedException ex ) {
+					poll = false;
+				}
+			} );
+		}
+		
+		public boolean isWorldUpToDate ( ) {
+			return modified.size ( ) == 0;
+		}
+		
+		public boolean isWorldOutOfDate ( ) {
+			return modified.size ( ) > 0;
+		}
+		
+		public void reset ( ) {
+			modified.clear ( );
+		}
+		
+		public void saveChanges ( ) {
+			Bukkit.getScheduler ( ).runTask (
+					BattleRoyale.getInstance ( ) , session.world :: save );
+		}
+		
+		protected void mark ( Location location ) {
+			if ( Objects.equals ( location.getWorld ( ) , session.world )
+					&& ( session.bounds == null || session.bounds.contains ( location ) ) ) {
+				Chunk chunk = location.getChunk ( );
+				
+				modified.add ( new ChunkLocation ( chunk.getX ( ) , chunk.getZ ( ) )
+									   .getRegionLocation ( ) );
+			}
+		}
+		
+		@EventHandler ( priority = EventPriority.MONITOR, ignoreCancelled = true )
+		public void onModify ( BlockPlaceEvent event ) {
+			mark ( event.getBlock ( ).getLocation ( ) );
+		}
+		
+		@EventHandler ( priority = EventPriority.MONITOR, ignoreCancelled = true )
+		public void onModify ( BlockBreakEvent event ) {
+			mark ( event.getBlock ( ).getLocation ( ) );
+		}
+		
+		@EventHandler ( priority = EventPriority.MONITOR, ignoreCancelled = true )
+		public void onModify ( org.bukkit.event.block.BlockBurnEvent event ) {
+			mark ( event.getBlock ( ).getLocation ( ) );
+		}
+		
+		@EventHandler ( priority = EventPriority.MONITOR, ignoreCancelled = true )
+		public void onModify ( org.bukkit.event.block.SignChangeEvent event ) {
+			mark ( event.getBlock ( ).getLocation ( ) );
+		}
+		
+		@EventHandler ( priority = EventPriority.MONITOR, ignoreCancelled = true )
+		public void onModify ( org.bukkit.event.block.BlockExplodeEvent event ) {
+			mark ( event.getBlock ( ).getLocation ( ) );
+		}
+		
+		@EventHandler ( priority = EventPriority.MONITOR, ignoreCancelled = true )
+		public void onModify ( org.bukkit.event.block.BlockFromToEvent event ) {
+			mark ( event.getBlock ( ).getLocation ( ) );
+		}
+		
+		public void dispose ( ) {
+			modified.clear ( );
+			HandlerList.unregisterAll ( this );
+		}
+	}
 	
 	// result
 	protected String                   name;
@@ -387,8 +527,9 @@ public class BattlefieldSetupSession {
 	protected BattlefieldSetupSession ( Player configurator , World input , ZoneBounds bounds ) {
 		Validate.notNull ( input , "input world cannot be null" );
 		
-		this.owner = configurator;
-		this.world = input;
+		this.owner        = configurator;
+		this.world        = input;
+		this.worldMonitor = new WorldModificationMonitor ( this );
 		
 		if ( bounds != null ) {
 			this.setBounds ( bounds , false , false );
@@ -916,9 +1057,25 @@ public class BattlefieldSetupSession {
 		Validate.isTrue ( StringUtil.isNotBlank ( name ) , "name never set or invalid" );
 		Validate.notNull ( bounds , "bounds never set" );
 		
-		// blocks until done so we must
-		// keep it asynchronous.
+		// saving world changes if not saved yet.
+		if ( worldMonitor.isWorldOutOfDate ( ) ) {
+			worldMonitor.saveChanges ( );
+		}
+		
+		// blocks until done so we must keep it asynchronous.
 		SHAPE_EXECUTOR_SERVICE.execute ( ( ) -> {
+			// must wait until world is done saving
+			while ( worldMonitor.isWorldOutOfDate ( ) ) {
+				try {
+					Thread.sleep ( 50 );
+				} catch ( InterruptedException e ) {
+					e.printStackTrace ( );
+				}
+				
+				System.out.println ( ">>> left to be saved: " + worldMonitor.modified.size ( ) );
+			}
+			
+			// then generating
 			MinimapGenerator generator = new MinimapGenerator ( world );
 			
 			generator.generate ( bounds );
@@ -999,9 +1156,24 @@ public class BattlefieldSetupSession {
 				}
 			}
 			
-			// blocks until done so we must
-			// keep it asynchronous.
+			// saving world changes if not saved yet.
+			if ( worldMonitor.isWorldOutOfDate ( ) ) {
+				worldMonitor.saveChanges ( );
+			}
+			
+			// blocks until done so we must keep it asynchronous.
 			SHAPE_EXECUTOR_SERVICE.execute ( ( ) -> {
+				// must wait until world is done saving
+				while ( worldMonitor.isWorldOutOfDate ( ) ) {
+					try {
+						Thread.sleep ( 50 );
+					} catch ( InterruptedException e ) {
+						e.printStackTrace ( );
+					}
+					
+					System.out.println ( ">>> left to be saved: " + worldMonitor.modified.size ( ) );
+				}
+				
 				try {
 					SchematicUtil.generateBattlefieldShape ( world , bounds.toBoundingBox ( ) , folder );
 					
@@ -1258,6 +1430,9 @@ public class BattlefieldSetupSession {
 	 */
 	protected void close ( ) {
 		closed = true;
+		
+		// disposing world monitor
+		worldMonitor.dispose ( );
 		
 		// unloading world
 		world.getPlayers ( ).forEach ( player -> player.kickPlayer ( "Unloading world" ) );

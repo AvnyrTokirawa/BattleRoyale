@@ -1,13 +1,11 @@
 plugins {
     id('es.outlook.adriansrj.custom-plugin')
-    id 'net.minecrell.plugin-yml.bukkit'
-
     //id 'com.github.johnrengelman.shadow' version '7.0.0'
     // id "io.github.patrick.remapper" version "1.1.0"
 }
 
 group 'es.outlook.adriansrj'
-version '2.0.3'
+version '2.0.4'
 description 'A battle royale minigame plugin'
 
 repositories {
@@ -107,37 +105,13 @@ dependencies {
     // 1.12-
     //implementation 'com.sk89q.worldedit:worldedit-core:6.0'
     //implementation 'com.sk89q.worldedit:worldedit-bukkit:6.0'
-
-    // libraries downloaded when the plugin is loaded
-    library 'com.zaxxer:HikariCP:5.0.0'
-    library 'org.mongodb:mongodb-driver-sync:4.2.1'
-    library 'net.kyori:adventure-nbt:4.9.2'
-    library 'xyz.xenondevs:particle:1.6.6'
 }
 
-bukkit {
-    main = 'es.outlook.adriansrj.battleroyale.main.BattleRoyale'
-    author = 'AdrianSR'
-    apiVersion = '1.13'
-
-    softDepend = ['AdrianSRCore', 'WorldEdit', 'ProtocolSupport', 'ViaVersion',
-                  'Vault', 'QualityArmory', 'QualityArmoryVehicles', 'MMOItems',
-                  'CrackShot', 'CrackShotPlus', 'PlaceholderAPI', 'MVdWPlaceholderAPI', 'ProtocolLib']
-
-    commands {
-        battleroyale {
-            description = 'Plugin base command'
-            aliases = ['br', 'brl', 'btr', 'btrl']
-            permission = 'br.br-op'
-            usage = '/battleroyale [arguments]'
-            permissionMessage = 'You do not have permission to use this command.'
-        }
-    }
-
-    permissions {
-        'br.op' {
-            description = 'Battle royale operators permission'
-            setDefault('OP')
-        }
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
     }
 }
