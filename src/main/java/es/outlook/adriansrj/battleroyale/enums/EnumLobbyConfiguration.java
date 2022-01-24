@@ -36,6 +36,9 @@ public enum EnumLobbyConfiguration implements ConfigurationEntrySettable {
 	SPAWN_YAW ( "spawn.yaw" , "" , 0.0F ),
 	SPAWN_PITCH ( "spawn.pitch" , "" , 0.0F ),
 	
+	INVENTORY_LOBBY_ITEMS ( "inventory.lobby-items" , "whether to give the lobby items\n" +
+			"to the player when joining." , true ) ,
+	
 	;
 	
 	/**

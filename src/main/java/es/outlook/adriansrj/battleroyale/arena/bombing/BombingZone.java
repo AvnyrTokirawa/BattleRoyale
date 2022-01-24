@@ -32,6 +32,10 @@ public class BombingZone {
 		
 		@Override
 		public void run ( ) {
+			if ( zone.arena.getState ( ) != EnumArenaState.RUNNING ) {
+				return;
+			}
+			
 			if ( timestamp == -1 ) {
 				timestamp = System.currentTimeMillis ( );
 			}

@@ -74,38 +74,16 @@ public class BattleRoyaleLobby implements Listener {
 		}
 	}
 	
-	public void introduce ( final org.bukkit.entity.Player player ) {
+	public void introduce ( final org.bukkit.entity.Player player , boolean sendToSpawn ) {
 		Player br_player = Player.getPlayer ( player );
 		
 		introduce0 ( br_player );
 		
-		// making sure is visible for others
-		for ( org.bukkit.entity.Player other : Bukkit.getOnlinePlayers ( ) ) {
-			if ( !Objects.equals ( other , player ) ) {
-				Player br_other = Player.getPlayer ( other );
-				
-				if ( !br_other.isInArena ( ) ) {
-					br_other.showPlayer ( player );
-					br_player.showPlayer ( other );
-				}
-			}
-		}
-		
-		player.setGameMode ( GameMode.ADVENTURE );
-		player.setFlying ( false );
-		player.setAllowFlight ( false );
-		player.setTotalExperience ( 0 );
-		player.setLevel ( 0 );
-		player.setExp ( 0F );
-		player.setFoodLevel ( 20 );
-		player.setSaturation ( 20.0F );
-		EntityUtil.setMaxHealth ( player , 20.0D );
-		player.setHealth ( 20.0D );
-		EntityUtil.clearPotionEffects ( player );
-		
 		// inventory
-		player.getInventory ( ).clear ( );
-		player.getInventory ( ).setArmorContents ( null );
+		if ( EnumLobbyConfiguration.INVENTORY_LOBBY_ITEMS.getAsBoolean ( ) ) {
+			player.getInventory ( ).clear ( );
+			player.getInventory ( ).setArmorContents ( null );
+		}
 		
 		if ( RunModeHandler.getInstance ( ).getMode ( ) == EnumMode.BUNGEE ) {
 			BattleRoyaleArena arena = EnumMode.BUNGEE.getArena ( );
@@ -115,7 +93,7 @@ public class BattleRoyaleLobby implements Listener {
 					br_player.setArena ( arena );
 					
 					if ( arena.getMode ( ).isTeamSelectionEnabled ( ) ) {
-						EnumItem.TEAM_SELECTOR.give ( player );
+						give ( EnumItem.TEAM_SELECTOR , player );
 					}
 				}
 			} else {
@@ -124,27 +102,61 @@ public class BattleRoyaleLobby implements Listener {
 						BattleRoyale.getInstance ( ) );
 			}
 		} else {
-			EnumItem.ARENA_SELECTOR.give ( player );
+			give ( EnumItem.ARENA_SELECTOR , player );
 		}
 		
-		EnumItem.SETTINGS.give ( player );
-		EnumItem.SHOP.give ( player );
-		EnumItem.LEAVE_ARENA.give ( player );
+		give ( EnumItem.SETTINGS , player );
+		give ( EnumItem.SHOP , player );
+		give ( EnumItem.LEAVE_ARENA , player );
 		
 		player.updateInventory ( );
 		
-		// sending to spawn
-		sendToSpawn ( player );
+		if ( sendToSpawn ) {
+			// making sure is visible for others
+			for ( org.bukkit.entity.Player other : Bukkit.getOnlinePlayers ( ) ) {
+				if ( !Objects.equals ( other , player ) ) {
+					Player br_other = Player.getPlayer ( other );
+					
+					if ( !br_other.isInArena ( ) ) {
+						br_other.showPlayer ( player );
+						br_player.showPlayer ( other );
+					}
+				}
+			}
+			
+			player.setGameMode ( GameMode.ADVENTURE );
+			player.setFlying ( false );
+			player.setAllowFlight ( false );
+			player.setTotalExperience ( 0 );
+			player.setLevel ( 0 );
+			player.setExp ( 0F );
+			player.setFoodLevel ( 20 );
+			player.setSaturation ( 20.0F );
+			EntityUtil.setMaxHealth ( player , 20.0D );
+			player.setHealth ( 20.0D );
+			EntityUtil.clearPotionEffects ( player );
+			
+			// sending to spawn
+			sendToSpawn ( player );
+		}
 	}
 	
-	public void introduce ( Player br_player ) {
+	public void introduce ( org.bukkit.entity.Player player ) {
+		introduce ( player , isCustomSpawnEnabled ( ) );
+	}
+	
+	public void introduce ( Player br_player , boolean sendToSpawn ) {
 		org.bukkit.entity.Player player = br_player.getBukkitPlayer ( );
 		
 		if ( player != null ) {
-			introduce ( player );
+			introduce ( player , sendToSpawn );
 		} else {
 			introduce0 ( br_player );
 		}
+	}
+	
+	public void introduce ( Player br_player ) {
+		introduce ( br_player , isCustomSpawnEnabled ( ) );
 	}
 	
 	protected void introduce0 ( Player player ) {
@@ -159,12 +171,20 @@ public class BattleRoyaleLobby implements Listener {
 		}
 	}
 	
-	// responsible for sending players to custom spawn
+	// responsible for sending players to custom spawn, and proving
+	// the corresponding lobby items.
 	@EventHandler ( priority = EventPriority.MONITOR )
 	public void onJoin ( PlayerJoinEvent event ) {
-		if ( EnumLobbyConfiguration.SPAWN_JOIN.getAsBoolean ( ) && isCustomSpawnEnabled ( ) ) {
-			introduce ( event.getPlayer ( ) );
-		}
+		introduce ( event.getPlayer ( ) , EnumLobbyConfiguration.
+				SPAWN_JOIN.getAsBoolean ( ) && isCustomSpawnEnabled ( ) );
+		
+		//		if ( EnumLobbyConfiguration.SPAWN_JOIN.getAsBoolean ( ) && isCustomSpawnEnabled ( ) ) {
+		//			introduce ( event.getPlayer ( ) );
+		//		}
+		//
+		//		if ( EnumLobbyConfiguration.INVENTORY_LOBBY_ITEMS.getAsBoolean ( ) ) {
+		//
+		//		}
 	}
 	
 	@EventHandler ( priority = EventPriority.HIGHEST, ignoreCancelled = true )
@@ -179,7 +199,7 @@ public class BattleRoyaleLobby implements Listener {
 				cancel = true;
 				
 				// sending back to spawn
-				introduce ( ( org.bukkit.entity.Player ) event.getEntity ( ) );
+				introduce ( ( org.bukkit.entity.Player ) event.getEntity ( ) , true );
 			}
 			
 			if ( cancel ) {
@@ -201,6 +221,14 @@ public class BattleRoyaleLobby implements Listener {
 	
 	public void sendToSpawn ( Player player ) {
 		player.getBukkitPlayerOptional ( ).ifPresent ( this :: sendToSpawn );
+	}
+	
+	// ---- utils
+	
+	protected void give ( EnumItem item , org.bukkit.entity.Player player ) {
+		if ( EnumLobbyConfiguration.INVENTORY_LOBBY_ITEMS.getAsBoolean ( ) ) {
+			item.give ( player );
+		}
 	}
 	
 	protected void register ( Plugin plugin ) {

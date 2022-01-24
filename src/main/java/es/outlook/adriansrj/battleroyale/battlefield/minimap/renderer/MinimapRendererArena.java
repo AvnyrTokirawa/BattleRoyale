@@ -2,6 +2,7 @@ package es.outlook.adriansrj.battleroyale.battlefield.minimap.renderer;
 
 import es.outlook.adriansrj.battleroyale.arena.BattleRoyaleArena;
 import es.outlook.adriansrj.battleroyale.arena.bombing.BombingZone;
+import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.util.math.Location2I;
 import es.outlook.adriansrj.battleroyale.util.math.ZoneBounds;
@@ -49,25 +50,27 @@ public class MinimapRendererArena extends MinimapRendererBase {
 		}
 		
 		/* drawing border */
-		// current border bounds
-		// we want to wrap it in case it is displaying the initial border.
-		drawBorder ( arena , arena.getBorder ( ).getCurrentBounds ( ) ,
-					 display_bounds , player , canvas , MapCursor.Type.RED_POINTER , true );
-		
-		// future border bounds
-		ZoneBounds future_border = arena.getBorder ( ).getFutureBounds ( );
-		
-		if ( future_border != null ) {
-			drawBorder ( arena , future_border , display_bounds , player , canvas ,
-						 MapCursor.Type.BLUE_POINTER , false );
-		}
-		
-		// bombing zones
-		List < BombingZone > bombing_zones = arena.getBombingZoneGenerator ( ).current ( );
-		
-		for ( BombingZone zone : bombing_zones ) {
-			if ( zone.isActive ( ) ) {
-				drawBombingZone ( arena , zone , display_bounds , player , canvas , false );
+		if ( arena.getState ( ) == EnumArenaState.RUNNING ) {
+			// current border bounds
+			// we want to wrap it in case it is displaying the initial border.
+			drawBorder ( arena , arena.getBorder ( ).getCurrentBounds ( ) ,
+						 display_bounds , player , canvas , MapCursor.Type.RED_POINTER , true );
+			
+			// future border bounds
+			ZoneBounds future_border = arena.getBorder ( ).getFutureBounds ( );
+			
+			if ( future_border != null ) {
+				drawBorder ( arena , future_border , display_bounds , player , canvas ,
+							 MapCursor.Type.BLUE_POINTER , false );
+			}
+			
+			// bombing zones
+			List < BombingZone > bombing_zones = arena.getBombingZoneGenerator ( ).current ( );
+			
+			for ( BombingZone zone : bombing_zones ) {
+				if ( zone.isActive ( ) ) {
+					drawBombingZone ( arena , zone , display_bounds , player , canvas , false );
+				}
 			}
 		}
 	}

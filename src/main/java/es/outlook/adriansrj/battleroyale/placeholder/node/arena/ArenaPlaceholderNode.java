@@ -5,6 +5,7 @@ import es.outlook.adriansrj.battleroyale.arena.autostarter.AutoStarter;
 import es.outlook.adriansrj.battleroyale.arena.border.BattleRoyaleArenaBorder;
 import es.outlook.adriansrj.battleroyale.battlefield.border.BattlefieldBorderResize;
 import es.outlook.adriansrj.battleroyale.enums.EnumArenaStat;
+import es.outlook.adriansrj.battleroyale.enums.EnumArenaState;
 import es.outlook.adriansrj.battleroyale.enums.EnumLanguage;
 import es.outlook.adriansrj.battleroyale.game.player.Player;
 import es.outlook.adriansrj.battleroyale.placeholder.node.PlaceholderTypableNode;
@@ -65,42 +66,46 @@ public class ArenaPlaceholderNode extends PlaceholderTypableNode < BattleRoyaleA
 								.reduce ( 0L , Long :: sum ).intValue ( ) );
 			} else if ( params.toLowerCase ( ).startsWith ( "border" ) ) { // br_arena_border
 				params = extractIdentifier ( params );
-				BattleRoyaleArenaBorder border = arena.getBorder ( );
 				
-				if ( params.toLowerCase ( ).startsWith ( "state" ) ) { // br_arena_border_state
-					BattlefieldBorderResize point = border.getPoint ( );
+				if ( arena.getState ( ) == EnumArenaState.RUNNING ) {
+					BattleRoyaleArenaBorder border = arena.getBorder ( );
 					
-					switch ( border.getState ( ) ) {
-						case IDLE: {
-							if ( point != null ) {
-								return String.format (
-										EnumLanguage.BORDER_STATE_IDLE.getAsString ( ) ,
-										TimeUtil.formatTime ( Duration.ofMilliseconds (
-												( border.getPoint ( ).getIdleTime ( ).toMillis ( ) + 1000 )
-														- ( System.currentTimeMillis ( ) - border.getStateTime ( ) ) ) ) );
-							}
-							return EnumLanguage.BORDER_STATE_STOPPED.getAsString ( );
-						}
+					if ( params.toLowerCase ( ).startsWith ( "state" ) ) { // br_arena_border_state
+						BattlefieldBorderResize point = border.getPoint ( );
 						
-						case RESIZING: {
-							if ( point != null ) {
-								return String.format (
-										border.getFutureSize ( ) < border.getCurrentSize ( )
-												? EnumLanguage.BORDER_STATE_SHRINKING.getAsString ( )
-												: EnumLanguage.BORDER_STATE_GROWING.getAsString ( ) ,
-										TimeUtil.formatTime ( Duration.ofMilliseconds (
-												( border.getPoint ( ).getTime ( ).toMillis ( ) + 1000 )
-														- ( System.currentTimeMillis ( ) - border.getStateTime ( ) ) ) ) );
+						switch ( border.getState ( ) ) {
+							case IDLE: {
+								if ( point != null ) {
+									return String.format (
+											EnumLanguage.BORDER_STATE_IDLE.getAsString ( ) ,
+											TimeUtil.formatTime ( Duration.ofMilliseconds (
+													( border.getPoint ( ).getIdleTime ( ).toMillis ( ) + 1000 )
+															- ( System.currentTimeMillis ( ) - border.getStateTime ( ) ) ) ) );
+								}
+								return EnumLanguage.BORDER_STATE_STOPPED.getAsString ( );
 							}
-							return EnumLanguage.BORDER_STATE_STOPPED.getAsString ( );
-						}
-						
-						default:
-						case STOPPED: {
-							return EnumLanguage.BORDER_STATE_STOPPED.getAsString ( );
+							
+							case RESIZING: {
+								if ( point != null ) {
+									return String.format (
+											border.getFutureSize ( ) < border.getCurrentSize ( )
+													? EnumLanguage.BORDER_STATE_SHRINKING.getAsString ( )
+													: EnumLanguage.BORDER_STATE_GROWING.getAsString ( ) ,
+											TimeUtil.formatTime ( Duration.ofMilliseconds (
+													( border.getPoint ( ).getTime ( ).toMillis ( ) + 1000 )
+															- ( System.currentTimeMillis ( ) - border.getStateTime ( ) ) ) ) );
+								}
+								return EnumLanguage.BORDER_STATE_STOPPED.getAsString ( );
+							}
+							
+							default:
+							case STOPPED: {
+								return EnumLanguage.BORDER_STATE_STOPPED.getAsString ( );
+							}
 						}
 					}
 				}
+				
 				return null;
 			} else if ( params.toLowerCase ( ).startsWith ( "autostart" ) ) { // br_arena_autostart
 				params = extractIdentifier ( params );
